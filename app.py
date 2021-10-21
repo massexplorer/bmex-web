@@ -73,8 +73,8 @@ app.layout = html.Div(
                             id="banner-title",
                             children=[
                                 html.A(
-                                    "Support Vector Machine (SVM) Explorer",
-                                    href="https://github.com/plotly/dash-svm",
+                                    "Bayesian Mass Explorer",
+                                    href="https://github.com/kylegodbey/bmex-web",
                                     style={
                                         "text-decoration": "none",
                                         "color": "inherit",
@@ -87,7 +87,7 @@ app.layout = html.Div(
                             children=[
                                 html.Img(src=app.get_asset_url("dash-logo-new.png"))
                             ],
-                            href="https://plot.ly/products/dash/",
+                            href="https://bmex.dev",
                         ),
                     ],
                 )
