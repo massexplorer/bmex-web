@@ -73,21 +73,13 @@ app.layout = html.Div(
                             id="banner-title",
                             children=[
                                 html.A(
-                                    "Bayesian Mass Explorer",
-                                    href="https://github.com/kylegodbey/bmex-web",
-                                    style={
-                                        "text-decoration": "none",
-                                        "color": "inherit",
-                                    },
-                                )
-                            ],
-                        ),
-                        html.A(
                             id="banner-logo",
                             children=[
-                                html.Img(src=app.get_asset_url("BMEX-logo.png"))
+                                html.Img(src=app.get_asset_url("BMEX-logo-2.png"))
                             ],
                             href="https://bmex.dev",
+                        )
+                            ],
                         ),
                     ],
                 )

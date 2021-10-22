@@ -21,10 +21,10 @@
 /* Banner
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .banner {
-    background-color: #2f3445; /* Machine Learning Color is orange */
-    padding: 3rem 0;
+    background-color: #4986B6;/*#B64986;/*#8f4d86; /*#2f3445; /* Machine Learning Color is orange */
+    padding: 0rem 0;
     width: 100%;
-    margin-bottom: 5rem;
+    margin-bottom: 2rem;
 }
 
 .banner h2 {
@@ -44,8 +44,8 @@
 .banner Img {
     position: relative;
     float: right;
-    height: 5rem;
-    margin-top: 1.25rem
+    height: 14rem;
+    margin-top: 1.00rem
 }
 
 @media (max-width: 1300px) {
@@ -62,7 +62,7 @@
     }
 
     .banner Img {
-        height: 8rem;
+        height: 10rem;
         margin-bottom: 3rem;
     }
 }
@@ -73,7 +73,7 @@
     }
 
     .banner Img {
-        height: 4rem;
+        height: 10rem;
         margin-bottom: 2rem;
     }
 
@@ -89,7 +89,7 @@
     }
 
     .banner Img {
-        height: 3rem;
+        height: 8rem;
         margin-bottom: 1rem;
     }
 
