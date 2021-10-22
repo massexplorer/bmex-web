@@ -424,7 +424,7 @@ def update_svm_graph(
             children=dcc.Loading(
                 className="graph-wrapper",
                 children=dcc.Graph(id="graph-sklearn-svm", figure=prediction_figure),
-                style={"display": "none"},
+                style={"display": "none", "width": "100%"},
             ),
         ),
         html.Div(

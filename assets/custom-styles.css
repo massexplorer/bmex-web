@@ -402,6 +402,7 @@
 }
 
 @media (max-width: 650px) {
+/*
     #graphs-container {
         align-items: center;
         width: 100%;
@@ -425,7 +426,7 @@
     #graphs-container .graph-wrapper:nth-of-type(2) {
         height: 45rem;
         padding-left: 3rem;
-    }
+    }*/
 }
 
 @media (max-width: 400px) {
