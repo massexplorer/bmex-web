@@ -412,7 +412,7 @@ def update_svm_graph(
         threshold=threshold,
     )
 
-    roc_figure = figs.serve_roc_curve(model=clf, X_test=X_test, y_test=y_test)
+    #roc_figure = figs.serve_roc_curve(model=clf, X_test=X_test, y_test=y_test)
 
     confusion_figure = figs.serve_pie_confusion_matrix(
         model=clf, X_test=X_test, y_test=y_test, Z=Z, threshold=threshold
@@ -430,10 +430,10 @@ def update_svm_graph(
         html.Div(
             id="graphs-container",
             children=[
-                dcc.Loading(
-                    className="graph-wrapper",
-                    children=dcc.Graph(id="graph-line-roc-curve", figure=roc_figure),
-                ),
+                #dcc.Loading(
+                #    className="graph-wrapper",
+                #    children=dcc.Graph(id="graph-line-roc-curve", figure=roc_figure),
+                #),
                 dcc.Loading(
                     className="graph-wrapper",
                     children=dcc.Graph(
