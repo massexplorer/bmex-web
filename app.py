@@ -75,7 +75,7 @@ app.layout = html.Div(
                                 html.A(
                             id="banner-logo",
                             children=[
-                                html.Img(src=app.get_asset_url("BMEX-logo-2.png"))
+                                html.Img(src=app.get_asset_url("BMEX-logo-3.png"))
                             ],
                             href="https://bmex.dev",
                         )
