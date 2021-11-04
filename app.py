@@ -108,6 +108,17 @@ app.layout = html.Div(
                                                 {"label": "Binding Energy", "value": "BE"},
                                                 {"label": "One Neutron Separation Energy", "value": "OneNSE",},
                                                 {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                                                {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                                                {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                                                {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                                                {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                                                {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                                                {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                                                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                                                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                                                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                                                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                                                {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
                                             ],
                                             clearable=False,
                                             searchable=False,
@@ -195,6 +206,28 @@ def main_output(
         out_str = "One Neutron Separation Energy: "
     elif (quantity == "OnePSE"):
         out_str = "One Proton Separation Energy: "
+    elif (quantity == "TwoNSE"):
+        out_str = "Two Neutron Separation Energy: "
+    elif (quantity == "TwoPSE"):
+        out_str = "Two Proton Separation Energy: "
+    elif (quantity == "AlphaSE"):
+        out_str = "Alpha Separation Energy: "
+    elif (quantity == "TwoPSGap"):
+        out_str = "Two Proton Shell Gap: "
+    elif (quantity == "TwoNSGap"):
+        out_str = "Two Neutron Shell Gap: "
+    elif (quantity == "DoubleMDiff"):
+        out_str = "Double Mass Difference: "
+    elif (quantity == "N3PointOED"):
+        out_str = "Neutron 3-Point Odd-Even Binding Energy Difference: "
+    elif (quantity == "P3PointOED"):
+        out_str = "Proton 3-Point Odd-Even Binding Energy Difference: "
+    elif (quantity == "SNESplitting"):
+        out_str = "Single-Neutron Energy Splitting: "
+    elif (quantity == "SPESplitting"):
+        out_str = "Single-Proton Energy Splitting: "
+    elif (quantity == "WignerEC"):
+        out_str = "Wigner Energy Coefficient: "
     #result = func(N,Z)
     if(N==None or Z==None):
         return [
@@ -207,6 +240,7 @@ def main_output(
             ),
         ]
     elif(quantity == "All"):
+        result = getattr(bmex, quantity)(N,Z,dataset)
         return [
             html.Div(
                 #id="svm-graph-container",

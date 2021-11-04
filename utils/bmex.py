@@ -25,7 +25,7 @@ def OnePSE(N1,Z1,model):
     try:
         res1=0+BE(N1,Z1,model)
         try:
-            res2=0+BE(N1,Z1-1)
+            res2=0+BE(N1,Z1-1,model)
             return res1-res2
         except TypeError:
             return "Error: Nuclei with N="+str(N1)+" and Z="+str(Z1-1)+" not available from "+str(model)+ " data"   
