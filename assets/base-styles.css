@@ -233,7 +233,8 @@ select {
   box-shadow: none;
   box-sizing: border-box;
   font-family: inherit;
-  font-size: inherit; /*https://stackoverflow.com/questions/6080413/why-doesnt-input-inherit-the-font-from-body*/}
+  font-size: inherit; /*https://stackoverflow.com/questions/6080413/why-doesnt-input-inherit-the-font-from-body*/
+  color: #D1D1D1;}
 /* Removes awkward default styles on some inputs for iOS */
 input[type="email"],
 input[type="number"],
