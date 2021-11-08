@@ -27,38 +27,6 @@ app.title = "Bayesian Mass Explorer"
 
 server = app.server
 
-
-def generate_data(n_samples, dataset, noise):
-    if dataset == "moons":
-        return datasets.make_moons(n_samples=n_samples, noise=noise, random_state=0)
-
-    elif dataset == "circles":
-        return datasets.make_circles(
-            n_samples=n_samples, noise=noise, factor=0.5, random_state=1
-        )
-
-    elif dataset == "linear":
-        X, y = datasets.make_classification(
-            n_samples=n_samples,
-            n_features=2,
-            n_redundant=0,
-            n_informative=2,
-            random_state=2,
-            n_clusters_per_class=1,
-        )
-
-        rng = np.random.RandomState(2)
-        X += noise * rng.uniform(size=X.shape)
-        linearly_separable = (X, y)
-
-        return linearly_separable
-
-    else:
-        raise ValueError(
-            "Data type incorrectly specified. Please choose an existing dataset."
-        )
-
-
 app.layout = html.Div(
     children=[
         # .container class is fixed, .container.scalable is scalable
@@ -105,6 +73,7 @@ app.layout = html.Div(
                                             name="Select Quantity",
                                             id="dropdown-select-quantity",
                                             options=[
+                                                {"label": "All", "value": "All"},
                                                 {"label": "Binding Energy", "value": "BE"},
                                                 {"label": "One Neutron Separation Energy", "value": "OneNSE",},
                                                 {"label": "One Proton Separation Energy", "value": "OnePSE",},
@@ -122,7 +91,7 @@ app.layout = html.Div(
                                             ],
                                             clearable=False,
                                             searchable=False,
-                                            value="BE",
+                                            value="All",
                                         ),
                                         drc.NamedDropdown(
                                             name="Select Dataset",
@@ -200,6 +169,7 @@ def main_output(
     Z,
 ):
     t_start = time.time()
+    np.set_printoptions(precision=5)
     if (quantity == "BE"):
         out_str = "Binding Energy: "
     elif (quantity == "OneNSE"):
@@ -240,13 +210,48 @@ def main_output(
             ),
         ]
     elif(quantity == "All"):
-        result = getattr(bmex, quantity)(N,Z,dataset)
+        all_eval = []
+        for name, val in  bmex.__dict__.items():
+            if callable(val):
+                if (name == "BE"):
+                    out_str = "Binding Energy: "
+                elif (name == "OneNSE"):
+                    out_str = "One Neutron Separation Energy: "
+                elif (name == "OnePSE"):
+                    out_str = "One Proton Separation Energy: "
+                elif (name == "TwoNSE"):
+                    out_str = "Two Neutron Separation Energy: "
+                elif (name == "TwoPSE"):
+                    out_str = "Two Proton Separation Energy: "
+                elif (name == "AlphaSE"):
+                    out_str = "Alpha Separation Energy: "
+                elif (name == "TwoPSGap"):
+                    out_str = "Two Proton Shell Gap: "
+                elif (name == "TwoNSGap"):
+                    out_str = "Two Neutron Shell Gap: "
+                elif (name == "DoubleMDiff"):
+                    out_str = "Double Mass Difference: "
+                elif (name == "N3PointOED"):
+                    out_str = "Neutron 3-Point Odd-Even Binding Energy Difference: "
+                elif (name == "P3PointOED"):
+                    out_str = "Proton 3-Point Odd-Even Binding Energy Difference: "
+                elif (name == "SNESplitting"):
+                    out_str = "Single-Neutron Energy Splitting: "
+                elif (name == "SPESplitting"):
+                    out_str = "Single-Proton Energy Splitting: "
+                elif (name == "WignerEC"):
+                    out_str = "Wigner Energy Coefficient: "
+
+                result = val(N,Z,dataset)
+                if isinstance(result,str):
+                    all_eval.append(html.P(result))
+                else: 
+                    all_eval.append(html.P(dataset+" "+out_str+"{:.4f}".format(result)+" MeV"))
+
         return [
             html.Div(
                 #id="svm-graph-container",
-                children=[
-                    html.P("Output: "+str(result)+" MeV"),
-                ],
+                children=all_eval,
                 style={'font-size':'3rem'},
             ),
         ]
@@ -267,7 +272,7 @@ def main_output(
                 html.Div(
                     #id="svm-graph-container",
                     children=[
-                        html.P(dataset+" "+out_str+str(result)+" MeV"),
+                        html.P(dataset+" "+out_str+"{:.4f}".format(result)+" MeV"),
                     ],
                     style={'font-size':'3rem'},
                 ),

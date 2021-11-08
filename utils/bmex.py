@@ -5,15 +5,15 @@ df=pd.read_csv("utils/BEAllFull.csv")
 
 def BE(N1,Z1,model):
     try:
-        return df[(df["N"]==N1) & (df["Z"]==Z1) & (df["Model"]==model)]["BE"].to_numpy()[0]
+        return np.round(df[(df["N"]==N1) & (df["Z"]==Z1) & (df["Model"]==model)]["BE"].to_numpy(),6)[0]
     except IndexError:
         return "Error: Nuclei wtih N="+str(N1)+" and Z="+str(Z1)+" not available from "+str(model)+ " data"
 
 def OneNSE(N1,Z1,model):
     try:
-        res1=0+BE(N1,Z1,model)
+        res1=0.0+BE(N1,Z1,model)
         try:
-            res2=0+BE(N1-1,Z1,model)
+            res2=0.0+BE(N1-1,Z1,model)
             return res1-res2
         except TypeError:
             return "Error: Nuclei with N="+str(N1-1)+" and Z="+str(Z1)+" not available from "+str(model)+ " data"   
