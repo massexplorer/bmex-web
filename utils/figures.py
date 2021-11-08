@@ -96,23 +96,24 @@ def serve_prediction_plot(
     return figure
 
 
-def serve_roc_curve(model, X_test, y_test):
-    decision_test = model.decision_function(X_test)
-    fpr, tpr, threshold = metrics.roc_curve(y_test, decision_test)
+def isotope_chain(Z, NRange, model, func):
 
-    # AUC Score
-    auc_score = metrics.roc_auc_score(y_true=y_test, y_score=decision_test)
+    output = []
+
+    for i in NRange:
+        output.append(func(i, Z, model))
 
     trace0 = go.Scatter(
-        x=fpr, y=tpr, mode="lines", name="Test Data", marker={"color": "#13c6e9"}
+        x=NRange, y=output, mode="lines", name="Test Data", marker={"color": "#13c6e9"}
     )
 
     layout = go.Layout(
-        title=f"ROC Curve (AUC = {auc_score:.3f})",
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isotopic Chain",
         xaxis=dict(title="False Positive Rate", gridcolor="#2f3445"),
         yaxis=dict(title="True Positive Rate", gridcolor="#2f3445"),
-        legend=dict(x=0, y=1.05, orientation="h"),
-        margin=dict(l=100, r=10, t=25, b=40),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
         plot_bgcolor="#282b38",
         paper_bgcolor="#282b38",
         font={"color": "#a5b1cd"},

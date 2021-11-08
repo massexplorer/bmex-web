@@ -147,8 +147,9 @@
     padding: 2rem 0;
 }
 
-#last-card {
+#protons-card, #neutrons-card, #zmin-card, #zmax-card, #nmin-card, #nmax-card {
     border-bottom: none;
+    padding: 0rem 0;
 }
 
 .graph-title {

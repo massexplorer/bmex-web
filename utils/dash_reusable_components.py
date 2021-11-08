@@ -34,8 +34,9 @@ def NamedSlider(name, **kwargs):
     )
 
 def NamedInput(name, **kwargs):
+    box_style = {"padding": "20px 10px 25px 4px"}
     return html.Div(
-        style={"padding": "20px 10px 25px 4px"},
+        style=box_style,
         children=[
             html.P(f"{name}:"),
             html.Div(style={"margin-left": "6px"}, children=dcc.Input(**kwargs)),
