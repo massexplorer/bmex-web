@@ -1,6 +1,8 @@
 import colorlover as cl
 import plotly.graph_objs as go
+import plotly.express as px
 import numpy as np
+import utils.bmex as bmex
 from sklearn import metrics
 
 
@@ -96,7 +98,7 @@ def serve_prediction_plot(
     return figure
 
 
-def isotope_chain(Z, NRange, model, func):
+def isotope_chain_go(Z, NRange, model, axis_label, func):
 
     output = []
 
@@ -110,8 +112,8 @@ def isotope_chain(Z, NRange, model, func):
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
         title=f"Isotopic Chain",
-        xaxis=dict(title="False Positive Rate", gridcolor="#2f3445"),
-        yaxis=dict(title="True Positive Rate", gridcolor="#2f3445"),
+        xaxis=dict(title="Neutrons", gridcolor="#2f3445"),
+        yaxis=dict(title=axis_label, gridcolor="#2f3445"),
         #legend=dict(x=0, y=1.05, orientation="h"),
         #margin=dict(l=100, r=10, t=25, b=40),
         plot_bgcolor="#282b38",
@@ -122,6 +124,107 @@ def isotope_chain(Z, NRange, model, func):
     data = [trace0]
     figure = go.Figure(data=data, layout=layout)
 
+    return figure
+
+def isotope_chain(Z, NRange, model, axis_label, func):
+
+    output = []
+
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isotopic Chain",
+        xaxis=dict(title="Neutrons", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title=axis_label, gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+    )
+
+    N = bmex.df[(bmex.df["Z"]==Z) & (bmex.df["Model"]==model) & (bmex.df["N"] >= NRange[0]) & (bmex.df["N"] <= NRange[1])]["N"]
+    for i in N:
+        output.append(func(i, Z, model))
+
+    trace0 = go.Scatter(
+        x=N, y=output, mode="lines+markers", name="Test Data", marker=\
+            {
+                "color": "#13c6e9",
+                #"size": 20,
+            }
+    )
+
+    #figure = px.line(x=Z, y=output, markers=True)
+    data = [trace0]
+    figure = go.Figure(data=data, layout=layout)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+    return figure
+
+
+def isotone_chain_go(N, ZRange, model, axis_label, func):
+
+    output = []
+
+    for i in ZRange:
+        output.append(func(N, i, model))
+
+    trace0 = go.Scatter(
+        x=ZRange, y=output, mode="lines", name="Test Data", marker={"color": "#13c6e9"}
+    )
+
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isotonic Chain",
+        xaxis=dict(title="Protons", gridcolor="#2f3445"),
+        yaxis=dict(title=axis_label, gridcolor="#2f3445"),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd"},
+    )
+
+    data = [trace0]
+    figure = go.Figure(data=data, layout=layout)
+
+    return figure
+
+def isotone_chain(N, ZRange, model, axis_label, func):
+
+    output = []
+
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isotonic Chain",
+        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title=axis_label, gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+    )
+
+    Z = bmex.df[(bmex.df["N"]==N) & (bmex.df["Model"]==model) & (bmex.df["Z"] >= ZRange[0]) & (bmex.df["Z"] <= ZRange[1])]["Z"]
+    for i in Z:
+        output.append(func(N, i, model))
+
+    trace0 = go.Scatter(
+        x=Z, y=output, mode="lines+markers", name="Test Data", marker=\
+            {
+                "color": "#13c6e9",
+                #"size": 20,
+            }
+    )
+
+    #figure = px.line(x=Z, y=output, markers=True)
+    data = [trace0]
+    figure = go.Figure(data=data, layout=layout)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
     return figure
 
 

@@ -389,7 +389,7 @@ def main_output(
                 html.Div(
                     #id="svm-graph-container",
                     children=[
-                        html.P("Welcome to BMEX! Please input a value for N and Z."),
+                        html.P("Welcome to BMEX! Please input your requested nuclei on the left."),
                     ],
                     style={'font-size':'3rem'},
                 ),
@@ -403,7 +403,7 @@ def main_output(
                     if isinstance(result,str):
                         all_eval.append(html.P(result))
                     else: 
-                        all_eval.append(html.P(dataset+" "+out_str+"{:.4f}".format(result)+" MeV"))
+                        all_eval.append(html.P(dataset+" "+out_str+": {:.4f}".format(result)+" MeV"))
 
             return [
                 html.Div(
@@ -430,26 +430,110 @@ def main_output(
                     html.Div(
                         #id="svm-graph-container",
                         children=[
-                            html.P(dataset+" "+out_str+"{:.4f}".format(result)+" MeV"),
+                            html.P(dataset+" "+out_str+": {:.4f}".format(result)+" MeV"),
                         ],
                         style={'font-size':'3rem'},
                     ),
                 ]
     elif chain=="isotopic":
-        #add figure here
+        if(NRange[0]==None or NRange[1]==None):
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=[
+                        html.P("Welcome to BMEX! Please input your requested nuclei on the left."),
+                    ],
+                    style={'font-size':'3rem'},
+                ),
+            ]
         func = getattr(bmex, quantity)
-        isotope_chain = figs.isotope_chain(Z, NRange, dataset, func)
-        return [
-            html.Div(
-                id="graph-container",
-                children=dcc.Loading(
-                    className="graph-wrapper",
-                    children=dcc.Graph(id="graph-chains", figure=isotope_chain),
+        out_str = bmex.OutputString(quantity)
+        #& (bmex.df["Z"]==Z1)
+        nmin = bmex.df[(bmex.df["Z"]==Z) & (bmex.df["Model"]==dataset)]['N'].min()
+        nmax = bmex.df[(bmex.df["Z"]==Z) & (bmex.df["Model"]==dataset)]['N'].max()
+        if NRange[0] < nmin:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for N Min, "+str(NRange[0])+\
+                            ", is smaller than the minimum N from the data, "+str(nmin)),
+                    ],
+                    style={'font-size':'3rem'},
                 )
-            )
-        ]
+            ]
+        if NRange[1] > nmax:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for N Max, "+str(NRange[1])+\
+                            ", is smaller than the maximum N from the data, "+str(nmax)),
+                    ],
+                    style={'font-size':'3rem'},
+                )
+            ]
+        if (NRange[0] >= nmin) and (NRange[1] <= nmax):
+            isotope_chain = figs.isotope_chain(Z, NRange, dataset, out_str, func)
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=dcc.Loading(
+                        className="graph-wrapper",
+                        children=dcc.Graph(id="graph-chains", figure=isotope_chain),
+                    )
+                )
+            ]
     elif chain=="isotonic":
-        print("Hello")
+        if(ZRange[0]==None or ZRange[1]==None):
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=[
+                        html.P("Welcome to BMEX! Please input your requested nuclei on the left."),
+                    ],
+                    style={'font-size':'3rem'},
+                ),
+            ]
+        func = getattr(bmex, quantity)
+        out_str = bmex.OutputString(quantity)
+        #& (bmex.df["Z"]==Z1)
+        zmin = bmex.df[(bmex.df["N"]==N) & (bmex.df["Model"]==dataset)]["Z"].min()
+        zmax = bmex.df[(bmex.df["N"]==N) & (bmex.df["Model"]==dataset)]["Z"].max()
+        if ZRange[0] < zmin:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for Z Min, "+str(ZRange[0])+\
+                            ", is smaller than the minimum Z from the data, "+str(zmin)),
+                    ],
+                    style={'font-size':'3rem'},
+                )
+            ]
+        if ZRange[1] > zmax:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for Z Max, "+str(ZRange[1])+\
+                            ", is smaller than the maximum Z from the data, "+str(zmax)),
+                    ],
+                    style={'font-size':'3rem'},
+                )
+            ]
+        if (ZRange[0] >= zmin) and (ZRange[1] <= zmax):
+            isotone_chain = figs.isotone_chain(N, ZRange, dataset, out_str, func)
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=dcc.Loading(
+                        className="graph-wrapper",
+                        children=dcc.Graph(id="graph-chains", figure=isotone_chain),
+                    )
+                )
+            ]
+
 # Running the server
 if __name__ == "__main__":
     app.run_server(debug=True)
