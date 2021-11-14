@@ -194,3 +194,76 @@ def OutputString(quantity):
     elif (quantity == "WignerEC"):
         out_str = "Wigner Energy Coefficient"
     return out_str
+
+def GP(eta,rhoN,rhoZ,ZPlot):
+    def Ker(X1,X2):
+        return eta**2*np.exp(-1.0/(2*rhoN**2)*(X1[0]-X2[0])**2-1.0/(2*rhoZ**2)*(X1[1]-X2[1])**2)
+    Data=np.loadtxt("utils/TwoNSEDeltaFRDM2003.txt")
+
+    DataExtrapolar=np.loadtxt("utils/FRDMTwoNSE.txt")
+
+    DataExp=np.loadtxt("utils/TwoNSE2016Full.txt")
+
+    KXX=np.zeros((len(Data),len(Data)))
+
+    for i in range(len(Data)):
+        for j in range(i+1):
+            #print([i,j])
+            KXX[i][j]=Ker(Data[i],Data[j])
+            KXX[j][i]=KXX[i][j]
+
+    KXX1= np.linalg.inv(KXX)
+
+    def GP_l(x,KXXInv1,Data1):
+        KxX=np.zeros(len(Data1))
+        for i in range(len(Data1)):
+            KxX[i]=Ker(Data1[i],x)
+            
+        YmX=np.zeros(len(Data1))
+        for i in range(len(Data1)):
+            YmX[i]=Data1[i][2]
+
+        return np.dot(KxX,np.dot(KXXInv1,YmX))
+
+
+
+    def GPBand(x,KXXInv1,Data1):
+        KxX=np.zeros(len(Data1))
+        for i in range(len(Data1)):
+            KxX[i]=Ker(Data1[i],x)
+            
+        
+
+        return np.sqrt(abs(Ker(x,x)-np.dot(KxX,np.dot(KXXInv1,KxX))))
+
+    results=[]
+
+    for i in range(len(DataExtrapolar)):
+        results.append([DataExtrapolar[i][0],DataExtrapolar[i][1],DataExtrapolar[i][2],DataExtrapolar[i][2]+GP_l(DataExtrapolar[i],KXX1,Data),GPBand(DataExtrapolar[i],KXX1,Data)])
+
+    plotExp=[]
+    plotFRDM=[]
+    plotFRDMGP=[]
+    plotFRDMGPBandplus=[]
+    plotFRDMGPBandminus=[]
+
+    for i in range(len(DataExp)):
+        if DataExp[i][1]==ZPlot:
+            plotExp.append([DataExp[i][0],DataExp[i][2]])
+    plotExp=np.array(plotExp)        
+            
+    for i in range(len(DataExtrapolar)):
+        if DataExtrapolar[i][1]==ZPlot:
+            plotFRDM.append([DataExtrapolar[i][0],DataExtrapolar[i][2]])
+    plotFRDM=np.array(plotFRDM)
+    for i in range(len(results)):
+        if results[i][1]==ZPlot:
+            plotFRDMGP.append([results[i][0],results[i][3]])
+            plotFRDMGPBandplus.append([results[i][0],results[i][3]+results[i][4]])
+            plotFRDMGPBandminus.append([results[i][0],results[i][3]-results[i][4]])
+            
+    plotFRDMGP=np.array(plotFRDMGP)        
+    plotFRDMGPBandplus=np.array(plotFRDMGPBandplus)
+    plotFRDMGPBandminus=np.array(plotFRDMGPBandminus)
+
+    return plotFRDMGP,plotFRDMGPBandplus,plotFRDMGPBandminus
