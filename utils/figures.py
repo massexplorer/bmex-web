@@ -162,6 +162,57 @@ def isotope_chain(Z, NRange, model, axis_label, func):
     figure.update_layout(title_font_size=24)
     return figure
 
+def isotope_chain_gp(Z, NRange, model, axis_label, func):
+
+    output = []
+
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isotopic Chain",
+        xaxis=dict(title="Neutrons", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title=axis_label, gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+    )
+
+    N = bmex.df[(bmex.df["Z"]==Z) & (bmex.df["Model"]=="Exp") & (bmex.df["N"] >= NRange[0]) & (bmex.df["N"] <= NRange[1])]["N"]
+    plotFRDMGP,plotFRDMGPBandplus,plotFRDMGPBandminus = func(model[0],model[1],model[2],Z)
+
+    trace0 = go.Scatter(
+        x=N, y=plotFRDMGP, mode="lines+markers", name="Test Data", marker=\
+            {
+                "color": "#13c6e9",
+                #"size": 20,
+            }
+    )
+
+    #figure = px.line(x=Z, y=output, markers=True)
+    data = [trace0]
+    figure = go.Figure([
+        go.Scatter(
+            x=plotFRDMGP.T[0],
+            y=plotFRDMGP.T[1],
+            line=dict(color='rgb(100,100,80)'),
+            mode='lines'
+        ),
+        go.Scatter(
+            x=plotFRDMGP.T[0]+plotFRDMGP.T[0][::-1], # x, then x reversed
+            y=plotFRDMGPBandplus.T[0]+plotFRDMGPBandminus.T[1][::-1], # upper, then lower reversed
+            fill='toself',
+            fillcolor='rgba(255,0,0)',
+            line=dict(color='rgba(255,255,255,0)'),
+            hoverinfo="skip",
+            #showlegend=False
+        )
+    ], layout=layout)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+    return figure
+
 
 def isotone_chain_go(N, ZRange, model, axis_label, func):
 

@@ -1,19 +1,17 @@
 import time
-import importlib
 
 import dash
 from dash import dcc
 from dash import html
 import numpy as np
 from dash.dependencies import Input, Output, State
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn import datasets
-from sklearn.svm import SVC
+import json
 
 import utils.dash_reusable_components as drc
 import utils.figures as figs
 import utils.bmex as bmex
+from utils.bmex_views import *
+import utils.gpe as gpe
 
 
 app = dash.Dash(
@@ -23,12 +21,15 @@ app = dash.Dash(
     ],
 )
 
+app.config.suppress_callback_exceptions=True
+
 app.title = "Bayesian Mass Explorer"
 
 server = app.server
 
 app.layout = html.Div(
     children=[
+        dcc.Location(id='url', refresh=False),
         # .container class is fixed, .container.scalable is scalable
         html.Div(
             className="banner",
@@ -51,194 +52,30 @@ app.layout = html.Div(
                             ],
                         ),
                     ],
-                )
+                ),
             ],
         ),
-        html.Div(
-            id="body",
-            className="container scalable",
-            children=[
-                html.Div(
-                    id="app-container",
-                    # className="row",
-                    children=[
-                        html.Div(
-                            # className="three columns",
-                            id="left-column",
-                            children=[
-                                drc.Card(
-                                    id="first-card",
-                                    children=[
-                                        drc.NamedDropdown(
-                                            name="Compute For",
-                                            id="dropdown-iso-chain",
-                                            options=[
-                                                {"label": "Single Nucleus", "value": "single"},
-                                                {"label": "Isotopic Chain", "value": "isotopic"},
-                                                {"label": "Isotonic Chain", "value": "isotonic"},
-                                            ],
-                                            clearable=False,
-                                            searchable=False,
-                                            value="single",
-                                        ),
-                                    ]
-                                ),
-                                drc.Card(
-                                    id="quantity-single",
-                                    children=[
-                                        drc.NamedDropdown(
-                                            name="Select Quantity",
-                                            id="dropdown-select-quantity",
-                                            options=[
-                                                {"label": "All", "value": "All"},
-                                                {"label": "Binding Energy", "value": "BE"},
-                                                {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                                                {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                                                {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                                                {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                                                {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                                                {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                                                {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                                                {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                                                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                                                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                                                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                                                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                                                {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-                                            ],
-                                            clearable=False,
-                                            searchable=False,
-                                            value="All",
-                                        ),
-                                    ]
-                                ),
-                                drc.Card(
-                                    id="data-card",
-                                    children=[
-                                        drc.NamedDropdown(
-                                            name="Select Dataset",
-                                            id="dropdown-select-dataset",
-                                            options=[
-                                                {"label": "Experiment", "value": "Exp"},
-                                                {"label": "SkMs", "value": "SkMs"},
-                                            ],
-                                            clearable=False,
-                                            searchable=False,
-                                            value="Exp",
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="protons-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Protons",
-                                            id="protons",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Proton #",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="neutrons-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Neutrons",
-                                            id="neutrons",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Neutron #",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="zmin-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Minimum Z",
-                                            id="zmin",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Z Min",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="zmax-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Maximum Z",
-                                            id="zmax",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Z Max",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="nmin-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Minimum N",
-                                            id="nmin",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="N Min",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="nmax-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Maximum N",
-                                            id="nmax",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="N Max",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
-                            ],
-                        ),
-                        html.Div(
-                            id="div-graphs",
-                            children=[
-                                dcc.Graph(
-                                    id="graph-sklearn-svm",
-                                    figure=dict(
-                                        layout=dict(
-                                            plot_bgcolor="#282b38", paper_bgcolor="#282b38"
-                                        )
-                                    ),
-                                ),
-                            ],
-                        ),
-                    ],
-                )
-            ],
-        ),
+        html.Div(id='page-content'),
+        dcc.Store(id='intermediate-value'),
     ]
 )
+
+@app.callback(
+    Output('page-content','children'),
+    [Input('url','pathname')]
+    )
+def display_page(pathname):
+    if(pathname == "/masses"):
+        out = masses_view()
+    elif(pathname == "/gpe"):
+        out = gpe_view()
+    else:
+        out = html.Div(
+            id="body",
+            className="container scalable",
+            children=[html.P("How did you get here? Click the banner to make it back to safety!")])
+    return out
+
 
 
 @app.callback(
@@ -254,47 +91,17 @@ app.layout = html.Div(
     ],
     [
         Input(component_id='dropdown-iso-chain', component_property='value'),
+        Input('url','pathname'),
     ]
 )
-def quantity_options(is_chain):
+def quantity_options(is_chain,url):
     show = {'display': 'block'}
     hide = {'display': 'none'}
-    if is_chain == 'single':
-        return [[
-            # Options for Dropdown
-            {"label": "All", "value": "All"},
-            {"label": "Binding Energy", "value": "BE"},
-            {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-            {"label": "One Proton Separation Energy", "value": "OnePSE",},
-            {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-            {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-            {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-            {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-            {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-            {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-            {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-            {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-            {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-            {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-            {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-        ],
-        # Default Value
-        "All",
-        # Proton Box Visibility
-        show,
-        # Neutron Box Visibility
-        show,
-        # Zmin Visibility
-        hide,
-        # Zmax Visibility
-        hide,
-        # Nmin Visibility
-        hide,
-        # Nmax Visibility
-        hide,
-        ]
-    elif is_chain == 'isotopic':
-        return [[
+    if url == "/masses":
+        if is_chain == 'single':
+            return [[
+                # Options for Dropdown
+                {"label": "All", "value": "All"},
                 {"label": "Binding Energy", "value": "BE"},
                 {"label": "One Neutron Separation Energy", "value": "OneNSE",},
                 {"label": "One Proton Separation Energy", "value": "OnePSE",},
@@ -309,54 +116,186 @@ def quantity_options(is_chain):
                 {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
                 {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
                 {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-        ],
-        # Default Value
-        "BE",
-        # Proton Box Visibility
-        show,
-        # Neutron Box Visibility
-        hide,
-        # Zmin Visibility
-        hide,
-        # Zmax Visibility
-        hide,
-        # Nmin Visibility
-        show,
-        # Nmax Visibility
-        show,
-        ]
-    elif is_chain == 'isotonic':
-        return [[
-                {"label": "Binding Energy", "value": "BE"},
-                {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                {"label": "One Proton Separation Energy", "value": "OnePSE",},
+            ],
+            # Default Value
+            "All",
+            # Proton Box Visibility
+            show,
+            # Neutron Box Visibility
+            show,
+            # Zmin Visibility
+            hide,
+            # Zmax Visibility
+            hide,
+            # Nmin Visibility
+            hide,
+            # Nmax Visibility
+            hide,
+            ]
+        elif is_chain == 'isotopic':
+            return [[
+                    {"label": "Binding Energy", "value": "BE"},
+                    {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                    {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                    {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                    {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                    {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                    {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                    {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                    {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                    {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                    {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                    {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                    {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                    {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+            ],
+            # Default Value
+            "BE",
+            # Proton Box Visibility
+            show,
+            # Neutron Box Visibility
+            hide,
+            # Zmin Visibility
+            hide,
+            # Zmax Visibility
+            hide,
+            # Nmin Visibility
+            show,
+            # Nmax Visibility
+            show,
+            ]
+        elif is_chain == 'isotonic':
+            return [[
+                    {"label": "Binding Energy", "value": "BE"},
+                    {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                    {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                    {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                    {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                    {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                    {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                    {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                    {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                    {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                    {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                    {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                    {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                    {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+            ],
+            # Default Value
+            "BE",
+            # Proton Box Visibility
+            hide,
+            # Neutron Box Visibility
+            show,
+            # Zmin Visibility
+            show,
+            # Zmax Visibility
+            show,
+            # Nmin Visibility
+            hide,
+            # Nmax Visibility
+            hide,
+            ]
+    elif url == "/gpe":
+        if is_chain == 'single':
+            return [[
+                # Options for Dropdown
+                #{"label": "All", "value": "All"},
+                #{"label": "Binding Energy", "value": "BE"},
+                #{"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                #{"label": "One Proton Separation Energy", "value": "OnePSE",},
                 {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-        ],
-        # Default Value
-        "BE",
-        # Proton Box Visibility
-        hide,
-        # Neutron Box Visibility
-        show,
-        # Zmin Visibility
-        show,
-        # Zmax Visibility
-        show,
-        # Nmin Visibility
-        hide,
-        # Nmax Visibility
-        hide,
-        ]
+                # {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                # {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                # {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                # {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                # {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                # {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                # {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                # {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                # {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                # {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+            ],
+            # Default Value
+            "TwoNSE",
+            # Proton Box Visibility
+            show,
+            # Neutron Box Visibility
+            show,
+            # Zmin Visibility
+            hide,
+            # Zmax Visibility
+            hide,
+            # Nmin Visibility
+            hide,
+            # Nmax Visibility
+            hide,
+            ]
+        elif is_chain == 'isotopic':
+            return [[
+                    # {"label": "Binding Energy", "value": "BE"},
+                    # {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                    # {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                    {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                    # {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                    # {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                    # {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                    # {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                    # {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                    # {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                    # {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                    # {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                    # {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                    # {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+            ],
+            # Default Value
+            "TwoNSE",
+            # Proton Box Visibility
+            show,
+            # Neutron Box Visibility
+            hide,
+            # Zmin Visibility
+            hide,
+            # Zmax Visibility
+            hide,
+            # Nmin Visibility
+            hide,
+            # Nmax Visibility
+            hide,
+            ]
+        elif is_chain == 'isotonic':
+            return [[
+                    # {"label": "Binding Energy", "value": "BE"},
+                    # {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                    # {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                    {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                    # {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                    # {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                    # {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                    # {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                    # {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                    # {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                    # {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                    # {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                    # {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                    # {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+            ],
+            # Default Value
+            "TwoNSE",
+            # Proton Box Visibility
+            hide,
+            # Neutron Box Visibility
+            show,
+            # Zmin Visibility
+            show,
+            # Zmax Visibility
+            show,
+            # Nmin Visibility
+            hide,
+            # Nmax Visibility
+            hide,
+            ]
+
 
 
 
@@ -397,7 +336,7 @@ def main_output(
         elif(quantity == "All"):
             all_eval = []
             for name, val in  bmex.__dict__.items():
-                if (callable(val) and name != "OutputString"):
+                if (callable(val) and name != "OutputString" and name != "GP"):
                     out_str = bmex.OutputString(name)
                     result = val(N,Z,dataset)
                     if isinstance(result,str):
@@ -533,6 +472,254 @@ def main_output(
                     )
                 )
             ]
+
+@app.callback(
+    Output('intermediate-value', 'data'),
+    Output('div-graphs-loading', 'children'),
+    Input('submit-gpe', 'n_clicks'),
+    [
+        State("eta","value"),
+        State("rhon","value"),
+        State("rhoz","value"),
+        State('div-graphs-loading','children'),
+    ],
+    prevent_initial_call=True
+)
+def update_GP_json(n_clicks, eta, rhon, rhoz, old_out):
+    t_start = time.time()
+    model = [eta, rhon, rhoz]
+    if(model == gpe.default_model):
+        return json.dumps(gpe.gp_output.tolist()), [old_out[0]]
+    gp_out = gpe.update_GP(model)
+    gp_json = json.dumps(gp_out.tolist())
+    t_stop = time.time()
+    train_out = [html.P("Trained! Took {:.4f} seconds!".format(t_stop-t_start))]
+    return gp_json, [old_out[0]]+train_out
+
+# @app.callback(
+#     Output('div-graphs-loading', 'children'),
+#     Input('submit-gpe', 'n_clicks'),
+#     [
+#         State("eta","value"),
+#         State("rhon","value"),
+#         State("rhoz","value"),
+#         State('div-graphs-loading','children'),
+#     ],
+#     prevent_initial_call=True
+# )
+# def update_GP(n_clicks, eta, rhon, rhoz, old_out):
+#     t_start = time.time()
+
+#     model = [eta, rhon, rhoz]
+#     gpe.gp_output = gpe.update_GP(model)
+#     #gp_json = json.dumps(gp_out.tolist())
+#     t_stop = time.time()
+#     train_out = [html.P("Trained! Took {:.4f} seconds!".format(t_stop-t_start))]
+#     return [old_out[0]] + train_out
+
+
+@app.callback(
+    Output("div-graphs-gpe", "children"),
+    [
+        Input("dropdown-select-quantity", "value"),
+        Input("dropdown-select-dataset", "value"),
+        Input("neutrons", "value"),
+        Input("protons", "value"),
+        Input("dropdown-iso-chain","value"),
+        [Input("nmin","value"),Input("nmax","value")],
+        [Input("zmin","value"),Input("zmax","value")],
+        Input("intermediate-value","data"),
+    ],
+)
+def main_output_gpe(
+    quantity,
+    dataset,
+    N,
+    Z,
+    chain,
+    NRange,
+    ZRange,
+    gp_json,
+):
+    t_start = time.time()
+    gp_out = np.array(json.loads(gp_json))
+    np.set_printoptions(precision=5)
+    if(chain=='single'):
+        if(N==None or Z==None):
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=[
+                        html.P("Welcome to the BMEX Gaussian Process Playground! Please input your requested nuclei on the left."),
+                    ],
+                    style={'font-size':'3rem'},
+                ),
+            ]
+        elif(quantity == "All"):
+            all_eval = []
+            for name, val in  bmex.__dict__.items():
+                if (callable(val) and name != "OutputString" and name != "GP"):
+                    out_str = bmex.OutputString(name)
+                    result = val(N,Z,dataset)
+                    if isinstance(result,str):
+                        all_eval.append(html.P(result))
+                    else: 
+                        all_eval.append(html.P(dataset+" "+out_str+": {:.4f}".format(result)+" MeV"))
+
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=all_eval,
+                    style={'font-size':'3rem'},
+                ),
+            ]
+        else:
+            result = gpe.gp_single(N,Z,gp_out)
+            if isinstance(result, str):
+                return [
+                    html.Div(
+                        #id="svm-graph-container",
+                        children=[
+                            html.P(result),
+                        ],
+                        style={'font-size':'3rem'},
+                    ),
+                ]
+            else:
+                out_str = bmex.OutputString(quantity)
+                return [
+                    html.Div(
+                        #id="svm-graph-container",
+                        children=[
+                            html.P(dataset+" "+out_str+": {:.4f}".format(result[0])+"±"+"{:.4f}".format(result[1])+" MeV"),
+                        ],
+                        style={'font-size':'3rem'},
+                    ),
+                ]
+    elif chain=="isotopic":
+        '''
+        if(NRange[0]==None or NRange[1]==None and False):
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=[
+                        html.P("Welcome to the BMEX Gaussian Process Playground! Please input your requested nuclei on the left."),
+                    ],
+                    style={'font-size':'3rem'},
+                ),
+            ]
+        '''
+        if(Z==None):
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=[
+                        html.P("Welcome to the BMEX Gaussian Process Playground! Please input your requested nuclei on the left."),
+                    ],
+                    style={'font-size':'3rem'},
+                ),
+            ]
+        #& (bmex.df["Z"]==Z1)
+        out_str = "Two Neutron Separation Energy"
+        #model = [0.9, 1.529, 0.2533]
+        #nmin = bmex.df[(bmex.df["Z"]==Z) & (bmex.df["Model"]==dataset)]['N'].min()
+        #nmax = bmex.df[(bmex.df["Z"]==Z) & (bmex.df["Model"]==dataset)]['N'].max()
+        '''
+        if NRange[0] < nmin:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for N Min, "+str(NRange[0])+\
+                            ", is smaller than the minimum N from the data, "+str(nmin)),
+                    ],
+                    style={'font-size':'3rem'},
+                )
+            ]
+        if NRange[1] > nmax:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for N Max, "+str(NRange[1])+\
+                            ", is smaller than the maximum N from the data, "+str(nmax)),
+                    ],
+                    style={'font-size':'3rem'},
+                )
+            ]
+        '''
+        #if (NRange[0] >= nmin) and (NRange[1] <= nmax):
+        isotope_chain = gpe.gp_figure_isotopic(Z,out_str,gp_out)
+        if isinstance(isotope_chain, str):
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=[
+                        html.P(isotope_chain),
+                    ],
+                    style={'font-size':'3rem'},
+                ),
+            ]
+        else:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=dcc.Loading(
+                        className="graph-wrapper",
+                        children=dcc.Graph(id="graph-chains", figure=isotope_chain),
+                    )
+                )
+            ]
+    elif chain=="isotonic":
+        if(ZRange[0]==None or ZRange[1]==None):
+            return [
+                html.Div(
+                    #id="svm-graph-container",
+                    children=[
+                        html.P("Welcome to BMEX! Please input your requested nuclei on the left."),
+                    ],
+                    style={'font-size':'3rem'},
+                ),
+            ]
+        func = getattr(bmex, quantity)
+        out_str = bmex.OutputString(quantity)
+        #& (bmex.df["Z"]==Z1)
+        zmin = bmex.df[(bmex.df["N"]==N) & (bmex.df["Model"]==dataset)]["Z"].min()
+        zmax = bmex.df[(bmex.df["N"]==N) & (bmex.df["Model"]==dataset)]["Z"].max()
+        if ZRange[0] < zmin:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for Z Min, "+str(ZRange[0])+\
+                            ", is smaller than the minimum Z from the data, "+str(zmin)),
+                    ],
+                    style={'font-size':'3rem'},
+                )
+            ]
+        if ZRange[1] > zmax:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=[
+                        html.P("Input value for Z Max, "+str(ZRange[1])+\
+                            ", is smaller than the maximum Z from the data, "+str(zmax)),
+                    ],
+                    style={'font-size':'3rem'},
+                )
+            ]
+        if (ZRange[0] >= zmin) and (ZRange[1] <= zmax):
+            isotone_chain = figs.isotone_chain(N, ZRange, dataset, out_str, func)
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=dcc.Loading(
+                        className="graph-wrapper",
+                        children=dcc.Graph(id="graph-chains", figure=isotone_chain),
+                    )
+                )
+            ]
+
 
 # Running the server
 if __name__ == "__main__":
