@@ -315,6 +315,30 @@
         align-items: stretch;
     }
 
+    #div-graphs-gpe {
+        flex: 4 80%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    #div-graphs-loading {
+        flex: 4 80%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    #div-right {
+        flex: 4 80%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: stretch;
+    }
+
     #graph-sklearn-svm {
         height: 100%;
     }
@@ -333,10 +357,24 @@
     #div-graphs {
         height: 83rem;
     }
+    #div-graphs-gpe {
+        height: 83rem;
+    }
+    #div-graphs-loading {
+        height: 83rem;
+    }
 }
 
 @media (max-width: 1300px) {
     #div-graphs {
+        height: 70rem;
+    }
+
+    #div-graphs-gpe {
+        height: 70rem;
+    }
+
+    #div-graphs-loading {
         height: 70rem;
     }
 
@@ -351,6 +389,22 @@
 
 @media (max-width: 950px) {
     #div-graphs {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    #div-graphs-gpe {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    #div-graphs-loading {
         width: 100%;
         display: flex;
         flex-direction: column;
