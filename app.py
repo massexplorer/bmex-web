@@ -6,12 +6,21 @@ from dash import html
 import numpy as np
 from dash.dependencies import Input, Output, State
 import json
+import dash_bootstrap_components as dbc
+
 
 import utils.dash_reusable_components as drc
 import utils.figures as figs
 import utils.bmex as bmex
 from utils.bmex_views import *
 import utils.gpe as gpe
+
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
+import h5py
+import base64, io
+import re
 
 
 app = dash.Dash(
@@ -69,6 +78,8 @@ def display_page(pathname):
         out = masses_view()
     elif(pathname == "/gpe"):
         out = gpe_view()
+    elif(pathname == "/pesnet"):
+        out = pesnet_view()
     else:
         out = html.Div(
             id="body",
@@ -719,6 +730,45 @@ def main_output_gpe(
                     )
                 )
             ]
+
+@app.callback(
+    Output("div-graphs-pesnet", "children"),
+    [
+        Input("dropdown-select-quantity", "value"),
+        Input("dropdown-select-dataset", "value"),
+        Input("neutrons", "value"),
+        Input("protons", "value"),
+    ],
+)
+def main_output_pesnet(
+    quantity,
+    dataset,
+    N,
+    Z,
+):
+    t_start = time.time()
+    np.set_printoptions(precision=5)
+    if(N==None or Z==None):
+        return [
+            html.Div(
+                #id="svm-graph-container",
+                children=[
+                    html.P("Welcome to the BMEX Potential Energy Surface Generator! Please input your requested nuclei on the left."),
+                ],
+                style={'font-size':'3rem'},
+            ),
+        ] 
+    else:
+        pesnet_result = figs.pesnet_surface(N, Z)
+        return [
+            html.Div(
+                id="graph-container",
+                children=dcc.Loading(
+                    className="graph-wrapper",
+                    children=dcc.Graph(id="graph-chains", figure=pesnet_result),
+                )
+            )
+        ]
 
 
 # Running the server

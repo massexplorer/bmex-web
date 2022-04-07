@@ -1,5 +1,6 @@
 from dash import dcc
 from dash import html
+import dash_bootstrap_components as dbc
 
 import utils.dash_reusable_components as drc
 
@@ -422,6 +423,156 @@ def gpe_view():
                         id="loading-1",
                         children =html.Div(id="div-graphs-loading",style={'width':'100%'},children=[html.Div(
                         id="div-graphs-gpe",
+                        children=[
+                            dcc.Graph(
+                                id="graph-sklearn-svm",
+                                figure=dict(
+                                    layout=dict(
+                                        plot_bgcolor="#282b38", paper_bgcolor="#282b38"
+                                    )
+                                ),
+                            ),
+                        ],
+                    ),]))),
+                ],
+            )
+        ],
+    )
+
+def pesnet_view():
+    return html.Div(
+        id="body",
+        className="container scalable",
+        children=[
+            html.Div(
+                id="app-container",
+                # className="row",
+                children=[
+                    html.Div(
+                        # className="three columns",
+                        id="left-column",
+                        children=[
+                            drc.Card(
+                                id="first-card",
+                                children=[
+                                    drc.NamedDropdown(
+                                        name="Compute For",
+                                        id="dropdown-iso-chain",
+                                        options=[
+                                            {"label": "Single Nucleus", "value": "single"},
+                                            #{"label": "Isotonic Chain", "value": "isotonic"},
+                                        ],
+                                        clearable=False,
+                                        searchable=False,
+                                        value="single",
+                                    ),
+                                ]
+                            ),
+                            drc.Card(
+                                id="quantity-single",
+                                children=[
+                                    drc.NamedDropdown(
+                                        name="Select Quantity",
+                                        id="dropdown-select-quantity",
+                                        options=[
+                                            #{"label": "All", "value": "All"},
+                                            #{"label": "Binding Energy", "value": "BE"},
+                                            #{"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                                            #{"label": "One Proton Separation Energy", "value": "OnePSE",},
+                                            {"label": "Potential Energy Surface", "value": "PES",},
+                                            #{"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                                            #{"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                                            #{"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                                            #{"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                                            #{"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                                            #{"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                                            #{"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                                            #{"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                                            #{"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                                            #{"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+                                        ],
+                                        clearable=False,
+                                        searchable=False,
+                                        value="PES",
+                                    ),
+                                ]
+                            ),
+                            drc.Card(
+                                id="data-card",
+                                children=[
+                                    drc.NamedDropdown(
+                                        name="Select Dataset",
+                                        id="dropdown-select-dataset",
+                                        options=[
+                                            {"label": "UNEDF1", "value": "UNEDF1"},
+                                            #{"label": "SkMs", "value": "SkMs"},
+                                        ],
+                                        clearable=False,
+                                        searchable=False,
+                                        value="UNEDF1",
+                                    ),
+                                ],
+                            ),
+                            drc.Card(
+                                id="protons-card",
+                                children=[
+                                    drc.NamedInput(
+                                        name="Protons",
+                                        id="protons",
+                                        type="number",
+                                        min=0,
+                                        max=200,
+                                        step=1,
+                                        placeholder="Proton #",
+                                        style={'width':'100%'},
+                                    ),
+                                ],
+                            ),
+                            drc.Card(
+                                id="neutrons-card",
+                                children=[
+                                    drc.NamedInput(
+                                        name="Neutrons",
+                                        id="neutrons",
+                                        type="number",
+                                        min=0,
+                                        max=250,
+                                        step=1,
+                                        placeholder="Neutron #",
+                                        style={'width':'100%'},
+                                    ),
+                                ],
+                            ),
+                        ],
+                    ),
+                    # html.Div(
+                    #     id="div-graphs-loading",
+                    #     children=[
+                    #         dcc.Loading(
+                    #             id="loading-1",
+                    #             children=[
+                    #                 html.Div(
+                    #                     id="div-graphs-gpe",
+                    #                     children=[
+                    #                         dcc.Graph(
+                    #                             id="graph-sklearn-svm",
+                    #                             figure=dict(
+                    #                                 layout=dict(
+                    #                                     plot_bgcolor="#282b38", paper_bgcolor="#282b38"
+                    #                                 )
+                    #                             ),
+                    #                         ),
+                    #                     ],
+                    #                 ),
+                    #             ],
+                    #         ),
+                    #     ],
+                    # ),
+                    html.Div(id='div-right',children=
+                    dcc.Loading(
+                        id="loading-1",
+                        children =html.Div(id="div-graphs-loading",style={'width':'100%'},children=[html.Div(
+                        id="div-graphs-pesnet",
                         children=[
                             dcc.Graph(
                                 id="graph-sklearn-svm",

@@ -4,6 +4,9 @@ import plotly.express as px
 import numpy as np
 import utils.bmex as bmex
 from sklearn import metrics
+from pickle import dump, load
+import tensorflow as tf
+from tensorflow.keras import backend as K
 
 
 def serve_prediction_plot(
@@ -161,6 +164,89 @@ def isotope_chain(Z, NRange, model, axis_label, func):
     figure.update_yaxes(title_font_size=20)
     figure.update_layout(title_font_size=24)
     return figure
+
+def R2(y_true, y_pred):
+    SS_res =  K.sum(K.square( y_true-y_pred )) 
+    SS_tot = K.sum(K.square( y_true - K.mean(y_true) ) ) 
+    return ( 1 - SS_res/(SS_tot + K.epsilon()) )
+
+def PESpredict_single(A, Z, Q20, Q30, model, scaler):
+
+    X = np.zeros(4)
+    X[0] = A
+    X[1] = Z
+    X[2] = Q20
+    X[3] = Q30
+    xx = scaler.transform(X.reshape(1,-1))
+    pes=model.predict(xx)
+    
+    return pes.T.squeeze()
+
+def PESpredict(X, model, scaler):
+
+    xx = scaler.transform(X)
+    pes=model.predict(xx)
+    
+    return pes.T.squeeze()
+
+def pesnet_surface(N, Z):
+
+    model = tf.keras.models.load_model('utils/PESNet.model',custom_objects={'R2':R2})
+    xscaler = load( open( 'utils/xscaler.pkl', "rb" ) )
+
+    An = N+Z
+    q20num = 121
+    q30num = 21
+    Q20 = np.linspace(0,250,q20num)
+    Q30 = np.linspace(0,60,q30num)
+    Q20v, Q30v = np.meshgrid(Q20,Q30, indexing='ij')
+    Q20v = Q20v.flatten()
+    Q30v = Q30v.flatten()
+    Av = np.zeros(Q20v.shape)
+    Zv = np.zeros(Q20v.shape)
+    Av[:] = An
+    Zv[:] = Z
+    #xx = (Q20,Q30)
+    #PESv = np.vectorize(PESpredict)
+    #pes = PESv(A, Z, Q20v, Q30v, model, xscaler)
+    X=(Av,Zv,Q20v,Q30v)
+    X = np.asarray(X)
+    X = X.T
+
+    pes = np.reshape(PESpredict(X,model,xscaler),(q20num,q30num)).T
+
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"PESnet Prediction",
+        xaxis=dict(title="Q20", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title="Q30", gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 28},
+    )
+
+    fig = go.Figure(data =
+    go.Contour(
+        z=pes,
+        x=Q20, # horizontal axis
+        y=Q30 # vertical axis
+    ),layout=layout)
+    return fig
+
+    #fig, axs = plt.subplots(1,2,figsize=(20,8), gridspec_kw={'width_ratios': [0.8, 1]})
+
+    # Plot the surface.
+    #cmp = 'coolwarm'
+
+    #surf = axs[1].contour(np.reshape(Q20.to_numpy(),(126,21)), np.reshape(Q30.to_numpy(),(126,21)), np.reshape(pes,(126,21)))#, cmap=mpl.cm.seismic)
+    #axs[1].set_title("From NN")
+    #img = axs[1].imshow(np.reshape(pes,(126,21)).T, extent=[0, 250, 0, 60], origin='lower',
+    #       cmap=cmp,interpolation='bilinear',aspect="auto")
+    #fig.colorbar(img)
+
+    #plt.show()
 
 def isotope_chain_gp(Z, NRange, model, axis_label, func):
 
