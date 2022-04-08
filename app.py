@@ -748,6 +748,11 @@ def main_output_pesnet(
 ):
     t_start = time.time()
     np.set_printoptions(precision=5)
+
+    infile = "utils/All.dat"
+
+    PESfull = pd.read_csv(infile,delim_whitespace=True,low_memory=False)
+
     if(N==None or Z==None):
         return [
             html.Div(
@@ -760,15 +765,29 @@ def main_output_pesnet(
         ] 
     else:
         pesnet_result = figs.pesnet_surface(N, Z)
-        return [
-            html.Div(
-                id="graph-container",
-                children=dcc.Loading(
-                    className="graph-wrapper",
-                    children=dcc.Graph(id="graph-chains", figure=pesnet_result),
+        #if(PESfull['A'].isin([N+Z]) and PESfull['Z'].isin([Z])):
+        if(not PESfull[(PESfull['A'] == N+Z) & (PESfull['Z'] == Z)].empty):
+            true_pes = figs.true_surface(PESfull,N,Z)
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=dcc.Loading(
+                        className="graph-wrapper",
+                        children=[dcc.Graph(id="graph-chains", figure=pesnet_result),
+                        dcc.Graph(id="graph-chains", figure=true_pes)],
+                    )
                 )
-            )
-        ]
+            ]
+        else:
+            return [
+                html.Div(
+                    id="graph-container",
+                    children=dcc.Loading(
+                        className="graph-wrapper",
+                        children=dcc.Graph(id="graph-chains", figure=pesnet_result),
+                    )
+                )
+            ]
 
 
 # Running the server

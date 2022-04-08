@@ -236,18 +236,54 @@ def pesnet_surface(N, Z):
     ),layout=layout)
     return fig
 
-    #fig, axs = plt.subplots(1,2,figsize=(20,8), gridspec_kw={'width_ratios': [0.8, 1]})
+def true_surface(df, N, Z):
 
-    # Plot the surface.
-    #cmp = 'coolwarm'
+    An = N+Z
+    q20num = 126
+    q30num = 21
+    Q20 = np.linspace(0,250,q20num)
+    Q30 = np.linspace(0,60,q30num)
+    Q20v, Q30v = np.meshgrid(Q20,Q30, indexing='ij')
+    Q20v = Q20v.flatten()
+    Q30v = Q30v.flatten()
+    Av = np.zeros(Q20v.shape)
+    Zv = np.zeros(Q20v.shape)
+    Av[:] = An
+    Zv[:] = Z
+    #xx = (Q20,Q30)
+    #PESv = np.vectorize(PESpredict)
+    #pes = PESv(A, Z, Q20v, Q30v, model, xscaler)
+    PES_sub = df[(df['A'] == An) & (df['Z'] == Z)]
 
-    #surf = axs[1].contour(np.reshape(Q20.to_numpy(),(126,21)), np.reshape(Q30.to_numpy(),(126,21)), np.reshape(pes,(126,21)))#, cmap=mpl.cm.seismic)
-    #axs[1].set_title("From NN")
-    #img = axs[1].imshow(np.reshape(pes,(126,21)).T, extent=[0, 250, 0, 60], origin='lower',
-    #       cmap=cmp,interpolation='bilinear',aspect="auto")
-    #fig.colorbar(img)
+    A = PES_sub['A']
+    Z = PES_sub['Z']
+    #Q20 = PES_sub['Q20']
+    #Q30 = PES_sub['Q30']
+    E = PES_sub['HFB_cubic']
 
-    #plt.show()
+
+
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"True PES",
+        xaxis=dict(title="Q20", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title="Q30", gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 28},
+    )
+
+    fig = go.Figure(data =
+    go.Contour(
+        z=np.reshape(E.to_numpy(),(q20num,q30num)).T,
+        x=Q20, # horizontal axis
+        y=Q30, # vertical axis
+        colorscale="Spectral_r",
+    ),layout=layout)
+    return fig
+
 
 def isotope_chain_gp(Z, NRange, model, axis_label, func):
 
