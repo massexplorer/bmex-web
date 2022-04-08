@@ -231,7 +231,8 @@ def pesnet_surface(N, Z):
     go.Contour(
         z=pes,
         x=Q20, # horizontal axis
-        y=Q30 # vertical axis
+        y=Q30, # vertical axis
+        colorscale="Spectral_r",
     ),layout=layout)
     return fig
 
