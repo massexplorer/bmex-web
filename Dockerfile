@@ -1,8 +1,6 @@
 # syntax=docker/dockerfile:1
 
 FROM python:3.9-slim-bullseye
-RUN apt-get update
-RUN apt-get install nano
 
 RUN mkdir wd
 WORKDIR wd
