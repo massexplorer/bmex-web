@@ -14,6 +14,7 @@ import utils.figures as figs
 import utils.bmex as bmex
 from utils.bmex_views import *
 import utils.gpe as gpe
+import utils.rbm as rbm
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -80,6 +81,8 @@ def display_page(pathname):
         out = gpe_view()
     elif(pathname == "/pesnet"):
         out = pesnet_view()
+    elif(pathname == "/emulator"):
+        out = emu_view()
     else:
         out = html.Div(
             id="body",
@@ -788,6 +791,51 @@ def main_output_pesnet(
                     )
                 )
             ]
+
+
+@app.callback(
+    Output("div-emu", "children"),
+    [
+        Input("dropdown-select-dataset", "value"),
+        Input("dropdown-nuc","value"),
+        [Input("Msigma","value"),Input("Rho","value"),Input("BE","value"),\
+         Input("Mstar","value"),Input("K","value"),Input("zeta","value"),\
+         Input("J","value"),Input("L","value"),],
+    ],
+)
+def main_output_emu(
+    dataset,
+    nuc,
+    NMP,
+):
+    np.set_printoptions(precision=5)
+    nuc_dict={'16O':0,'40Ca':1,'48Ca':2,'68Ni':3,'90Zr':4,'100Sn':5,'116Sn':6,'132Sn':7,'144Sm':8,'208Pb':9}
+    if(None in NMP):
+        return [
+            html.Div(
+                #id="svm-graph-container",
+                children=[
+                    html.P("Welcome to BMEX! Please input your requested nuclear matter properties on the left!"),
+                ],
+                style={'font-size':'3rem'},
+            ),
+        ]
+    elif(dataset == "rmf"):
+        all_eval = []
+        energy, protrad, timing = rbm.rbm_emulator(nuc_dict[nuc],NMP)
+
+        all_eval.append(html.P(nuc+" Emulator Results:"))
+        all_eval.append(html.P("Binding Energy: {} MeV".format(energy)))
+        all_eval.append(html.P("Charge Radius:  {} fm".format(protrad)))
+        all_eval.append(html.P("Emulation time: {} s".format(timing)))
+
+        return [
+            html.Div(
+                #id="svm-graph-container",
+                children=all_eval,
+                style={'font-size':'3rem'},
+            ),
+        ]
 
 
 # Running the server

@@ -201,6 +201,7 @@
         flex: 1 20%;
         margin: 0 3rem 0 0;
         max-height: 83rem;
+        max-width: 20%;
         overflow-x: hidden;
         overflow-y: auto;
     }
@@ -215,6 +216,7 @@
         flex: 1 20%;
         margin: 0 3rem 0 0;
         max-height: 70rem;
+        max-width: 20%;
         overflow-x: hidden;
         overflow-y: auto;
     }
