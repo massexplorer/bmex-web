@@ -4,11 +4,6 @@ import numpy as np
 from scipy import optimize
 import time
 
-if (platform.machine() == "aarch64"):
-    os.system("cp utils/rmf_rbm_arm.so utils/rmf_rbm_hybrid.so")
-else:
-    os.system("cp utils/rmf_rbm.so utils/rmf_rbm_hybrid.so")
-
 from utils import rmf_rbm_hybrid as rmf_rbm
 
 def NM_to_RMF(params):
