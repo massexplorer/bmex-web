@@ -1,8 +1,9 @@
-import platform
-import os
+import glob
 import numpy as np
 from scipy import optimize
+import plotly.graph_objs as go
 import time
+from utils.rmf_rbm_density import *
 
 from utils import rmf_rbm_hybrid as rmf_rbm
 
@@ -190,4 +191,111 @@ def rbm_emulator(nuc,theta):
     protrad = np.sqrt(protonrad_func[nuc](sol.x, rmf_param))
     energy = (nucenergy_func[nuc](sol.x, rmf_param) - \
         fldenergy_func[nuc](sol.x, rmf_param)) + 0.75*41*A[nuc]**(-1.0/3.0)
-    return energy, protrad, end-start
+    return energy, protrad, sol, end-start
+
+def plot_dens(nuc,sol):
+
+    directory=glob.glob("HybridPolynomials/Results_"+nuc+"*/Basis/")[0]
+
+    nuc_dict={'16O':0,'40Ca':1,'48Ca':2,'68Ni':3,'90Zr':4,'100Sn':5,'116Sn':6,'132Sn':7,'144Sm':8,'208Pb':9}
+    j_dict={'16O':0,'40Ca':1,\
+        '48Ca':[[0.5,1.5,0.5,2.5,1.5,0.5,3.5],[0.5,1.5,0.5,2.5,1.5,0.5]],'68Ni':3,'90Zr':4,'100Sn':5,'116Sn':6,'132Sn':7,'144Sm':8,'208Pb':9}
+
+    index = nuc_dict[nuc]
+
+    pstates = [3, 6, 6, 7,  10, 11, 11, 11, 13, 16]
+    nstates = [3, 6, 7, 10, 11, 11, 14, 16, 16, 22]
+
+
+
+    nx = 400
+    dx=0.0375
+    # x = np.arange(0.05,20.05,0.05)
+    x = np.arange(dx,dx*nx+dx,dx)
+    coeffs=[1.0,0.0,0.0,0.0,0.0]
+    rho = np.zeros((nx,2))
+    for state in range(1,nstates[index]+1):
+        filename = directory + "Nucleus_"+nuc+"_NeutronsF_Level"+str(state)+".txt"
+        temp = np.loadtxt(filename)**2
+        nbasis = temp.shape[0]//nx
+        for i in range(nx):
+            for basis in range(nbasis):
+                rho[i,0] += coeffs[basis]*temp[i+basis*nx]*(2*j_dict[nuc][0][state-1] + 1)/(4*np.pi*x[i]**2)
+        filename = directory + "Nucleus_"+nuc+"_NeutronsG_Level"+str(state)+".txt"
+        temp = np.loadtxt(filename)**2
+        nbasis = temp.shape[0]//nx
+        for i in range(nx):
+            for basis in range(nbasis):
+                rho[i,0] += coeffs[basis]*temp[i+basis*nx]*(2*j_dict[nuc][0][state-1] + 1)/(4*np.pi*x[i]**2)
+    for state in range(1,pstates[index]+1):
+        filename = directory + "Nucleus_"+nuc+"_ProtonsF_Level"+str(state)+".txt"
+        temp = np.loadtxt(filename)**2
+        nbasis = temp.shape[0]//nx
+        for i in range(nx):
+            for basis in range(nbasis):
+                rho[i,1] += coeffs[basis]*temp[i+basis*nx]*(2*j_dict[nuc][1][state-1] + 1)/(4*np.pi*x[i]**2)
+        filename = directory + "Nucleus_"+nuc+"_ProtonsG_Level"+str(state)+".txt"
+        temp = np.loadtxt(filename)**2
+        nbasis = temp.shape[0]//nx
+        for i in range(nx):
+            for basis in range(nbasis):
+                rho[i,1] += coeffs[basis]*temp[i+basis*nx]*(2*j_dict[nuc][1][state-1] + 1)/(4*np.pi*x[i]**2)
+
+    return rho
+
+def dens(nuc, x0):
+    if(nuc == '48Ca'):
+        rhon = rmf_rbm_48Ca_neutdensity(x0)
+        rhop = rmf_rbm_48Ca_protdensity(x0)
+    return np.asarray([rhon,rhop])
+
+def plot_dens(axis_label,rho):
+    x = np.arange(0,20,0.02)
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Density",
+        xaxis=dict(title="R (fm)", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title="r$\rho$", gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+    )
+
+    #figure = px.line(x=Z, y=output, markers=True)
+    figure = go.Figure([
+        go.Scatter(
+            name='Neutrons',
+            x=x,
+            y=rho[0,:],
+            mode='lines',
+            line=dict(color='#e76f51'),#'rgb(100, 100, 80)'),
+        ),
+        go.Scatter(
+            name='Protons',
+            x=x,
+            y=rho[1,:],
+            mode='lines',
+            line=dict(color='#e76f51'),#'rgb(100, 100, 80)'),
+        ),
+    ], layout=layout)
+    figure.update_layout(
+    #    yaxis_title='Wind speed (m/s)',
+    #    title='Continuous, variable value error bars',
+        hovermode="x"
+    )
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+
+    return figure
+
+
+#  -1.0   1.00000   0.0     0.0    72.45440     -1.0   1.00000   0.0     0.0    69.57074
+#  -2.0   1.00000   0.0     0.0    54.17861     -2.0   1.00000   0.0     0.0    52.65930
+#   1.0   1.00000   0.0     1.0    50.51665      1.0   1.00000   0.0     1.0    48.73188
+#  -3.0   1.00000   0.0     0.0    34.94008     -3.0   1.00000   0.0     0.0    33.84392
+#   2.0   1.00000   0.0     1.0    27.23649      2.0   1.00000   0.0     1.0    25.91329
+#  -1.0   1.00000   1.0     1.0    24.76784     -1.0   1.00000   1.0     1.0    21.21943
+#  -4.0   1.00000   0.0     0.0    16.25656      0.0   0.00000   0.0     0.0     0.00000

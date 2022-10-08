@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 #*.so
-
+*Zone.Identifier
 # Distribution / packaging
 .Python
 build/

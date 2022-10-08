@@ -822,13 +822,23 @@ def main_output_emu(
         ]
     elif(dataset == "rmf"):
         all_eval = []
-        energy, protrad, timing = rbm.rbm_emulator(nuc_dict[nuc],NMP)
+        energy, protrad, solution, timing = rbm.rbm_emulator(nuc_dict[nuc],NMP)
 
         all_eval.append(html.P(nuc+" Emulator Results:"))
         all_eval.append(html.P("Binding Energy: {} MeV".format(energy)))
         all_eval.append(html.P("Charge Radius:  {} fm".format(protrad)))
         all_eval.append(html.P("Emulation time: {} s".format(timing)))
-
+        if(nuc=='48Ca'):
+            rho = rbm.dens(nuc, solution.x)
+            figure = rbm.plot_dens(nuc,rho)
+            all_eval.append(
+                html.Div(
+                    id="graph-container",
+                    children=dcc.Loading(
+                        className="graph-wrapper",
+                        children=dcc.Graph(id="graph-chains", figure=figure),
+                    )
+                ))
         return [
             html.Div(
                 #id="svm-graph-container",

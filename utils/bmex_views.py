@@ -763,7 +763,7 @@ def emu_view():
                                         type="number",
                                         min=0.0,
                                         max=0.06,
-                                        # step=1,
+                                        step=0.01,
                                         placeholder=0.04,
                                         value=0.04,
                                         style={'width':'100%'},
