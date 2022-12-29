@@ -825,9 +825,9 @@ def main_output_emu(
         energy, protrad, solution, timing = rbm.rbm_emulator(nuc_dict[nuc],NMP)
 
         all_eval.append(html.P(nuc+" Emulator Results:"))
-        all_eval.append(html.P("Binding Energy: {} MeV".format(energy)))
-        all_eval.append(html.P("Charge Radius:  {} fm".format(protrad)))
-        all_eval.append(html.P("Emulation time: {} s".format(timing)))
+        all_eval.append(html.P("Binding Energy: {:.2f} MeV".format(energy)))
+        all_eval.append(html.P("Charge Radius:  {:.2f} fm".format(protrad)))
+        all_eval.append(html.P("Emulation time: {:.3f} s".format(timing)))
         if(nuc=='48Ca'):
             rho = rbm.dens(nuc, solution.x)
             figure = rbm.plot_dens(nuc,rho)

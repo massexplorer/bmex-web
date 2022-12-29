@@ -151,7 +151,7 @@ def SPESplitting(N1,Z1,model):
 
 def WignerEC(N1,Z1,model):
     if N1!=Z1 or (N1%2!=0) or (Z1%2!=0):
-        return "Error: Nuclei must be even-even and with N=Z"
+        return "Error: Nuclei must be even-even and with N=Z for Wigner Energy Correction"
     res1=DoubleMDiff(N1,Z1,model)
     res2=DoubleMDiff(N1,Z1-2,model)
     res3=DoubleMDiff(N1+2,Z1,model)
