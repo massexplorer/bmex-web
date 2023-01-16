@@ -10,12 +10,17 @@
     }
 }
 
+#react-entry-point {
+    height: auto
+}
+
 /* Scalable Container
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 .container.scalable {
     width: 95%;
     max-width: none;
+    height: auto;
 }
 
 /* Banner
@@ -103,10 +108,47 @@
 @media (min-width: 951px) {
     #app-container {
         width: 100%;
+        height: auto;
         display: flex;
         flex-direction: row;
         align-items: flex-start;
     }
+}
+
+/* Tabs
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+.custom-tabs-container {
+    width: 85%;
+}
+.custom-tabs {
+    border-top-left-radius: 3px;
+    background-color: #2f3445;
+    padding: 0px 24px;
+    border-bottom: 1px solid #d6d6d6;
+}
+
+.custom-tab {
+    color:#2f3445;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-top: 3px solid transparent !important;
+    border-left: 0px !important;
+    border-right: 0px !important;
+    border-bottom: 0px !important;
+    background-color: #2f3445;
+    padding: 12px !important;
+    font-family: "system-ui";
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+.custom-tab--selected {
+    color: black;
+    box-shadow: 1px 1px 0px white;
+    border-left: 1px solid lightgrey !important;
+    border-right: 1px solid lightgrey !important;
+    border-top: 3px solid #e36209 !important;
 }
 
 /* Dropdowns
@@ -200,10 +242,11 @@
     #left-column {
         flex: 1 20%;
         margin: 0 3rem 0 0;
-        max-height: 83rem;
+        max-height: none;
         max-width: 20%;
         overflow-x: hidden;
         overflow-y: auto;
+        height: 750px;
     }
 
     .card {
@@ -213,8 +256,35 @@
 
 @media (max-width: 1300px) {
     #left-column {
+        flex: 1 35%;
+        margin: 0 0 0 0;
+        max-height: none;
+        max-width: 25%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 750px;
+    }
+}
+
+@media (min-width: 1301px) {
+    #right-column {
         flex: 1 20%;
-        margin: 0 3rem 0 0;
+        margin: 0 0 0 3rem;
+        max-height: 83rem;
+        max-width: 20%;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    /* .card {
+        padding-left: 2rem;
+    } */
+}
+
+@media (max-width: 1300px) {
+    #right-column {
+        flex: 1 24%;
+        margin:  0 0 0 3rem;
         max-height: 70rem;
         max-width: 20%;
         overflow-x: hidden;
@@ -238,6 +308,18 @@
 
 @media (max-width: 950px) {
     #left-column {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        max-height: none;
+        max-width: none;
+    }
+}
+
+@media (max-width: 950px) {
+    #right-column {
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -281,16 +363,34 @@
     padding: 20px 10px 25px 4px
 }
 
+/* Right column
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+#slider-svm-parameter-C-coef {
+    padding: 5px 10px 25px;
+}
+
+#slider-svm-parameter-gamma-coef {
+    padding: 5px 10px 25px
+}
+
+#shrinking-container {
+    padding: 20px 10px 25px 4px
+}
+
 /* Graph container
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 #svm-graph-container {
-    margin-top: 0.5rem;
+    margin-top: 0rem;
 }
 
 #svm-graph-container .graph-wrapper {
     height: 100%;
     width: 100%;
 }
+
+/* #graph-container {
+
+} */
 
 @media (min-width: 951px) {
     #graphs-container {
@@ -312,8 +412,8 @@
     #div-graphs {
         flex: 4 80%;
         display: flex;
-        flex-direction: row;
-        justify-content: center;
+        flex-direction: column;
+        justify-content: top;
         align-items: stretch;
     }
 
@@ -327,6 +427,7 @@
 
     #div-graphs-loading {
         flex: 4 80%;
+        height: auto;
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -335,6 +436,7 @@
 
     #div-right {
         flex: 4 80%;
+        height: auto;
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -365,6 +467,12 @@
     #div-graphs-loading {
         height: 83rem;
     }
+    /* .gtitle {
+        font-size: .5 !important;
+    }
+    .xtitle, .ytitle {
+        font-size: .5 !important;
+    } */
 }
 
 @media (max-width: 1300px) {
@@ -379,14 +487,13 @@
     #div-graphs-loading {
         height: 70rem;
     }
-
-    .gtitle {
-        font-size: 1.25rem !important;
+    /* .gtitle {
+        font-size: .5 !important;
     }
 
     .xtitle, .ytitle {
-        font-size: 0.9rem !important;
-    }
+        font-size: .5 !important;
+    } */
 }
 
 @media (max-width: 950px) {
