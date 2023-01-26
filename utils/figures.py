@@ -8,7 +8,236 @@ from pickle import dump, load
 import tensorflow as tf
 from tensorflow.keras import backend as K
 import pandas as pd
+from dash import html
 
+
+def single(quantity, model, Z, N, wigner=0):
+    if quantity == 'All':
+        # return html.P("All")
+        output = []
+        for qs in bmex.qinput:
+            result = bmex.QuanValue(N,Z,model,qs,w=0)
+            try:
+                result+"a"
+            except:
+                output.append(html.P(bmex.OutputString(qs)+": "+str(result)+" MeV"))
+            else:
+                output.append(html.P(result))
+        return html.Div(id="nucleiAll", children=output, style={'font-size':'3rem'})
+    # all_eval = []
+    #         for name, val in  bmex.__dict__.items():
+    #             if (callable(val) and name != "OutputString" and name != "GP"):
+    #                 out_str = bmex.OutputString(name)
+    #                 result = val(N,Z,dataset)
+    #                 if isinstance(result,str):
+    #                     all_eval.append(html.P(result))
+    #                 else: 
+    #                     all_eval.append(html.P(dataset+" "+out_str+": {:.4f}".format(result)+" MeV"))
+    else:
+        result = bmex.QuanValue(N,Z,model,quantity,w=0)
+        try:
+            result+"a"
+        except:
+            return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result)+" MeV")
+        return html.P(result)
+
+def isotopic(quantity, model, colorbar, wigner, ZRange, NRange):
+    Z = ZRange['protons']
+    Nmin = NRange['nmin']
+    Nmax = NRange['nmax']
+
+    if(Nmin == None):
+        Nmin = 0
+    if(Nmax == None):
+        Nmax = 156
+
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isotopic Chain"+"  -  "+str(model)+"  -  Z = "+str(Z),
+        xaxis=dict(title="Neutrons", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+    )
+
+    neutrons = []
+    output = []
+    for N in list(range(Nmin,Nmax+1)):
+        q = bmex.QuanValue(N,Z,model,quantity,wigner)
+        try: 
+            q+1
+        except:
+            continue
+        else:
+            neutrons.append(N)
+            output.append(q)
+
+    trace0 = go.Scatter(
+        x=neutrons, y=output, mode="lines+markers", name="Test Data", marker=\
+            {
+                "color": "#13c6e9",
+                #"size": 20,
+            }
+    )
+
+    #figure = px.line(x=Z, y=output, markers=True)
+    data = [trace0]
+    figure = go.Figure(data=data, layout=layout)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+    return figure
+
+def isotonic(quantity, model, colorbar, wigner, ZRange, NRange):
+    N = NRange['neutrons']
+    Zmin = ZRange['zmin']
+    Zmax = ZRange['zmax']
+
+    if(Zmin == None):
+        Zmin = 0
+    if(Zmax == None):
+        Zmax = 106
+        
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isotonic Chain"+"  -  "+str(model)+"  -  N = "+str(N),
+        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+    )
+
+    protons = []
+    output = []
+    for Z in list(range(Zmin,Zmax+1)):
+        q = bmex.QuanValue(N,Z,model,quantity,wigner)
+        try: 
+            q+1
+        except:
+            continue
+        else:
+            protons.append(Z)
+            output.append(q)
+
+    trace0 = go.Scatter(
+        x=protons, y=output, mode="lines+markers", name="Test Data", marker=\
+            {
+                "color": "#13c6e9",
+                #"size": 20,
+            }
+    )
+
+    #figure = px.line(x=Z, y=output, markers=True)
+    data = [trace0]
+    figure = go.Figure(data=data, layout=layout)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+    return figure
+
+def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None):
+    
+    layout = go.Layout(
+            font={"color": "#a5b1cd"},
+            title=dict(text=bmex.OutputString(quantity)+"   -   "+str(model), font=dict(size=20)),
+            xaxis=dict(title=dict(text="Neutrons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
+            showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,156]),
+            yaxis=dict(title=dict(text="Protons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
+            showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,104]),
+            #legend=dict(x=0, y=1.05, orientation="h"),
+            #margin=dict(l=100, r=10, t=25, b=40),
+            plot_bgcolor="#282b38",
+            paper_bgcolor="#282b38",
+            #uirevision=model,
+            width=600,
+            height=440,
+    )
+
+    step = 2
+
+    # values = []
+    # for zi in range(2, 105, step):
+    #     column = []
+    #     for ni in range(2, 155, step):
+    #         try:
+    #             bmex.QuanValue(ni,zi,model,quantity,wigner) + "test"
+    #         except TypeError:
+    #             column.append(round(bmex.QuanValue(ni,zi,model,quantity,wigner), 3))
+    #         else:
+    #             column.append(None)
+    #     values.append(column)
+    values = np.full((200//step,350//step), None)
+    for Z in range(2, 105, step):
+        chain = bmex.IsotopicChain(Z, model, quantity, step, wigner)
+        for N in chain["N"]:
+            values[Z//2,N//2] = chain[chain["N"]==N].iloc[0,0]
+    
+    filtered = []
+    for e in values.flatten():
+        try:
+            e + 0.0
+        except:
+            pass
+        else:
+            filtered.append(e)
+    filtered = np.array(filtered)
+    max_z=float(np.percentile(filtered, [97]))
+    equalized_color = filtered[filtered>=0]
+    equalized_color = equalized_color[equalized_color<=max_z]
+    
+    def cb(colorbar):
+        if(colorbar == 'linear'):
+            return [
+            [0, 'rgb(0, 0, 0)'],
+            [.01, 'rgb(127, 0, 255)'],
+            [.2, 'rgb(0, 0, 255)'],      
+            [.39, 'rgb(0, 255, 127)'],
+            [.58, 'rgb(127, 255, 0)'],
+            [.76, 'rgb(255, 255, 0)'],
+            [.95, 'rgb(255, 128, 0)'],
+            [1, 'rgb(255, 0, 0)'],
+            ]
+        elif(colorbar == 'equal'):
+            range_z = max(equalized_color) - min(equalized_color)
+            scale = (np.percentile(equalized_color, [19*x for x in range(1,6)]))/range_z
+            return [
+            [0, 'rgb(0, 0, 0)'],
+            [.01, 'rgb(127, 0, 255)'],
+            [scale[0], 'rgb(0, 0, 255)'],      
+            [scale[1], 'rgb(0, 255, 127)'],
+            [scale[2], 'rgb(127, 255, 0)'],
+            [scale[3], 'rgb(255, 255, 0)'],
+            [scale[4], 'rgb(255, 128, 0)'],
+            [1, 'rgb(255, 0, 0)'],
+            ]
+        elif(colorbar == 'monochrome'):
+            return  [[0, 'rgb(230, 120, 85)'], [1, 'rgb(255, 255, 255)']]
+
+    trace = go.Heatmap(
+                x=np.arange(2,155,step), y=np.arange(2,105,step), z=values, 
+                zmin=0, zmax=max_z, name = "",
+                colorscale=cb(colorbar),
+                colorbar=dict(
+                    title="",
+                    #len=,
+                    #y=cb_y
+                    # tick0= 0,
+                    # tickmode= 'array',
+                    # tickvals= [-2, 0, 2, 4, 6],
+                    # ticktext= ["<0", "0", "2", "4", "6"],
+                ),
+                hovertemplate = '<b><i>N</i></b>: %{x}<br>'+
+                        '<b><i>Z</i></b>: %{y}<br>'+
+                        '<b><i>Value</i></b>: %{z}',          
+    )
+    
+    return go.Figure(data=[trace], layout=layout)
 
 def serve_prediction_plot(
     model, X_train, X_test, y_train, y_test, Z, xx, yy, mesh_step, threshold
@@ -101,7 +330,6 @@ def serve_prediction_plot(
 
     return figure
 
-
 def isotope_chain_go(Z, NRange, model, axis_label, func):
 
     output = []
@@ -128,42 +356,6 @@ def isotope_chain_go(Z, NRange, model, axis_label, func):
     data = [trace0]
     figure = go.Figure(data=data, layout=layout)
 
-    return figure
-
-def isotopic(quantity, model, colorbar, wigner, NRange, ZRange):
-    print('YES!')
-    Z = ZRange[0]
-    output = []
-
-    layout = go.Layout(
-        #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title=f"Isotopic Chain",
-        xaxis=dict(title="Neutrons", gridcolor="#2f3445",title_font_size=14),
-        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
-        #legend=dict(x=0, y=1.05, orientation="h"),
-        #margin=dict(l=100, r=10, t=25, b=40),
-        plot_bgcolor="#282b38",
-        paper_bgcolor="#282b38",
-        font={"color": "#a5b1cd", "size": 14},
-    )
-
-    for N in range(NRange[0],NRange[1]+1):
-        bmex.QuanValue(N,Z,model,quantity,wigner)
-
-    trace0 = go.Scatter(
-        x=N, y=output, mode="lines+markers", name="Test Data", marker=\
-            {
-                "color": "#13c6e9",
-                #"size": 20,
-            }
-    )
-
-    #figure = px.line(x=Z, y=output, markers=True)
-    data = [trace0]
-    figure = go.Figure(data=data, layout=layout)
-    figure.update_xaxes(title_font_size=20)
-    figure.update_yaxes(title_font_size=20)
-    figure.update_layout(title_font_size=24)
     return figure
 
 def R2(y_true, y_pred):
@@ -285,7 +477,6 @@ def true_surface(df, N, Z):
     ),layout=layout)
     return fig
 
-
 def isotope_chain_gp(Z, NRange, model, axis_label, func):
 
     output = []
@@ -337,7 +528,6 @@ def isotope_chain_gp(Z, NRange, model, axis_label, func):
     figure.update_layout(title_font_size=24)
     return figure
 
-
 def isotone_chain_go(N, ZRange, model, axis_label, func):
 
     output = []
@@ -365,135 +555,6 @@ def isotone_chain_go(N, ZRange, model, axis_label, func):
     figure = go.Figure(data=data, layout=layout)
 
     return figure
-
-def isotone_chain(N, ZRange, model, axis_label, func):
-
-    output = []
-
-    layout = go.Layout(
-        #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title=f"Isotonic Chain",
-        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
-        yaxis=dict(title=axis_label, gridcolor="#2f3445",title_font_size=14),
-        #legend=dict(x=0, y=1.05, orientation="h"),
-        #margin=dict(l=100, r=10, t=25, b=40),
-        plot_bgcolor="#282b38",
-        paper_bgcolor="#282b38",
-        font={"color": "#a5b1cd", "size": 14},
-    )
-
-    Z = bmex.df[(bmex.df["N"]==N) & (bmex.df["Model"]==model) & (bmex.df["Z"] >= ZRange[0]) & (bmex.df["Z"] <= ZRange[1])]["Z"]
-    for i in Z:
-        output.append(func(N, i, model))
-
-    trace0 = go.Scatter(
-        x=Z, y=output, mode="lines+markers", name="Test Data", marker=\
-            {
-                "color": "#13c6e9",
-                #"size": 20,
-            }
-    )
-
-    #figure = px.line(x=Z, y=output, markers=True)
-    data = [trace0]
-    figure = go.Figure(data=data, layout=layout)
-    figure.update_xaxes(title_font_size=20)
-    figure.update_yaxes(title_font_size=20)
-    figure.update_layout(title_font_size=24)
-    return figure
-
-def landscape(quantity, model, colorbar, wigner, NRange=None, ZRange=None):
-    
-    layout = go.Layout(
-            font={"color": "#a5b1cd"},
-            title=dict(text=bmex.OutputString(quantity)+"   -   "+str(model), font=dict(size=20)),
-            xaxis=dict(title=dict(text="Neutrons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
-            showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,156]),
-            yaxis=dict(title=dict(text="Protons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
-            showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,104]),
-            #legend=dict(x=0, y=1.05, orientation="h"),
-            #margin=dict(l=100, r=10, t=25, b=40),
-            plot_bgcolor="#282b38",
-            paper_bgcolor="#282b38",
-            #uirevision=model,
-            width=600,
-            height=440,
-    )
-
-    step = 2
-
-    values = []
-    for zi in range(2, 105, step):
-        column = []
-        for ni in range(2, 155, step):
-            try:
-                bmex.QuanValue(ni,zi,model,quantity,wigner) + "test"
-            except TypeError:
-                column.append(round(bmex.QuanValue(ni,zi,model,quantity,wigner), 3))
-            else:
-                column.append(None)
-        values.append(column)
-
-    filtered = []
-    for e in np.array(values).flatten():
-        try:
-            e + 0.0
-        except:
-            pass
-        else:
-            filtered.append(e)
-    filtered = np.array(filtered)
-    max_z=float(np.percentile(filtered, [97]))
-    equalized_color = filtered[filtered>=0]
-    equalized_color = equalized_color[equalized_color<=max_z]
-    
-    def cb(colorbar):
-        if(colorbar == 'linear'):
-            return [
-            [0, 'rgb(0, 0, 0)'],
-            [.01, 'rgb(127, 0, 255)'],
-            [.2, 'rgb(0, 0, 255)'],      
-            [.39, 'rgb(0, 255, 127)'],
-            [.58, 'rgb(127, 255, 0)'],
-            [.76, 'rgb(255, 255, 0)'],
-            [.95, 'rgb(255, 128, 0)'],
-            [1, 'rgb(255, 0, 0)'],
-            ]
-        elif(colorbar == 'equal'):
-            range_z = max(equalized_color) - min(equalized_color)
-            scale = (np.percentile(equalized_color, [19*x for x in range(1,6)]))/range_z
-            return [
-            [0, 'rgb(0, 0, 0)'],
-            [.01, 'rgb(127, 0, 255)'],
-            [scale[0], 'rgb(0, 0, 255)'],      
-            [scale[1], 'rgb(0, 255, 127)'],
-            [scale[2], 'rgb(127, 255, 0)'],
-            [scale[3], 'rgb(255, 255, 0)'],
-            [scale[4], 'rgb(255, 128, 0)'],
-            [1, 'rgb(255, 0, 0)'],
-            ]
-        elif(colorbar == 'monochrome'):
-            return  [[0, 'rgb(230, 120, 85)'], [1, 'rgb(255, 255, 255)']]
-
-    trace = go.Heatmap(
-                x=np.arange(2,155,step), y=np.arange(2,105,step), z=values, 
-                zmin=0, zmax=max_z, name = "",
-                colorscale=cb(colorbar),
-                colorbar=dict(
-                    title="",
-                    #len=,
-                    #y=cb_y
-                    # tick0= 0,
-                    # tickmode= 'array',
-                    # tickvals= [-2, 0, 2, 4, 6],
-                    # ticktext= ["<0", "0", "2", "4", "6"],
-                ),
-                hovertemplate = '<b><i>N</i></b>: %{x}<br>'+
-                        '<b><i>Z</i></b>: %{y}<br>'+
-                        '<b><i>Value</i></b>: %{z}',          
-    )
-    
-    return go.Figure(data=[trace], layout=layout)
     
 def serve_pie_confusion_matrix(model, X_test, y_test, Z, threshold):
     # Compute threshold

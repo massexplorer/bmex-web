@@ -117,6 +117,16 @@
 
 /* Tabs
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+.tab {
+    color: #a5b1cd;
+    background-color: #264653;
+}
+
+.tab--selected.jsx-3468109796 {
+    color: #a5b1cd;
+    background-color: #264653;
+    border-top: 3px solid #e36209;
+}
 
 .custom-tabs-container {
     width: 85%;
@@ -129,7 +139,7 @@
 }
 
 .custom-tab {
-    color:#2f3445;
+    color:#ff00d9;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border-top: 3px solid transparent !important;
@@ -149,6 +159,36 @@
     border-left: 1px solid lightgrey !important;
     border-right: 1px solid lightgrey !important;
     border-top: 3px solid #e36209 !important;
+}
+
+/* Buttons
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+#button-zero-threshold {
+    background-color: #2f3445;
+    color: #a5b1cd;
+    border-color: gray;
+}
+
+#button-zero-threshold:hover {
+    border-color: white;
+}
+
+#button-card {
+    display: flex;
+    flex-direction: column;
+}
+
+#reset-button {
+    color: #e76f51;
+}
+
+#delete-button {
+    color: #e76f51;
+}
+
+#new-button {
+    color: #a5b1cd;
 }
 
 /* Dropdowns
@@ -199,21 +239,6 @@
     margin: 15% 0 0 25%;
 }
 
-#button-zero-threshold {
-    background-color: #2f3445;
-    color: #a5b1cd;
-    border-color: gray;
-}
-
-#button-zero-threshold:hover {
-    border-color: white;
-}
-
-#button-card {
-    display: flex;
-    flex-direction: column;
-}
-
 #first-card {
     padding-top: 0;
 }
@@ -246,7 +271,6 @@
         max-width: 20%;
         overflow-x: hidden;
         overflow-y: auto;
-        height: 750px;
     }
 
     .card {
@@ -262,7 +286,6 @@
         max-width: 25%;
         overflow-x: hidden;
         overflow-y: auto;
-        height: 750px;
     }
 }
 

@@ -21,8 +21,7 @@ import pandas as pd
 import random as rand
 
 class View:
-
-    def __init__(self, my_dict=dict(graphstyle='landscape', quantity='BE', dataset='EXP', link=[0], colorbar='linear', wigner=0, id=rand.randint(0,999999), NRange=[], ZRange=[])):
+    def __init__(self, my_dict=dict(graphstyle='landscape', quantity='BE', dataset='EXP', colorbar='linear', wigner=0, id=rand.randint(0,999999), ZRange={"zmin": 0, "zmax": 60, "protons": 40}, NRange={"nmin": 0, "nmax": 60, "neutrons": 40})):
         for key in my_dict:
             setattr(self, key, my_dict[key])
 
@@ -30,4 +29,6 @@ class View:
     #     self.attribute = value
 
     def plot(self):
-        return dcc.Graph(id='graph-chains'+str(self.id), figure=getattr(figs, self.graphstyle)(self.quantity, self.dataset, self.colorbar, self.wigner, self.NRange, self.ZRange))
+        if self.graphstyle == 'single':
+            return figs.single(self.quantity, self.dataset, self.ZRange["protons"], self.NRange["neutrons"], self.wigner)
+        return dcc.Graph(id='graph-chains'+str(self.id), figure=getattr(figs, self.graphstyle)(self.quantity, self.dataset, self.colorbar, self.wigner, self.ZRange, self.NRange))

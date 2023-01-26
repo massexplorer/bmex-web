@@ -1,28 +1,42 @@
 import numpy as np
 import pandas as pd
 
-#df=pd.read_csv("utils/BEAllFull.csv")
+# Make dictionary of models and corresponding pandas dataframes
 modelNames = ['EXP', 'ME2', 'MEdelta', 'PC1', 'NL3S', 'SKMS', 'SKP', 'SLY4', 'SV', 'UNEDF0', 'UNEDF1']
 models = [pd.read_hdf('utils/models.h5', n) for n in modelNames]
 data_dict = {modelNames[i]: models[i] for i in range(len(modelNames))}
 
+# Make dictionary to convert quantity code to full quantity name
 qinput = ['BE', 'OneNSE', 'OnePSE', 'TwoNSE', 'TwoPSE', 'AlphaSE', 'TwoNSGap', 'TwoPSGap', 'DoubleMDiff', 'N3PointOED', 'P3PointOED', 'SNESplitting', 'SPESplitting', 'WignerEC', 'QDB2t']
 qnames = ['Binding_Energy_(MeV)', 'One Neutron Separation Energy', 'One Proton Separation Energy', 'Two Neutron Separation Energy', 
 'Two Proton Separation Energy', 'Alpha Separation Energy', 'Two Proton Shell Gap', 'Two Neutron Shell Gap', 
 'Double Mass Difference', 'Neutron 3-Point Odd-Even Binding Energy Difference', 'Proton 3-Point Odd-Even Binding Energy Difference',
-'Single-Neutron Energy Splitting', 'Single-Proton Energy Splitting', 'Wigner Energy Coeffiency', 'Quad_Def_Beta2_total']
+'Single-Neutron Energy Splitting', 'Single-Proton Energy Splitting', 'Wigner Energy Coeffienct', 'Quad_Def_Beta2_total']
 q_dict = {qinput[j]: qnames[j] for j in range(len(qinput))}
 
-def QuanValue(N1,Z1,model,quan,w=0):
+# Retrieves single value
+def QuanValue(N,Z,model,quan,w=0):
     df = data_dict[model]
     try:
-        if w==3 and N1==Z1:
-            return np.round(float(df[(df["N"]==N1) & (df["Z"]==Z1)][q_dict[quan]])*float(df[(df["N"]==N1) & (df["Z"]==Z1)][q_dict['WignerEC']]),6)
+        if w==3 and N==Z:
+            return np.round(float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict[quan]])*float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict['WignerEC']]),6)
         else:
-            return np.round(float(df[(df["N"]==N1) & (df["Z"]==Z1)][q_dict[quan]]),6)*-1.0
+            return np.round(float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict[quan]]),6)*-1.0
     except:
-        return "Error: "+str(model)+" data does not have this quantity available for Nuclei with N="+str(N1)+" and Z="+str(Z1)
+        return "Error: "+str(model)+" data does not have "+OutputString(quan)+" available for Nuclei with N="+str(N)+" and Z="+str(Z)
 
+def IsotopicChain(Z,model,quan,divisibilty,w=0):
+    df = data_dict[model]
+    df = df[df["Z"]==Z]
+    df = df[df["N"]%divisibilty==0]
+    df[q_dict[quan]] = df[q_dict[quan]]*-1
+    return df[[q_dict[quan], "N"]]
+
+def IsotonicChain(N,model,quan,w=0):
+    df = data_dict[model]
+    return df[df["N"]==N][q_dict[quan]]
+
+    
 # def BE(N1,Z1,model):
 #     df = data_dict[model]
 #     try:

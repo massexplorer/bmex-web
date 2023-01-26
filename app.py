@@ -28,6 +28,34 @@ import base64, io
 import re
 import base64
 
+TAB_STYLE = {
+    'width': '72px',
+    'border': 'none',
+    #'boxShadow': 'inset 0px -1px 0px 0px lightgrey',
+    'background': '#a5b1cd',
+    'paddingTop': 0,
+    'paddingBottom': 0,
+    'height': '60px',
+    'font-size': 32,
+    'color': '#282b38',
+    'borderTop': '3px  #ffffff solid',
+}
+
+SELECTED_STYLE = {
+    'width': '72px',
+    'boxShadow': 'none',
+    'borderLeft': '3px #ffffff solid',
+    'borderRight': '3px #282b38 solid',
+    'borderTop': '3px #ffffff solid',
+    'borderBottom': '3px #282b38 solid',
+    'background': '#a5b1cd',
+    'paddingTop': 0,
+    'paddingBottom': 0,
+    'height': '60px',
+    'font-size': 32,
+    'color': '#282b38'
+}
+
 app = dash.Dash(
     __name__,
     meta_tags=[
@@ -73,9 +101,10 @@ app.layout = html.Div(
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='nextgraphid', data=2),
         dcc.Store(id='viewsmemory', storage_type='memory',
-        data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "link": [0], "colorbar": 'linear', "wigner": 0, "id": 1, "NRange": [], "ZRange": []}]),
+        data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1, 
+        "ZRange": {"zmin": None, "zmax": None, "protons": 40}, "NRange": {"nmin": None, "nmax": None, "neutrons": 40}}]),
         ),
-        dcc.Store(id='trigger', data=json.dumps("update")),
+        dcc.Store(id='triggerGraph', data=json.dumps("update")),
     ]
 )
 
@@ -102,15 +131,15 @@ def display_page(pathname):
 @app.callback(
     [
         Output(component_id='dropdown-select-quantity', component_property='options'),
-        Output(component_id='dropdown-select-quantity', component_property='value'),
+        #Output(component_id='dropdown-select-quantity', component_property='value'),
         Output(component_id='protons-card', component_property='style'),
         Output(component_id='neutrons-card', component_property='style'),
-        Output(component_id='zmin-card', component_property='style'),
-        Output(component_id='zmax-card', component_property='style'),
-        Output(component_id='nmin-card', component_property='style'),
-        Output(component_id='nmax-card', component_property='style'),
-        Output(component_id='dropdown-colorbar', component_property='style'),
-        Output(component_id='radio-wigner', component_property='style'),
+        # Output(component_id='zmin-card', component_property='style'),
+        # Output(component_id='zmax-card', component_property='style'),
+        # Output(component_id='nmin-card', component_property='style'),
+        # Output(component_id='nmax-card', component_property='style'),
+        Output(component_id='colorbar-card', component_property='style'),
+        Output(component_id='Wigner-card', component_property='style'),
     ],
     [
         Input(component_id='dropdown-iso-chain', component_property='value'),
@@ -141,19 +170,19 @@ def quantity_options(is_chain,url):
                 {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
             # Default Value
-            "All",
+            #"All",
             # Proton Box Visibility
             show,
             # Neutron Box Visibility
             show,
-            # Zmin Visibility
-            hide,
-            # Zmax Visibility
-            hide,
-            # Nmin Visibility
-            hide,
-            # Nmax Visibility
-            hide,
+            # # Zmin Visibility
+            # hide,
+            # # Zmax Visibility
+            # hide,
+            # # Nmin Visibility
+            # hide,
+            # # Nmax Visibility
+            # hide,
             # Colorbar Visibility
             hide,
             # Wigner Visibility
@@ -177,19 +206,19 @@ def quantity_options(is_chain,url):
                     {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
             # Default Value
-            "BE",
+            #"BE",
             # Proton Box Visibility
             show,
             # Neutron Box Visibility
             hide,
-            # Zmin Visibility
-            hide,
-            # Zmax Visibility
-            hide,
-            # Nmin Visibility
-            show,
-            # Nmax Visibility
-            show,
+            # # Zmin Visibility
+            # hide,
+            # # Zmax Visibility
+            # hide,
+            # # Nmin Visibility
+            # show,
+            # # Nmax Visibility
+            # show,
             # Colorbar Visibility
             hide,
             # Wigner Visibility
@@ -213,19 +242,19 @@ def quantity_options(is_chain,url):
                     {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
             # Default Value
-            "BE",
+            #"BE",
             # Proton Box Visibility
             hide,
             # Neutron Box Visibility
             show,
-            # Zmin Visibility
-            show,
-            # Zmax Visibility
-            show,
-            # Nmin Visibility
-            hide,
-            # Nmax Visibility
-            hide,
+            # # Zmin Visibility
+            # show,
+            # # Zmax Visibility
+            # show,
+            # # Nmin Visibility
+            # hide,
+            # # Nmax Visibility
+            # hide,
             # Colorbar Visibility
             hide,
             # Wigner Visibility
@@ -250,19 +279,19 @@ def quantity_options(is_chain,url):
                     {"label": "Quad Def Beta2", "value": "QDB2t",},
             ],
             # Default Value
-            "BE",
+            #"BE",
             # Proton Box Visibility
             hide,
             # Neutron Box Visibility
             hide,
-            # Zmin Visibility
-            hide,
-            # Zmax Visibility
-            hide,
-            # Nmin Visibility
-            hide,
-            # Nmax Visibility
-            hide,
+            # # Zmin Visibility
+            # hide,
+            # # Zmax Visibility
+            # hide,
+            # # Nmin Visibility
+            # hide,
+            # # Nmax Visibility
+            # hide,
             # Colorbar Visibility
             show,
             # Wigner Visibility
@@ -289,7 +318,7 @@ def quantity_options(is_chain,url):
                 # {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
             # Default Value
-            "TwoNSE",
+            #"TwoNSE",
             # Proton Box Visibility
             show,
             # Neutron Box Visibility
@@ -321,7 +350,7 @@ def quantity_options(is_chain,url):
                     # {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
             # Default Value
-            "TwoNSE",
+            #"TwoNSE",
             # Proton Box Visibility
             show,
             # Neutron Box Visibility
@@ -353,7 +382,7 @@ def quantity_options(is_chain,url):
                     # {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
             # Default Value
-            "TwoNSE",
+            #"TwoNSE",
             # Proton Box Visibility
             hide,
             # Neutron Box Visibility
@@ -368,265 +397,89 @@ def quantity_options(is_chain,url):
             hide,
             ]
 
-def tab_comp(n, l, chain, quantity, dataset, link):
-    dis = [True, True, True, True]
-    for i in range(l):
-        if i != n-1:
-            dis[i] = False
-    return [drc.Card(
-                id="delete-card",
-                children=[
-                    html.Button('Delete Plot', id='delete-plot', value=None)
-                ]
-            ),drc.Card(
-                id="first-card",
-                children=[
-                    drc.NamedDropdown(
-                        name="Graph Style",
-                        id="dropdown-iso-chain",
-                        options=[
-                            {"label": "Single Nucleus", "value": "single"},
-                            {"label": "Isotopic Chain", "value": "isotopic"},
-                            {"label": "Isotonic Chain", "value": "isotonic"},
-                            {"label": "Landscape", "value": "landscape"},
-                        ],
-                        clearable=False,
-                        searchable=False,
-                        value=chain,
-                    ),
-                ]
-            ),
-            drc.Card(
-                id="quantity-single",
-                children=[
-                    drc.NamedDropdown(
-                        name="Select Quantity",
-                        id="dropdown-select-quantity",
-                        options=[
-                            {"label": "All", "value": "All"},
-                            {"label": "Binding Energy", "value": "BE"},
-                            {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                            {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                            {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                            {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                            {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                            {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                            {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                            {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                            {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                            {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                            {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                            {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                            {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-                            {"label": "Quad Def Beta2", "value": "QDB2t",},
-                        ],
-                        clearable=False,
-                        searchable=False,
-                        value=quantity,
-                        maxHeight=160,
-                        optionHeight=80
-                    ),
-                ]
-            ),
-            drc.Card(
-                id="data-card",
-                children=[
-                    drc.NamedDropdown(
-                        name="Select Dataset",
-                        id="dropdown-select-dataset",
-                        options=[
-                            {"label": "Experiment", "value": "EXP"},
-                            {"label": "ME2", "value": "ME2"},
-                            {"label": "MEdelta", "value": "MEdelta"},
-                            {"label": "PC1", "value": "PC1"},
-                            {"label": "NL3S", "value": "NL3S"},
-                            {"label": "SkMs", "value": "SKMS"},
-                            {"label": "SKP", "value": "SKP"},
-                            {"label": "SLY4", "value": "SLY4"},
-                            {"label": "SV", "value": "SV"},
-                            {"label": "UNEDF0", "value": "UNEDF0"},
-                            {"label": "UNEDF1", "value": "UNEDF1"},
-                        ],
-                        clearable=False,
-                        searchable=False,
-                        value=dataset,
-                    ),
-                ],
-            ), 
-            drc.Card(
-                id="link-card",
-                children=[
-                    drc.NamedRadioItems(
-                        name="Link Plot",
-                        id="radio-link",
-                        options=[
-                            {"label": "None", "value": 0,},
-                            {"label": "1", "value": 1, "disabled": dis[0]},
-                            {"label": "2", "value": 2, "disabled": dis[1]},
-                            {"label": "3", "value": 3, "disabled": dis[2]},
-                            {"label": "4", "value": 4, "disabled": dis[3]},
-                        ],
-                        value=link[0],
-                        inline=True
-                    ),
-                ],
-            ),
-            # drc.Card(
-            #     id="protons-card",
-            #     children=[
-            #         drc.NamedInput(
-            #             name="Protons",
-            #             id="protons",
-            #             type="number",
-            #             min=0,
-            #             max=200,
-            #             step=1,
-            #             placeholder="Proton #",
-            #             style={'width':'100%'},
-            #         ),
-            #     ],
-            # ),
-            # drc.Card(
-            #     id="neutrons-card",
-            #     children=[
-            #         drc.NamedInput(
-            #             name="Neutrons",
-            #             id="neutrons",
-            #             type="number",
-            #             min=0,
-            #             max=200,
-            #             step=1,
-            #             placeholder="Neutron #",
-            #             style={'width':'100%'},
-            #         ),
-            #     ],
-            # ),
-            # drc.Card(
-            #     id="zmin-card",
-            #     children=[
-            #         drc.NamedInput(
-            #             name="Minimum Z",
-            #             id="zmin",
-            #             type="number",
-            #             min=0,
-            #             max=200,
-            #             step=1,
-            #             placeholder="Z Min",
-            #             style={'width':'100%'},
-            #         ),
-            #     ],
-            # ),
-            # drc.Card(
-            #     id="zmax-card",
-            #     children=[
-            #         drc.NamedInput(
-            #             name="Maximum Z",
-            #             id="zmax",
-            #             type="number",
-            #             min=0,
-            #             max=200,
-            #             step=1,
-            #             placeholder="Z Max",
-            #             style={'width':'100%'},
-            #         ),
-            #     ],
-            # ),
-            # drc.Card(
-            #     id="nmin-card",
-            #     children=[
-            #         drc.NamedInput(
-            #             name="Minimum N",
-            #             id="nmin",
-            #             type="number",
-            #             min=0,
-            #             max=200,
-            #             step=1,
-            #             placeholder="N Min",
-            #             style={'width':'100%'},
-            #         ),
-            #     ],
-            # ),
-            # drc.Card(
-            #     id="nmax-card",
-            #     children=[
-            #         drc.NamedInput(
-            #             name="Maximum N",
-            #             id="nmax",
-            #             type="number",
-            #             min=0,
-            #             max=200,
-            #             step=1,
-            #             placeholder="N Max",
-            #             style={'width':'100%'},
-            #         ),
-            #     ],
-            # )
-            ]
-
 @app.callback(
     [
         Output("viewsmemory", "data"),
         Output("tabs", "children"),
-        Output("tabs_output", "children"),
-        Output("trigger", "data"),
+        Output("triggerGraph", "data"),
         Output("tabs", "value"),
-        Output("nextgraphid", "data")
+        Output("nextgraphid", "data"),
+        Output("dropdown-iso-chain", "value"),
+        Output("dropdown-select-quantity", "value"),
+        Output("dropdown-select-dataset", "value"),
+        Output("protons", "value"),
+        Output("neutrons", "value"),
+        Output("zmin", "value"),
+        Output("zmax", "value"),
+        Output("nmin", "value"),
+        Output("nmax", "value"),
     ],
     [
         State("viewsmemory", "data"),
         State("tabs", "children"),
-        State("tabs_output", "children"),
         #tabs_output
         Input("tabs", "value"),
         #new_plot
-        Input("new-plot","n_clicks"),
+        Input("new-button","n_clicks"),
         State("nextgraphid", "data"),
         #delete_plot
-        Input("delete-plot","n_clicks"),
+        Input("delete-button","n_clicks"),
+        #reset_page
+        Input("reset-button","n_clicks"),
         #dropdowns
         Input("dropdown-iso-chain","value"),
         Input("dropdown-select-quantity", "value"),
         Input("dropdown-select-dataset", "value"),
-        Input("radio-link","value"),
-        Input("dropdown-colorbar","value"),
-        Input("radio-wigner","value"),
-        #scale
-        Input("nmin", "value"),
-        Input("nmax", "value"),
         Input("zmin", "value"),
         Input("zmax", "value"),
+        Input("nmin", "value"),
+        Input("nmax", "value"),
+        Input("protons", "value"),
+        Input("neutrons", "value"),
+        Input("dropdown-colorbar","value"),
+        Input("radio-wigner","value"),
     ]
 )
 def main_update(
-    json_cur_views, cur_tabs, cur_tabs_output, tab_n, new_button, graphid, 
-    delete_button, graphstyle, quantity, dataset, link, colorbar, wigner,
-    nmin, nmax, zmin, zmax):
+    json_cur_views, cur_tabs, tab_n, new_button, graphid, 
+    delete_button, reset_button, graphstyle, quantity, dataset, zmin, 
+    zmax, nmin, nmax, protons, neutrons, colorbar, wigner):
     cur_views = json.loads(json_cur_views)
     n = int(tab_n[3])
     #print(base64.urlsafe_b64encode(json_cur_views.encode()).decode())
     print(cur_views[n-1])
+
     #tabs_change
     if "tabs" == dash.callback_context.triggered_id:
         print('TABS')
         return  [
             json_cur_views, 
             cur_tabs,
-            tab_comp(n, len(cur_tabs), cur_views[n-1]['graphstyle'], cur_views[n-1]['quantity'], 
-                    cur_views[n-1]['dataset'], cur_views[n-1]['link']),
-            json.dumps("dontupdate"),
+            json.dumps("dontupdate"), #graph
             tab_n, 
-            graphid
+            graphid,
+            cur_views[n-1]['graphstyle'],
+            cur_views[n-1]['quantity'],
+            cur_views[n-1]['dataset'],
+            cur_views[n-1]['ZRange']['protons'],
+            cur_views[n-1]['NRange']['neutrons'],
+            cur_views[n-1]['ZRange']['zmin'],
+            cur_views[n-1]['ZRange']['zmax'],
+            cur_views[n-1]['NRange']['nmin'],
+            cur_views[n-1]['NRange']['nmax'],
         ]
 
     #new_plot
-    if "new-plot" == dash.callback_context.triggered_id:
+    if "new-button" == dash.callback_context.triggered_id:
         if len(cur_tabs)>3 or type(new_button) != type(1):
             raise PreventUpdate
         new_views = cur_views
-        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "link": [0], "colorbar": 'linear', "wigner": 0, "id": graphid, "NRange": [], "ZRange": []}
+        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": graphid, 
+        "ZRange": {"zmin": None, "zmax": None, "protons": 40}, "NRange": {"nmin": None, "nmax": None, "neutrons": 40}}
         new_views.append(default)
         new_tabs = cur_tabs
-        new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1)))
+        new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), style=TAB_STYLE,
+            selected_style=SELECTED_STYLE))
         l = len(new_tabs)
         if graphid == 4:
             graphid = 1
@@ -635,74 +488,115 @@ def main_update(
         return [
             json.dumps(new_views),
             new_tabs,
-            tab_comp(l, l, 'landscape', 'BE', 'EXP', [0]),
-            json.dumps("update"),
+            json.dumps("update"), #graph
             "tab"+str(l),
-            graphid
+            graphid,
+            new_views[-1]['graphstyle'],
+            new_views[-1]['quantity'],
+            new_views[-1]['dataset'],
+            new_views[-1]['ZRange']['protons'],
+            new_views[-1]['NRange']['neutrons'],
+            new_views[-1]['ZRange']['zmin'],
+            new_views[-1]['ZRange']['zmax'],
+            new_views[-1]['NRange']['nmin'],
+            new_views[-1]['NRange']['nmax'],
         ]
  
-
     #delete_plot
-    if "delete-plot" == dash.callback_context.triggered_id:
+    if "delete-button" == dash.callback_context.triggered_id:
         if  type(delete_button)==type(1) and len(cur_views)>1:
-            #IMPLEMENT LINKS
-            # links.pop(n-1)
-            # links.append([0])
-            # links.remove()
             new_views = cur_views
             new_views.pop(n-1)
             new_tabs = cur_tabs
             new_tabs.pop(-1)
             return [
                 json.dumps(new_views), 
-                new_tabs, 
-                tab_comp(n, len(new_tabs), new_views[n-1]['graphstyle'], new_views[n-1]['quantity'], 
-                        new_views[n-1]['dataset'], new_views[n-1]['link']),
-                json.dumps("update"),
+                new_tabs,
+                json.dumps("update"), #graph
                 tab_n,
-                graphid
+                graphid,
+                new_views[n-1]['graphstyle'],
+                new_views[n-1]['quantity'],
+                new_views[n-1]['dataset'],
+                new_views[n-1]['ZRange']['protons'],
+                new_views[n-1]['NRange']['neutrons'],
+                new_views[n-1]['ZRange']['zmin'],
+                new_views[n-1]['ZRange']['zmax'],
+                new_views[n-1]['NRange']['nmin'],
+                new_views[n-1]['NRange']['nmax'],
             ]
         else:
             raise PreventUpdate
-
-    #scale_input
-    if "nmin" == dash.callback_context.triggered_id or "nmax" == dash.callback_context.triggered_id or "zmin" == dash.callback_context.triggered_id or "zmax" == dash.callback_context.triggered_id:
-        pass
+    
+    #reset_page
+    if "reset-button" == dash.callback_context.triggered_id:
+        new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1, 
+        "ZRange": {"zmin": None, "zmax": None, "protons": 40}, "NRange": {"nmin": None, "nmax": None, "neutrons": 40}}]
+        return [
+            json.dumps(new_views), 
+            dcc.Tab(label="1", value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE),
+            json.dumps("update"), #graph
+            'tab1',
+            1,
+            'landscape',
+            'BE',
+            'EXP',
+            40,
+            40,
+            None,
+            None,
+            None,
+            None,
+        ]
 
     #dropdown_input
-    else:
-        print('DROPDOWN')
-        new_views = cur_views
-        if "dropdown-iso-chain" == dash.callback_context.triggered_id:
-            new_views[n-1]['graphstyle'] = graphstyle
-        if "dropdown-select-quantity" == dash.callback_context.triggered_id:
-            new_views[n-1]['quantity'] = quantity
-            print(new_views[n-1]['quantity'])
-        if "dropdown-select-dataset" == dash.callback_context.triggered_id:
-            new_views[n-1]['dataset'] = dataset
-        if "radio-link" == dash.callback_context.triggered_id:
-            # NEEDS IMPLEMENTED
-            pass
-            # if link == 0:
-            #     links[n-1]=[0]
-            #     for i in range(4):
-            #         links[i].remove(n)
-            # else:
-            #     links[n-1].remove(0)
-            #     links[n-1].append(link)
-            #     links[link-1].remove(0)
-            #     links[link-1].append(n)
-        if "dropdown-colorbar" == dash.callback_context.triggered_id:
-            new_views[n-1]['colorbar'] = colorbar
-        if "radio-wigner" == dash.callback_context.triggered_id:
-            new_views[n-1]['wigner'] = wigner
-        return json.dumps(new_views), cur_tabs, cur_tabs_output, json.dumps("update"), tab_n, graphid
+    print('DROPDOWN')
+    new_views = cur_views
+    if "dropdown-iso-chain" == dash.callback_context.triggered_id:
+        new_views[n-1]['graphstyle'] = graphstyle
+    if "dropdown-select-quantity" == dash.callback_context.triggered_id:
+        new_views[n-1]['quantity'] = quantity
+        print(new_views[n-1]['quantity'])
+    if "dropdown-select-dataset" == dash.callback_context.triggered_id:
+        new_views[n-1]['dataset'] = dataset
+    if "dropdown-colorbar" == dash.callback_context.triggered_id:
+        new_views[n-1]['colorbar'] = colorbar
+    if "radio-wigner" == dash.callback_context.triggered_id:
+        new_views[n-1]['wigner'] = wigner
+    if "zmin" == dash.callback_context.triggered_id:
+        new_views[n-1]['ZRange']['min'] = zmin
+    if "zmax" == dash.callback_context.triggered_id:
+        new_views[n-1]['ZRange']['max'] = zmax
+    if "nmin" == dash.callback_context.triggered_id:
+        new_views[n-1]['ZRange']['min'] = nmin
+    if "nmax" == dash.callback_context.triggered_id:
+        new_views[n-1]['ZRange']['max'] = nmax
+    if "protons" == dash.callback_context.triggered_id:
+        new_views[n-1]['ZRange']['protons'] = protons
+    if "neutrons" == dash.callback_context.triggered_id:
+        new_views[n-1]['ZRange']['neutrons'] = neutrons
+    return [
+        json.dumps(new_views), 
+        cur_tabs, 
+        json.dumps("update"), 
+        tab_n, 
+        graphid,
+        graphstyle, 
+        quantity, 
+        dataset,
+        protons, 
+        neutrons,
+        zmin, 
+        zmax, 
+        nmin, 
+        nmax
+    ]
 
 
 @app.callback(
     Output("div-graphs", "children"),
     [
-        Input("trigger", "data"),
+        Input("triggerGraph", "data"),
         State("viewsmemory", "data"),
         #Input("graph-chains1", "relayoutData"),
     ],
@@ -719,8 +613,10 @@ def main_output(
         for view_dict in views_list: # iterate through dicts in list
             view = views.View(view_dict) # create a view
             output.append(view.plot())
-        output.append(html.Button('New Plot', id='new-plot', value=None))
+        output.append(html.Button('New Plot', id='new-button', value=None))
         return output
+    raise PreventUpdate
+
     # if "dropdown-iso-chain" == dash.callback_context.triggered_id
     #     outputs = []
     #     for fig in figures:
@@ -732,7 +628,6 @@ def main_output(
 
     #         outputs.append(fig)
     #     return outputs
-    raise PreventUpdate
 
 # @app.callback([Output('graph2', 'figure')],
 #          [Input('graph', 'relayoutData')], # this triggers the event

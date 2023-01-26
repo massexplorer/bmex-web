@@ -6,6 +6,33 @@ import utils.dash_reusable_components as drc
 
 import utils.views_class as views
 
+TAB_STYLE = {
+    'width': '72px',
+    'border': 'none',
+    #'boxShadow': 'inset 0px -1px 0px 0px lightgrey',
+    'background': '#a5b1cd',
+    'paddingTop': 0,
+    'paddingBottom': 0,
+    'height': '60px',
+    'font-size': 32,
+    'color': '#282b38',
+    'borderTop': '3px  #ffffff solid',
+}
+
+SELECTED_STYLE = {
+    'width': '72px',
+    'boxShadow': 'none',
+    'borderLeft': '3px #ffffff solid',
+    'borderRight': '3px #282b38 solid',
+    'borderTop': '3px #ffffff solid',
+    'borderBottom': '3px #282b38 solid',
+    'background': '#a5b1cd',
+    'paddingTop': 0,
+    'paddingBottom': 0,
+    'height': '60px',
+    'font-size': 32,
+    'color': '#282b38'
+}
 
 def masses_view():
     
@@ -25,7 +52,7 @@ def masses_view():
                             # html.Div(id='dropdown-select-quantity', value='SNESplitting'),
                             # html.Div(id='dropdown-select-dataset', value='EXP'),
                             dcc.Tabs(id="tabs", value='tab1', children=[
-                                dcc.Tab(label='1', value='tab1'),
+                                dcc.Tab(label='1', value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE),
                             ]),
                             html.Div(id='tabs_output', children=[
                                 drc.Card(id="graph-card", children=[
@@ -94,21 +121,21 @@ def masses_view():
                                         value="EXP",
                                     ),
                                 ]),
-                                drc.Card(id="link-card", children=[
-                                    drc.NamedRadioItems(
-                                        name="Link Plot",
-                                        id="radio-link",
-                                        options=[
-                                            {"label": "None", "value": 0,},
-                                            {"label": "1", "value": 1, "disabled": True},
-                                            {"label": "2", "value": 2, "disabled": True},
-                                            {"label": "3", "value": 3, "disabled": True},
-                                            {"label": "4", "value": 4, "disabled": True},
-                                        ],
-                                        value=0,
-                                        inline=True
-                                    ),
-                                ]),
+                                # drc.Card(id="link-card", children=[
+                                #     drc.NamedRadioItems(
+                                #         name="Link Plot",
+                                #         id="radio-link",
+                                #         options=[
+                                #             {"label": "None", "value": 0,},
+                                #             {"label": "1", "value": 1, "disabled": True},
+                                #             {"label": "2", "value": 2, "disabled": True},
+                                #             {"label": "3", "value": 3, "disabled": True},
+                                #             {"label": "4", "value": 4, "disabled": True},
+                                #         ],
+                                #         value=0,
+                                #         inline=True
+                                #     ),
+                                # ]),
                                 drc.Card(
                                     id="protons-card",
                                     children=[
@@ -121,6 +148,7 @@ def masses_view():
                                             step=1,
                                             placeholder="Proton #",
                                             style={'width':'100%'},
+                                            value=40
                                         ),
                                     ],
                                 ),
@@ -140,67 +168,42 @@ def masses_view():
                                     ],
                                 ),
                                 drc.Card(
-                                    id="zmin-card",
+                                    id="colorbar-card",
                                     children=[
-                                        drc.NamedInput(
-                                            name="Minimum Z",
-                                            id="zmin",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Z Min",
-                                            style={'width':'100%'},
+                                        drc.NamedDropdown(
+                                            name="Colorbar Style",
+                                            id="dropdown-colorbar",
+                                            options=[
+                                                {"label": "Linear", "value": "linear"},
+                                                {"label": "Equalized", "value": "equal"},
+                                                {"label": "Monochrome", "value": "monochrome"},
+                                            ],
+                                            clearable=False,
+                                            searchable=False,
+                                            value="linear",
                                         ),
-                                    ],
+                                    ]
                                 ),
                                 drc.Card(
-                                    id="zmax-card",
+                                    id="Wigner-card",
                                     children=[
-                                        drc.NamedInput(
-                                            name="Maximum Z",
-                                            id="zmax",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Z Max",
-                                            style={'width':'100%'},
+                                        drc.NamedDropdown(
+                                            name="Wigner Adjustment",
+                                            id="radio-wigner",
+                                            options=[
+                                                {"label": "None", "value": 0},
+                                                {"label": "Wigner (1)", "value": 1},
+                                                {"label": "Wigner (2)", "value": 2},
+                                                #{"label": "Wigner Coefficient", "value": 3},
+                                            ],
+                                            clearable=False,
+                                            searchable=False,
+                                            value=0,
                                         ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="nmin-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Minimum N",
-                                            id="nmin",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="N Min",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="nmax-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Maximum N",
-                                            id="nmax",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="N Max",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
+                                    ]
                                 ),
                                 drc.Card(id="delete-card", children=[
-                                    html.Button('Delete Plot', id='delete-plot', value=None)
+                                    html.Button('Delete Plot', id='delete-button', value=None)
                                 ]),
                             ])
                         ]
@@ -227,8 +230,8 @@ def masses_view():
                             children=[
                                 html.Div(id="div-graphs",
                                 children=[
-                                    views.View({"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "link": [0], "colorbar": 'linear', "wigner": 0, "id": 1, "NRange": [], "ZRange": []}).plot(),
-                                    html.Button('New Plot', id='new-plot', hidden=True),
+                                    views.View({"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "link": [0], "colorbar": 'linear', "wigner": 0, "id": 1, "NRange": {}, "ZRange": {}}).plot(),
+                                    html.Button('New Plot', id='new-button', hidden=True),
                                 ])
                             ])
                         ])
@@ -255,46 +258,18 @@ def masses_view():
                         # className="three columns",
                         id="right-column",
                         children=[
-                            drc.Card(
-                                id="colorbar-card",
-                                children=[
-                                    drc.NamedDropdown(
-                                        name="Colorbar Style",
-                                        id="dropdown-colorbar",
-                                        options=[
-                                            {"label": "Linear", "value": "linear"},
-                                            {"label": "Equalized", "value": "equal"},
-                                            {"label": "Monochrome", "value": "monochrome"},
-                                        ],
-                                        clearable=False,
-                                        searchable=False,
-                                        value="linear",
-                                    ),
-                                ]
-                            ),
-                            drc.Card(
-                                id="Wigner-card",
-                                children=[
-                                    drc.NamedRadioItems(
-                                        name="Wigner Adjustment",
-                                        id="radio-wigner",
-                                        options=[
-                                            {"label": "None", "value": 0},
-                                            {"label": "Wigner (1)", "value": 1},
-                                            {"label": "Wigner (2)", "value": 2},
-                                            #{"label": "Wigner Coefficient", "value": 3},
-                                        ],
-                                        value=0,
-                                    ),
-                                ]
-                            ),
+                            drc.Card(id="reset-card", children=[
+                                html.Button('Reset Page', id='reset-button')
+                            ]),
                             drc.Card(
                                 id="range-card",
                                 children=[
-                                    dcc.Input(id="nmin", type="number", placeholder="N min"),
-                                    dcc.Input(id="nmax", type="number", placeholder="N max"),
-                                    dcc.Input(id="zmin", type="number", placeholder="Z min"),
-                                    dcc.Input(id="zmax", type="number", placeholder="Z max"),
+                                    html.P("Neutrons Range:"),
+                                    dcc.Input(id="nmin", type="number", placeholder="N min", min=0, max=156),
+                                    dcc.Input(id="nmax", type="number", placeholder="N max", min=0, max=156),
+                                    html.P("Protons Range:", style={'marginTop': 25}),
+                                    dcc.Input(id="zmin", type="number", placeholder="Z min", min=0, max=106),
+                                    dcc.Input(id="zmax", type="number", placeholder="Z max", min=0, max=106),
                                 ]
                             ),
                         ]
