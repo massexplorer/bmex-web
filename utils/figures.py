@@ -104,7 +104,7 @@ def isotonic(quantity, model, colorbar, wigner, ZRange, NRange):
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
         title=f"Isotonic Chain"+"  -  "+str(model)+"  -  N = "+str(N),
-        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
+        xaxis=dict(title="Protons", gridcolor="#2f3445", title_font_size=14),
         yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
         #legend=dict(x=0, y=1.05, orientation="h"),
         #margin=dict(l=100, r=10, t=25, b=40),
@@ -142,7 +142,6 @@ def isotonic(quantity, model, colorbar, wigner, ZRange, NRange):
     return figure
 
 def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None):
-    
     layout = go.Layout(
             font={"color": "#a5b1cd"},
             title=dict(text=bmex.OutputString(quantity)+"   -   "+str(model), font=dict(size=20)),
@@ -161,17 +160,6 @@ def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None):
 
     step = 2
 
-    # values = []
-    # for zi in range(2, 105, step):
-    #     column = []
-    #     for ni in range(2, 155, step):
-    #         try:
-    #             bmex.QuanValue(ni,zi,model,quantity,wigner) + "test"
-    #         except TypeError:
-    #             column.append(round(bmex.QuanValue(ni,zi,model,quantity,wigner), 3))
-    #         else:
-    #             column.append(None)
-    #     values.append(column)
     values = np.full((200//step,350//step), None)
     for Z in range(2, 105, step):
         chain = bmex.IsotopicChain(Z, model, quantity, step, wigner)
