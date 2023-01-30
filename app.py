@@ -513,17 +513,17 @@ def main_update(
                 json.dumps(new_views), 
                 new_tabs,
                 json.dumps("update"), #graph
-                tab_n,
+                "tab"+str(len(new_views)),
                 graphid,
-                new_views[n-1]['graphstyle'],
-                new_views[n-1]['quantity'],
-                new_views[n-1]['dataset'],
-                new_views[n-1]['ZRange']['protons'],
-                new_views[n-1]['NRange']['neutrons'],
-                new_views[n-1]['ZRange']['zmin'],
-                new_views[n-1]['ZRange']['zmax'],
-                new_views[n-1]['NRange']['nmin'],
-                new_views[n-1]['NRange']['nmax'],
+                new_views[-1]['graphstyle'],
+                new_views[-1]['quantity'],
+                new_views[-1]['dataset'],
+                new_views[-1]['ZRange']['protons'],
+                new_views[-1]['NRange']['neutrons'],
+                new_views[-1]['ZRange']['zmin'],
+                new_views[-1]['ZRange']['zmax'],
+                new_views[-1]['NRange']['nmin'],
+                new_views[-1]['NRange']['nmax'],
             ]
         else:
             raise PreventUpdate
@@ -568,13 +568,13 @@ def main_update(
     if "zmax" == dash.callback_context.triggered_id:
         new_views[n-1]['ZRange']['max'] = zmax
     if "nmin" == dash.callback_context.triggered_id:
-        new_views[n-1]['ZRange']['min'] = nmin
+        new_views[n-1]['NRange']['min'] = nmin
     if "nmax" == dash.callback_context.triggered_id:
-        new_views[n-1]['ZRange']['max'] = nmax
+        new_views[n-1]['NRange']['max'] = nmax
     if "protons" == dash.callback_context.triggered_id:
         new_views[n-1]['ZRange']['protons'] = protons
     if "neutrons" == dash.callback_context.triggered_id:
-        new_views[n-1]['ZRange']['neutrons'] = neutrons
+        new_views[n-1]['NRange']['neutrons'] = neutrons
     return [
         json.dumps(new_views), 
         cur_tabs, 
