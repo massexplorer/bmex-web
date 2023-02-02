@@ -6,7 +6,7 @@ import utils.dash_reusable_components as drc
 
 import utils.views_class as views
 
-TAB_STYLE = {
+SELECTED_STYLE = {
     'width': '72px',
     'border': 'none',
     #'boxShadow': 'inset 0px -1px 0px 0px lightgrey',
@@ -16,16 +16,17 @@ TAB_STYLE = {
     'height': '60px',
     'font-size': 32,
     'color': '#282b38',
-    'borderTop': '3px  #ffffff solid',
+    'borderTop': '4px  #a5b1cd solid',
+    'borderLeft': '4px #a5b1cd solid',
 }
 
-SELECTED_STYLE = {
+TAB_STYLE = {
     'width': '72px',
     'boxShadow': 'none',
-    'borderLeft': '3px #ffffff solid',
-    'borderRight': '3px #282b38 solid',
-    'borderTop': '3px #ffffff solid',
-    'borderBottom': '3px #282b38 solid',
+    'borderLeft': '4px #ffffff solid',
+    'borderRight': '4px #282b38 solid',
+    'borderTop': '4px #ffffff solid',
+    'borderBottom': '4px #282b38 solid',
     'background': '#a5b1cd',
     'paddingTop': 0,
     'paddingBottom': 0,

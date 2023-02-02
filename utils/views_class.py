@@ -21,9 +21,12 @@ import pandas as pd
 import random as rand
 
 class View:
-    def __init__(self, my_dict=dict(graphstyle='landscape', quantity='BE', dataset='EXP', colorbar='linear', wigner=0, id=rand.randint(0,999999), ZRange={"zmin": 0, "zmax": 60, "protons": 40}, NRange={"nmin": 0, "nmax": 60, "neutrons": 40})):
+    def __init__(self, my_dict=dict(graphstyle='landscape', quantity='BE', dataset='EXP', colorbar='linear', wigner=0, id=rand.randint(0,999999), ZRange={"zmin": 0, "zmax": 60, "protons": 40}, NRange={"nmin": 0, "nmax": 60, "neutrons": 40}), zview=None, nview=None):
         for key in my_dict:
             setattr(self, key, my_dict[key])
+        self.ZView = zview
+        self.NView = nview
+        
 
     # def change_attr(self, attribute, value):
     #     self.attribute = value
@@ -31,4 +34,4 @@ class View:
     def plot(self):
         if self.graphstyle == 'single':
             return figs.single(self.quantity, self.dataset, self.ZRange["protons"], self.NRange["neutrons"], self.wigner)
-        return dcc.Graph(id='graph-chains'+str(self.id), figure=getattr(figs, self.graphstyle)(self.quantity, self.dataset, self.colorbar, self.wigner, self.ZRange, self.NRange))
+        return dcc.Graph(id='graph-chains'+str(self.id), figure=getattr(figs, self.graphstyle)(self.quantity, self.dataset, self.colorbar, self.wigner, self.ZRange, self.NRange, self.ZView, self.NView))

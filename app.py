@@ -28,7 +28,7 @@ import base64, io
 import re
 import base64
 
-TAB_STYLE = {
+SELECTED_STYLE = {
     'width': '72px',
     'border': 'none',
     #'boxShadow': 'inset 0px -1px 0px 0px lightgrey',
@@ -38,16 +38,17 @@ TAB_STYLE = {
     'height': '60px',
     'font-size': 32,
     'color': '#282b38',
-    'borderTop': '3px  #ffffff solid',
+    'borderTop': '4px  #a5b1cd solid',
+    'borderLeft': '4px #a5b1cd solid',
 }
 
-SELECTED_STYLE = {
+TAB_STYLE = {
     'width': '72px',
     'boxShadow': 'none',
-    'borderLeft': '3px #ffffff solid',
-    'borderRight': '3px #282b38 solid',
-    'borderTop': '3px #ffffff solid',
-    'borderBottom': '3px #282b38 solid',
+    'borderLeft': '4px #ffffff solid',
+    'borderRight': '4px #282b38 solid',
+    'borderTop': '4px #ffffff solid',
+    'borderBottom': '4px #282b38 solid',
     'background': '#a5b1cd',
     'paddingTop': 0,
     'paddingBottom': 0,
@@ -534,7 +535,7 @@ def main_update(
         "ZRange": {"zmin": None, "zmax": None, "protons": 40}, "NRange": {"nmin": None, "nmax": None, "neutrons": 40}}]
         return [
             json.dumps(new_views), 
-            dcc.Tab(label="1", value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE),
+            [dcc.Tab(label="1", value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE)],
             json.dumps("update"), #graph
             'tab1',
             1,
@@ -598,20 +599,32 @@ def main_update(
     [
         Input("triggerGraph", "data"),
         State("viewsmemory", "data"),
+        Input("zmin", "value"),
+        Input("zmax", "value"),
+        Input("nmin", "value"),
+        Input("nmax", "value"),
         #Input("graph-chains1", "relayoutData"),
     ],
 )
 def main_output(
     trigger,
     json_views,
+    zmin,
+    zmax,
+    nmin,
+    nmax,
     #relayout_data
-):
+):  
+    if "triggerGraph" == dash.callback_context.triggered_id:
+        zview, nview = None, None
+    else:
+        zview, nview = [zmin,zmax], [nmin,nmax]
     if(json.loads(trigger)=="update"):
         output = []
         views_list = json.loads(json_views) # list of dicts
         print("OUT ", views_list)
         for view_dict in views_list: # iterate through dicts in list
-            view = views.View(view_dict) # create a view
+            view = views.View(view_dict, zview, nview) # create a view
             output.append(view.plot())
         output.append(html.Button('New Plot', id='new-button', value=None))
         return output
