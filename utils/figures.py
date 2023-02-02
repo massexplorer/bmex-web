@@ -41,7 +41,7 @@ def single(quantity, model, Z, N, wigner=0):
             return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result)+" MeV")
         return html.P(result)
 
-def isotopic(quantity, model, colorbar, wigner, ZRange, NRange):
+def isotopic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView):
     Z = ZRange['protons']
     Nmin = NRange['nmin']
     Nmax = NRange['nmax']
@@ -53,7 +53,7 @@ def isotopic(quantity, model, colorbar, wigner, ZRange, NRange):
 
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title=f"Isotopic Chain"+"  -  "+str(model)+"  -  Z = "+str(Z),
+        title=f"Isotopic Chain"+"  |  Z = "+str(Z)+"  |  "+str(model),
         xaxis=dict(title="Neutrons", gridcolor="#2f3445",title_font_size=14),
         yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
         #legend=dict(x=0, y=1.05, orientation="h"),
@@ -84,14 +84,22 @@ def isotopic(quantity, model, colorbar, wigner, ZRange, NRange):
     )
 
     #figure = px.line(x=Z, y=output, markers=True)
-    data = [trace0]
-    figure = go.Figure(data=data, layout=layout)
+    if NView == None:
+        figure =  go.Figure(data=[trace0], layout=layout)
+    else:
+        figure = go.Figure(data=[trace0], layout=layout, layout_xaxis_range=NView)
+        try:
+            NView[1]-NView[0]
+        except:
+            pass
+        else:
+            figure.update_xaxes(dtick=(int((NView[1]-NView[0])/8))*2)
     figure.update_xaxes(title_font_size=20)
     figure.update_yaxes(title_font_size=20)
     figure.update_layout(title_font_size=24)
     return figure
 
-def isotonic(quantity, model, colorbar, wigner, ZRange, NRange):
+def isotonic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView=None):
     N = NRange['neutrons']
     Zmin = ZRange['zmin']
     Zmax = ZRange['zmax']
@@ -103,7 +111,7 @@ def isotonic(quantity, model, colorbar, wigner, ZRange, NRange):
         
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title=f"Isotonic Chain"+"  -  "+str(model)+"  -  N = "+str(N),
+        title=f"Isotonic Chain"+"  |  N = "+str(N)+"  |  "+str(model),
         xaxis=dict(title="Protons", gridcolor="#2f3445", title_font_size=14),
         yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
         #legend=dict(x=0, y=1.05, orientation="h"),
@@ -134,17 +142,25 @@ def isotonic(quantity, model, colorbar, wigner, ZRange, NRange):
     )
 
     #figure = px.line(x=Z, y=output, markers=True)
-    data = [trace0]
-    figure = go.Figure(data=data, layout=layout)
+    if ZView == None:
+        figure =  go.Figure(data=[trace0], layout=layout)
+    else:
+        figure = go.Figure(data=[trace0], layout=layout, layout_xaxis_range=ZView)
+        try:
+            ZView[1]-ZView[0]
+        except:
+            pass
+        else:
+            figure.update_xaxes(dtick=(int((ZView[1]-ZView[0])/8))*2)
     figure.update_xaxes(title_font_size=20)
     figure.update_yaxes(title_font_size=20)
     figure.update_layout(title_font_size=24)
     return figure
 
-def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None):
+def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None, ZView=None, NView=None):
     layout = go.Layout(
             font={"color": "#a5b1cd"},
-            title=dict(text=bmex.OutputString(quantity)+"   -   "+str(model), font=dict(size=20)),
+            title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=30)),
             xaxis=dict(title=dict(text="Neutrons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
             showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,156]),
             yaxis=dict(title=dict(text="Protons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
@@ -224,8 +240,13 @@ def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None):
                         '<b><i>Z</i></b>: %{y}<br>'+
                         '<b><i>Value</i></b>: %{z}',          
     )
-    
-    return go.Figure(data=[trace], layout=layout)
+    if NView == None and ZView == None:
+        return go.Figure(data=[trace], layout=layout)
+    if ZView == None:
+        return go.Figure(data=[trace], layout=layout, layout_xaxis_range=NView)
+    if NView == None:
+        return go.Figure(data=[trace], layout=layout, layout_yaxis_range=ZView)
+    return go.Figure(data=[trace], layout=layout, layout_xaxis_range=NView, layout_yaxis_range=ZView)
 
 def serve_prediction_plot(
     model, X_train, X_test, y_train, y_test, Z, xx, yy, mesh_step, threshold
