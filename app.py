@@ -101,7 +101,8 @@ app.layout = html.Div(
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='nextgraphid', data=2),
         dcc.Store(id='viewsmemory', storage_type='memory',
-            data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1}]),
+            data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', 
+                              "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0}]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
     ]
@@ -363,10 +364,10 @@ def quantity_options(is_chain,url):
         Output("dropdown-select-dataset", "value"),
         Output("protons", "value"),
         Output("neutrons", "value"),
-        Output("zmin", "value"),
-        Output("zmax", "value"),
-        Output("nmin", "value"),
-        Output("nmax", "value"),
+        # Output("zmin", "value"),
+        # Output("zmax", "value"),
+        # Output("nmin", "value"),
+        # Output("nmax", "value"),
     ],
     [
         State("viewsmemory", "data"),
@@ -413,12 +414,8 @@ def main_update(
             cur_views[n-1]['graphstyle'],
             cur_views[n-1]['quantity'],
             cur_views[n-1]['dataset'],
-            cur_views[n-1]['ZRange']['protons'],
-            cur_views[n-1]['NRange']['neutrons'],
-            cur_views[n-1]['ZRange']['zmin'],
-            cur_views[n-1]['ZRange']['zmax'],
-            cur_views[n-1]['NRange']['nmin'],
-            cur_views[n-1]['NRange']['nmax'],
+            cur_views[n-1]['proton'],
+            cur_views[n-1]['neutron'],
         ]
 
     #new_plot
@@ -426,7 +423,8 @@ def main_update(
         if len(cur_tabs)>3 or type(new_button) != type(1):
             raise PreventUpdate
         new_views = cur_views
-        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": graphid}
+        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', 
+                   "wigner": 0, "id": graphid, "proton": 0, "neutron": 0}
         new_views.append(default)
         new_tabs = cur_tabs
         new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), style=TAB_STYLE,
@@ -445,12 +443,8 @@ def main_update(
             new_views[-1]['graphstyle'],
             new_views[-1]['quantity'],
             new_views[-1]['dataset'],
-            new_views[-1]['ZRange']['protons'],
-            new_views[-1]['NRange']['neutrons'],
-            new_views[-1]['ZRange']['zmin'],
-            new_views[-1]['ZRange']['zmax'],
-            new_views[-1]['NRange']['nmin'],
-            new_views[-1]['NRange']['nmax'],
+            new_views[-1]['proton'],
+            new_views[-1]['neutron'],
         ]
  
     #delete_plot
@@ -469,19 +463,16 @@ def main_update(
                 new_views[-1]['graphstyle'],
                 new_views[-1]['quantity'],
                 new_views[-1]['dataset'],
-                new_views[-1]['ZRange']['protons'],
-                new_views[-1]['NRange']['neutrons'],
-                new_views[-1]['ZRange']['zmin'],
-                new_views[-1]['ZRange']['zmax'],
-                new_views[-1]['NRange']['nmin'],
-                new_views[-1]['NRange']['nmax'],
+                new_views[-1]['proton'],
+                new_views[-1]['neutron'],
             ]
         else:
             raise PreventUpdate
     
     #reset_page
     if "reset-button" == dash.callback_context.triggered_id:
-        new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1}]
+        new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', 
+                      "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0}]
         return [
             json.dumps(new_views), 
             [dcc.Tab(label="1", value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE)],
@@ -491,12 +482,8 @@ def main_update(
             'landscape',
             'BE',
             'EXP',
-            40,
-            40,
-            None,
-            None,
-            None,
-            None,
+            0,
+            0,
         ]
 
     #dropdown_input
@@ -513,18 +500,10 @@ def main_update(
         new_views[n-1]['colorbar'] = colorbar
     if "radio-wigner" == dash.callback_context.triggered_id:
         new_views[n-1]['wigner'] = wigner
-    if "zmin" == dash.callback_context.triggered_id:
-        new_views[n-1]['ZRange']['min'] = zmin
-    if "zmax" == dash.callback_context.triggered_id:
-        new_views[n-1]['ZRange']['max'] = zmax
-    if "nmin" == dash.callback_context.triggered_id:
-        new_views[n-1]['NRange']['min'] = nmin
-    if "nmax" == dash.callback_context.triggered_id:
-        new_views[n-1]['NRange']['max'] = nmax
     if "protons" == dash.callback_context.triggered_id:
-        new_views[n-1]['ZRange']['protons'] = protons
+        new_views[n-1]['proton'] = protons
     if "neutrons" == dash.callback_context.triggered_id:
-        new_views[n-1]['NRange']['neutrons'] = neutrons
+        new_views[n-1]['neutron'] = neutrons
     return [
         json.dumps(new_views), 
         cur_tabs, 
@@ -536,10 +515,6 @@ def main_update(
         dataset,
         protons, 
         neutrons,
-        zmin, 
-        zmax, 
-        nmin, 
-        nmax
     ]
 
 

@@ -32,15 +32,7 @@ def single(quantity, model, Z, N, wigner=0):
             return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result)+" MeV")
         return html.P(result)
 
-def isotopic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView):
-    Z = ZRange['protons']
-    Nmin = NRange['nmin']
-    Nmax = NRange['nmax']
-
-    if(Nmin == None):
-        Nmin = 0
-    if(Nmax == None):
-        Nmax = 156
+def isotopic(quantity, model, colorbar, wigner, Z, N, ZView, NView):
 
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
@@ -56,7 +48,7 @@ def isotopic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView):
 
     neutrons = []
     output = []
-    for N in list(range(Nmin,Nmax+1)):
+    for N in list(range(0,157)):
         q = bmex.QuanValue(N,Z,model,quantity,wigner)
         try: 
             q+1
@@ -89,15 +81,7 @@ def isotopic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView):
     figure.update_layout(title_font_size=24)
     return figure
 
-def isotonic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView=None):
-    N = NRange['neutrons']
-    Zmin = ZRange['zmin']
-    Zmax = ZRange['zmax']
-
-    if(Zmin == None):
-        Zmin = 0
-    if(Zmax == None):
-        Zmax = 106
+def isotonic(quantity, model, colorbar, wigner, N, Z, ZView, NView):
         
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
@@ -113,7 +97,7 @@ def isotonic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView=Non
 
     protons = []
     output = []
-    for Z in list(range(Zmin,Zmax+1)):
+    for Z in list(range(0, 121)):
         q = bmex.QuanValue(N,Z,model,quantity,wigner)
         try: 
             q+1
