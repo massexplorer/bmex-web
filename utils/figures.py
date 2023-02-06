@@ -24,15 +24,6 @@ def single(quantity, model, Z, N, wigner=0):
             else:
                 output.append(html.P(result))
         return html.Div(id="nucleiAll", children=output, style={'font-size':'3rem'})
-    # all_eval = []
-    #         for name, val in  bmex.__dict__.items():
-    #             if (callable(val) and name != "OutputString" and name != "GP"):
-    #                 out_str = bmex.OutputString(name)
-    #                 result = val(N,Z,dataset)
-    #                 if isinstance(result,str):
-    #                     all_eval.append(html.P(result))
-    #                 else: 
-    #                     all_eval.append(html.P(dataset+" "+out_str+": {:.4f}".format(result)+" MeV"))
     else:
         result = bmex.QuanValue(N,Z,model,quantity,w=0)
         try:
@@ -83,7 +74,6 @@ def isotopic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView):
             }
     )
 
-    #figure = px.line(x=Z, y=output, markers=True)
     if NView == None:
         figure =  go.Figure(data=[trace0], layout=layout)
     else:
@@ -141,7 +131,6 @@ def isotonic(quantity, model, colorbar, wigner, ZRange, NRange, ZView, NView=Non
             }
     )
 
-    #figure = px.line(x=Z, y=output, markers=True)
     if ZView == None:
         figure =  go.Figure(data=[trace0], layout=layout)
     else:
@@ -229,12 +218,6 @@ def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None, ZView
                 colorscale=cb(colorbar),
                 colorbar=dict(
                     title="",
-                    #len=,
-                    #y=cb_y
-                    # tick0= 0,
-                    # tickmode= 'array',
-                    # tickvals= [-2, 0, 2, 4, 6],
-                    # ticktext= ["<0", "0", "2", "4", "6"],
                 ),
                 hovertemplate = '<b><i>N</i></b>: %{x}<br>'+
                         '<b><i>Z</i></b>: %{y}<br>'+

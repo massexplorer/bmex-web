@@ -9,7 +9,6 @@ import utils.views_class as views
 SELECTED_STYLE = {
     'width': '72px',
     'border': 'none',
-    #'boxShadow': 'inset 0px -1px 0px 0px lightgrey',
     'background': '#a5b1cd',
     'paddingTop': 0,
     'paddingBottom': 0,
@@ -49,9 +48,6 @@ def masses_view():
                         # className="three columns",
                         id="left-column",
                         children=[
-                            # html.Div(id='dropdown-iso-chain', value='landscape'),
-                            # html.Div(id='dropdown-select-quantity', value='SNESplitting'),
-                            # html.Div(id='dropdown-select-dataset', value='EXP'),
                             dcc.Tabs(id="tabs", value='tab1', children=[
                                 dcc.Tab(label='1', value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE),
                             ]),
@@ -122,21 +118,6 @@ def masses_view():
                                         value="EXP",
                                     ),
                                 ]),
-                                # drc.Card(id="link-card", children=[
-                                #     drc.NamedRadioItems(
-                                #         name="Link Plot",
-                                #         id="radio-link",
-                                #         options=[
-                                #             {"label": "None", "value": 0,},
-                                #             {"label": "1", "value": 1, "disabled": True},
-                                #             {"label": "2", "value": 2, "disabled": True},
-                                #             {"label": "3", "value": 3, "disabled": True},
-                                #             {"label": "4", "value": 4, "disabled": True},
-                                #         ],
-                                #         value=0,
-                                #         inline=True
-                                #     ),
-                                # ]),
                                 drc.Card(
                                     id="protons-card",
                                     children=[
@@ -209,20 +190,6 @@ def masses_view():
                             ])
                         ]
                     ),
-                    
-                    # html.Div(
-                    #     id="div-graphs",
-                    #     children=[
-                    #         dcc.Graph(
-                    #             id="graph-sklearn-svm",
-                    #             figure=dict(
-                    #                 layout=dict(
-                    #                     plot_bgcolor="#282b38", paper_bgcolor="#282b38"
-                    #                 )
-                    #             ),
-                    #         ),
-                    #     ],
-                    # ),
                     html.Div(id='div-right',
                     children=[
                         dcc.Loading(id="loading-1",
@@ -237,26 +204,7 @@ def masses_view():
                             ])
                         ])
                     ]),
-
-                    # html.Div(id='div-graphs',children=
-                    # dcc.Loading(
-                    #     id="loading-1",
-                    #     children =html.Div(id="div-graphs-loading",style={'width':'100%'},children=[html.Div(
-                    #     # id="div-graphs-gpe",
-
-                    #     children=[
-                    #         dcc.Graph(
-                    #             id="graph-sklearn-svm",
-                    #             figure=dict(
-                    #                 layout=dict(
-                    #                     plot_bgcolor="#282b38", paper_bgcolor="#282b38"
-                    #                 )
-                    #             ),
-                    #         ),
-                    #     ],
-                    # ),]))),
                     html.Div(
-                        # className="three columns",
                         id="right-column",
                         children=[
                             drc.Card(id="reset-card", children=[

@@ -31,7 +31,6 @@ import base64
 SELECTED_STYLE = {
     'width': '72px',
     'border': 'none',
-    #'boxShadow': 'inset 0px -1px 0px 0px lightgrey',
     'background': '#a5b1cd',
     'paddingTop': 0,
     'paddingBottom': 0,
@@ -102,8 +101,7 @@ app.layout = html.Div(
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='nextgraphid', data=2),
         dcc.Store(id='viewsmemory', storage_type='memory',
-        data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1, 
-        "ZRange": {"zmin": None, "zmax": None, "protons": 40}, "NRange": {"nmin": None, "nmax": None, "neutrons": 40}}]),
+            data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1}]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
     ]
@@ -132,13 +130,8 @@ def display_page(pathname):
 @app.callback(
     [
         Output(component_id='dropdown-select-quantity', component_property='options'),
-        #Output(component_id='dropdown-select-quantity', component_property='value'),
         Output(component_id='protons-card', component_property='style'),
         Output(component_id='neutrons-card', component_property='style'),
-        # Output(component_id='zmin-card', component_property='style'),
-        # Output(component_id='zmax-card', component_property='style'),
-        # Output(component_id='nmin-card', component_property='style'),
-        # Output(component_id='nmax-card', component_property='style'),
         Output(component_id='colorbar-card', component_property='style'),
         Output(component_id='Wigner-card', component_property='style'),
     ],
@@ -170,20 +163,10 @@ def quantity_options(is_chain,url):
                 {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
                 {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
-            # Default Value
-            #"All",
             # Proton Box Visibility
             show,
             # Neutron Box Visibility
             show,
-            # # Zmin Visibility
-            # hide,
-            # # Zmax Visibility
-            # hide,
-            # # Nmin Visibility
-            # hide,
-            # # Nmax Visibility
-            # hide,
             # Colorbar Visibility
             hide,
             # Wigner Visibility
@@ -206,20 +189,10 @@ def quantity_options(is_chain,url):
                     {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
                     {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
-            # Default Value
-            #"BE",
             # Proton Box Visibility
             show,
             # Neutron Box Visibility
             hide,
-            # # Zmin Visibility
-            # hide,
-            # # Zmax Visibility
-            # hide,
-            # # Nmin Visibility
-            # show,
-            # # Nmax Visibility
-            # show,
             # Colorbar Visibility
             hide,
             # Wigner Visibility
@@ -242,20 +215,10 @@ def quantity_options(is_chain,url):
                     {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
                     {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
             ],
-            # Default Value
-            #"BE",
             # Proton Box Visibility
             hide,
             # Neutron Box Visibility
             show,
-            # # Zmin Visibility
-            # show,
-            # # Zmax Visibility
-            # show,
-            # # Nmin Visibility
-            # hide,
-            # # Nmax Visibility
-            # hide,
             # Colorbar Visibility
             hide,
             # Wigner Visibility
@@ -279,20 +242,10 @@ def quantity_options(is_chain,url):
                     {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
                     {"label": "Quad Def Beta2", "value": "QDB2t",},
             ],
-            # Default Value
-            #"BE",
             # Proton Box Visibility
             hide,
             # Neutron Box Visibility
             hide,
-            # # Zmin Visibility
-            # hide,
-            # # Zmax Visibility
-            # hide,
-            # # Nmin Visibility
-            # hide,
-            # # Nmax Visibility
-            # hide,
             # Colorbar Visibility
             show,
             # Wigner Visibility
@@ -448,15 +401,13 @@ def main_update(
     cur_views = json.loads(json_cur_views)
     n = int(tab_n[3])
     #print(base64.urlsafe_b64encode(json_cur_views.encode()).decode())
-    print(cur_views[n-1])
 
     #tabs_change
     if "tabs" == dash.callback_context.triggered_id:
-        print('TABS')
         return  [
             json_cur_views, 
             cur_tabs,
-            json.dumps("dontupdate"), #graph
+            json.dumps("dontupdate"),
             tab_n, 
             graphid,
             cur_views[n-1]['graphstyle'],
@@ -475,8 +426,7 @@ def main_update(
         if len(cur_tabs)>3 or type(new_button) != type(1):
             raise PreventUpdate
         new_views = cur_views
-        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": graphid, 
-        "ZRange": {"zmin": None, "zmax": None, "protons": 40}, "NRange": {"nmin": None, "nmax": None, "neutrons": 40}}
+        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": graphid}
         new_views.append(default)
         new_tabs = cur_tabs
         new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), style=TAB_STYLE,
@@ -531,12 +481,11 @@ def main_update(
     
     #reset_page
     if "reset-button" == dash.callback_context.triggered_id:
-        new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1, 
-        "ZRange": {"zmin": None, "zmax": None, "protons": 40}, "NRange": {"nmin": None, "nmax": None, "neutrons": 40}}]
+        new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1}]
         return [
             json.dumps(new_views), 
             [dcc.Tab(label="1", value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE)],
-            json.dumps("update"), #graph
+            json.dumps("update"),
             'tab1',
             1,
             'landscape',
@@ -603,7 +552,6 @@ def main_update(
         Input("zmax", "value"),
         Input("nmin", "value"),
         Input("nmax", "value"),
-        #Input("graph-chains1", "relayoutData"),
     ],
 )
 def main_output(
@@ -613,7 +561,6 @@ def main_output(
     zmax,
     nmin,
     nmax,
-    #relayout_data
 ):  
     if "triggerGraph" == dash.callback_context.triggered_id:
         zview, nview = None, None
@@ -630,34 +577,7 @@ def main_output(
         return output
     raise PreventUpdate
 
-    # if "dropdown-iso-chain" == dash.callback_context.triggered_id
-    #     outputs = []
-    #     for fig in figures:
-    #         try:
-    #             fig['layout']["xaxis"]["range"] = [relayout_data['xaxis.range[0]'], relayout_data['xaxis.range[1]']]
-    #             fig['layout']["xaxis"]["autorange"] = False
-    #         except (KeyError, TypeError):
-    #             fig['layout']["xaxis"]["autorange"] = True
-
-    #         outputs.append(fig)
-    #     return outputs
-
-# @app.callback([Output('graph2', 'figure')],
-#          [Input('graph', 'relayoutData')], # this triggers the event
-#          [State('graph2', 'figure')])
-# def zoom_event(relayout_data, *figures):
-#     outputs = []
-#     for fig in figures:
-#         try:
-#             fig['layout']["xaxis"]["range"] = [nmin, nmax]
-#             fig['layout']["xaxis"]["autorange"] = False
-#         except (KeyError, TypeError):
-#             fig['layout']["xaxis"]["autorange"] = True
-
-#         outputs.append(fig)
-
-#     return outputs
-
+# OLD WEBSITE CODE
 
     # t_start = time.time()
     #

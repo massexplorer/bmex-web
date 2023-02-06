@@ -26,10 +26,6 @@ class View:
             setattr(self, key, my_dict[key])
         self.ZView = zview
         self.NView = nview
-        
-
-    # def change_attr(self, attribute, value):
-    #     self.attribute = value
 
     def plot(self):
         if self.graphstyle == 'single':
