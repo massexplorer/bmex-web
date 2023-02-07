@@ -250,7 +250,7 @@ def quantity_options(is_chain,url):
             # Colorbar Visibility
             show,
             # Wigner Visibility
-            show,
+            hide,
             ]            
     elif url == "/gpe":
         if is_chain == 'single':

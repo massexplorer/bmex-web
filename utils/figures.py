@@ -16,7 +16,7 @@ def single(quantity, model, Z, N, wigner=0):
         # return html.P("All")
         output = []
         for qs in bmex.qinput:
-            result = bmex.QuanValue(N,Z,model,qs,w=0)
+            result = bmex.QuanValue(Z,N,model,qs,wigner)
             try:
                 result+"a"
             except:
@@ -25,7 +25,7 @@ def single(quantity, model, Z, N, wigner=0):
                 output.append(html.P(result))
         return html.Div(id="nucleiAll", children=output, style={'font-size':'3rem'})
     else:
-        result = bmex.QuanValue(N,Z,model,quantity,w=0)
+        result = bmex.QuanValue(Z,N,model,quantity,wigner)
         try:
             result+"a"
         except:
@@ -48,8 +48,8 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, ZView, NView):
 
     neutrons = []
     output = []
-    for N in list(range(0,157)):
-        q = bmex.QuanValue(N,Z,model,quantity,wigner)
+    for N in range(0,157):
+        q = bmex.QuanValue(Z,N,model,quantity,wigner)
         try: 
             q+1
         except:
@@ -98,7 +98,7 @@ def isotonic(quantity, model, colorbar, wigner, N, Z, ZView, NView):
     protons = []
     output = []
     for Z in list(range(0, 121)):
-        q = bmex.QuanValue(N,Z,model,quantity,wigner)
+        q = bmex.QuanValue(Z,N,model,quantity,wigner)
         try: 
             q+1
         except:

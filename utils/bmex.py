@@ -15,27 +15,34 @@ qnames = ['Binding_Energy_(MeV)', 'One Neutron Separation Energy', 'One Proton S
 q_dict = {qinput[j]: qnames[j] for j in range(len(qinput))}
 
 # Retrieves single value
-def QuanValue(N,Z,model,quan,w=0):
+def QuanValue(Z,N,model,quan,w=0):
     df = data_dict[model]
     try:
         if w==3 and N==Z:
             return np.round(float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict[quan]])*float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict['WignerEC']]),6)
+        elif w==2:
+            return np.round(float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict[quan]])-Wig2(Z, N),6)*-1.0
+        elif w==1:
+            return np.round(float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict[quan]])-Wig1(Z, N),6)*-1.0
         else:
             return np.round(float(df[(df["N"]==N) & (df["Z"]==Z)][q_dict[quan]]),6)*-1.0
     except:
         return "Error: "+str(model)+" data does not have "+OutputString(quan)+" available for Nuclei with N="+str(N)+" and Z="+str(Z)
 
 def IsotopicChain(Z,model,quan,divisibilty,w=0):
+    q = q_dict[quan]
     df = data_dict[model]
-    df = df[df["Z"]==Z]
-    df = df[df["N"]%divisibilty==0]
-    df[q_dict[quan]] = df[q_dict[quan]]*-1
-    return df[[q_dict[quan], "N"]]
+    df = df[df["Z"]==Z][df["N"]%divisibilty==0]
+    df[q] = df[q]*-1
+    return df[[q, "N"]]
 
-def IsotonicChain(N,model,quan,w=0):
+
+def IsotonicChain(N,model,quan,divisibilty,w=0):
+    q = q_dict[quan]
     df = data_dict[model]
-    return df[df["N"]==N][q_dict[quan]]
-
+    df = df[df["N"]==N][df["Z"]%divisibilty==0]
+    df[q] = df[q]*-1
+    return df[[q, "Z"]]
     
 # def BE(N1,Z1,model):
 #     df = data_dict[model]
@@ -155,10 +162,10 @@ def IsotonicChain(N,model,quan,w=0):
 #     except:
 #         return "Error: "+str(model)+" data does not have this quantity available for Nuclei with N="+str(N1)+" and Z="+str(Z1)
 
-def Wig(n, z):
+def Wig1(z, n):
     return (1.8*np.exp(-380*((n-z)/(n+z))**2))-(.84*abs(n-z)*np.exp(-(((n+z)/26)**2)))
 
-def Wig2(n, z):
+def Wig2(z, n):
     return -47*(abs(n-z)/(n+z))
 
 def OutputString(quantity):
