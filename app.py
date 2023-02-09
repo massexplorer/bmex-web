@@ -99,7 +99,9 @@ app.layout = html.Div(
         ),
         html.Div(id='page-content'),
         dcc.Store(id='intermediate-value'),
+        dcc.Store(id='url-store'),
         dcc.Store(id='nextgraphid', data=2),
+        #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
         dcc.Store(id='viewsmemory', storage_type='memory',
             data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', 
                               "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0}]),
@@ -109,11 +111,12 @@ app.layout = html.Div(
 )
 
 @app.callback(
+    Output('url-store','data'),
     Output('page-content','children'),
     [Input('url','pathname')]
     )
 def display_page(pathname):
-    if(pathname == "/masses"):
+    if(pathname[:7] == "/masses"):
         out = masses_view()
     elif(pathname == "/gpe"):
         out = gpe_view()
@@ -126,7 +129,7 @@ def display_page(pathname):
             id="body",
             className="container scalable",
             children=[html.P("How did you get here? Click the banner to make it back to safety!")])
-    return out
+    return pathname, out
 
 @app.callback(
     [
@@ -144,7 +147,7 @@ def display_page(pathname):
 def quantity_options(is_chain,url):
     show = {'display': 'block'}
     hide = {'display': 'none'}
-    if url == "/masses":
+    if url[:7] == "/masses":
         if is_chain == 'single':
             return [[
                 # Options for Dropdown
@@ -353,6 +356,18 @@ def quantity_options(is_chain,url):
             ]
 
 @app.callback(
+    # Output("linkmemory", "data"),
+    Output("clipboard", "content"),
+    Input("viewsmemory", "data")
+)
+def link_update(views):
+    info = json.loads(views)
+    #print(base64.urlsafe_b64encode(json_cur_views.encode()).decode())
+    # data = base64.urlsafe_b64encode(json.dumps({'a': 123}).encode()).decode()
+    # data = json.loads(base64.urlsafe_b64decode(query_param.encode()).decode()
+    return "https://beta.bmex/masses/"+base64.urlsafe_b64encode(json.dumps(info).encode()).decode()
+
+@app.callback(
     [
         Output("viewsmemory", "data"),
         Output("tabs", "children"),
@@ -362,16 +377,15 @@ def quantity_options(is_chain,url):
         Output("dropdown-iso-chain", "value"),
         Output("dropdown-select-quantity", "value"),
         Output("dropdown-select-dataset", "value"),
+        Output("dropdown-colorbar", "value"),
         Output("protons", "value"),
         Output("neutrons", "value"),
-        # Output("zmin", "value"),
-        # Output("zmax", "value"),
-        # Output("nmin", "value"),
-        # Output("nmax", "value"),
     ],
     [
         State("viewsmemory", "data"),
         State("tabs", "children"),
+        #url
+        Input('url-store','data'),
         #tabs_output
         Input("tabs", "value"),
         #new_plot
@@ -396,12 +410,36 @@ def quantity_options(is_chain,url):
     ]
 )
 def main_update(
-    json_cur_views, cur_tabs, tab_n, new_button, graphid, 
+    json_cur_views, cur_tabs, url, tab_n, new_button, graphid, 
     delete_button, reset_button, graphstyle, quantity, dataset, zmin, 
     zmax, nmin, nmax, protons, neutrons, colorbar, wigner):
+
     cur_views = json.loads(json_cur_views)
     n = int(tab_n[3])
-    #print(base64.urlsafe_b64encode(json_cur_views.encode()).decode())
+
+    #url
+    if "url-store" == dash.callback_context.triggered_id:
+        if(len(url)>10):
+            view = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
+            new_tabs = []
+            for i in range(len(view)):
+                new_tabs.append(dcc.Tab(label=str(i+1),value='tab'+str(i+1),style=TAB_STYLE,selected_style=SELECTED_STYLE))
+                graphid = (view[-1]["id"])%4+1
+            return  [
+                json.dumps(view), 
+                new_tabs,
+                json.dumps("update"),
+                tab_n, 
+                graphid,
+                view[n-1]['graphstyle'],
+                view[n-1]['quantity'],
+                view[n-1]['dataset'],
+                view[n-1]['colorbar'],
+                view[n-1]['proton'],
+                view[n-1]['neutron'],
+            ]
+        else:
+            raise PreventUpdate
 
     #tabs_change
     if "tabs" == dash.callback_context.triggered_id:
@@ -414,6 +452,7 @@ def main_update(
             cur_views[n-1]['graphstyle'],
             cur_views[n-1]['quantity'],
             cur_views[n-1]['dataset'],
+            cur_views[n-1]['colorbar'],
             cur_views[n-1]['proton'],
             cur_views[n-1]['neutron'],
         ]
@@ -443,6 +482,7 @@ def main_update(
             new_views[-1]['graphstyle'],
             new_views[-1]['quantity'],
             new_views[-1]['dataset'],
+            new_views[-1]['colorbar'],
             new_views[-1]['proton'],
             new_views[-1]['neutron'],
         ]
@@ -463,6 +503,7 @@ def main_update(
                 new_views[-1]['graphstyle'],
                 new_views[-1]['quantity'],
                 new_views[-1]['dataset'],
+                new_views[-1]['colorbar'],
                 new_views[-1]['proton'],
                 new_views[-1]['neutron'],
             ]
@@ -482,18 +523,17 @@ def main_update(
             'landscape',
             'BE',
             'EXP',
+            'linear',
             0,
             0,
         ]
 
     #dropdown_input
-    print('DROPDOWN')
     new_views = cur_views
     if "dropdown-iso-chain" == dash.callback_context.triggered_id:
         new_views[n-1]['graphstyle'] = graphstyle
     if "dropdown-select-quantity" == dash.callback_context.triggered_id:
         new_views[n-1]['quantity'] = quantity
-        print(new_views[n-1]['quantity'])
     if "dropdown-select-dataset" == dash.callback_context.triggered_id:
         new_views[n-1]['dataset'] = dataset
     if "dropdown-colorbar" == dash.callback_context.triggered_id:
@@ -513,6 +553,7 @@ def main_update(
         graphstyle, 
         quantity, 
         dataset,
+        colorbar,
         protons, 
         neutrons,
     ]
@@ -544,7 +585,6 @@ def main_output(
     if(json.loads(trigger)=="update"):
         output = []
         views_list = json.loads(json_views) # list of dicts
-        print("OUT ", views_list)
         for view_dict in views_list: # iterate through dicts in list
             view = views.View(view_dict, zview, nview) # create a view
             output.append(view.plot())

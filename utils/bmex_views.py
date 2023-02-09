@@ -207,6 +207,23 @@ def masses_view():
                     html.Div(
                         id="right-column",
                         children=[
+                            dcc.Textarea(
+                                id="textarea_id",
+                                value="Share Views URL",
+                                style={"height": 3, "width": 140},
+                            ),
+                            dcc.Clipboard(
+                                #target_id="linkmemory",
+                                # target_id="textarea_id",
+                                id="clipboard",
+                                title="Copy",
+                                content="",
+                                style={
+                                    "display": "inline-block",
+                                    "fontSize": 20,
+                                    "verticalAlign": "top",
+                                },
+                            ),
                             drc.Card(id="reset-card", children=[
                                 html.Button('Reset Page', id='reset-button')
                             ]),

@@ -32,17 +32,19 @@ def QuanValue(Z,N,model,quan,w=0):
 def IsotopicChain(Z,model,quan,divisibilty,w=0):
     q = q_dict[quan]
     df = data_dict[model]
-    df = df[df["Z"]==Z][df["N"]%divisibilty==0]
+    df = df[df["Z"]==Z]
+    df = df[df["N"]%divisibilty==0]
     df[q] = df[q]*-1
-    return df[[q, "N"]]
+    return df.loc[:, [q, "N"]]
 
 
 def IsotonicChain(N,model,quan,divisibilty,w=0):
     q = q_dict[quan]
     df = data_dict[model]
-    df = df[df["N"]==N][df["Z"]%divisibilty==0]
+    df = df[df["N"]==N]
+    df = df[df["Z"]%divisibilty==0]
     df[q] = df[q]*-1
-    return df[[q, "Z"]]
+    return df.loc[:, [q, "Z"]]
     
 # def BE(N1,Z1,model):
 #     df = data_dict[model]
