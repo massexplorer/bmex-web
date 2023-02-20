@@ -6,33 +6,33 @@ import utils.dash_reusable_components as drc
 
 import utils.views_class as views
 
-SELECTED_STYLE = {
-    'width': '72px',
-    'border': 'none',
-    'background': '#a5b1cd',
-    'paddingTop': 0,
-    'paddingBottom': 0,
-    'height': '60px',
-    'font-size': 32,
-    'color': '#282b38',
-    'borderTop': '4px  #a5b1cd solid',
-    'borderLeft': '4px #a5b1cd solid',
-}
+# SELECTED_STYLE = {
+#     'width': '72px',
+#     'border': 'none',
+#     'background': '#a5b1cd',
+#     'paddingTop': 0,
+#     'paddingBottom': 0,
+#     'height': '60px',
+#     'font-size': 32,
+#     'color': '#282b38',
+#     'borderTop': '4px  #a5b1cd solid',
+#     'borderLeft': '4px #a5b1cd solid',
+# }
 
-TAB_STYLE = {
-    'width': '72px',
-    'boxShadow': 'none',
-    'borderLeft': '4px #ffffff solid',
-    'borderRight': '4px #282b38 solid',
-    'borderTop': '4px #ffffff solid',
-    'borderBottom': '4px #282b38 solid',
-    'background': '#a5b1cd',
-    'paddingTop': 0,
-    'paddingBottom': 0,
-    'height': '60px',
-    'font-size': 32,
-    'color': '#282b38'
-}
+# TAB_STYLE = {
+#     'width': '72px',
+#     'boxShadow': 'none',
+#     'borderLeft': '4px #ffffff solid',
+#     'borderRight': '4px #282b38 solid',
+#     'borderTop': '4px #ffffff solid',
+#     'borderBottom': '4px #282b38 solid',
+#     'background': '#a5b1cd',
+#     'paddingTop': 0,
+#     'paddingBottom': 0,
+#     'height': '60px',
+#     'font-size': 32,
+#     'color': '#282b38'
+# }
 
 def masses_view():
     
@@ -48,8 +48,9 @@ def masses_view():
                         # className="three columns",
                         id="left-column",
                         children=[
-                            dcc.Tabs(id="tabs", value='tab1', children=[
-                                dcc.Tab(label='1', value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE),
+                            dcc.Tabs(id="tabs", value='tab1', parent_className='custom-tabs', className='custom-tabs-container' ,children=[
+                                dcc.Tab(label='1', value='tab1', className='custom-tab', selected_className='custom-tab--selected'),
+                                # style=TAB_STYLE, selected_style=SELECTED_STYLE
                             ]),
                             html.Div(id='tabs_output', children=[
                                 drc.Card(id="graph-card", children=[

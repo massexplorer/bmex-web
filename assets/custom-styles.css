@@ -118,6 +118,39 @@
 /* Tabs
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
+.custom-tabs-container {
+    width: 70% !important;
+}
+
+.custom-tabs {
+    width: 70% !important;
+    background-color: #282b38 !important;
+}
+
+.custom-tab {
+    border-radius: 40% !important;
+    width: 20% !important;
+    border: 3px solid #ffff !important;
+    background: #a5b1cd !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 55px !important;
+    font-size: 175% !important;
+    color: #282b38 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.custom-tab--selected {
+    border: 3px solid #ffffff76 !important;
+    background: #e76f51 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 55px !important;
+    font-size: 32 !important;
+    color: #282b38  !important;
+}
 
 /* Buttons
 –––––––––––––––––––––––––––––––––––––––––––––––––– */

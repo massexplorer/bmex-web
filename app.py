@@ -28,34 +28,6 @@ import base64, io
 import re
 import base64
 
-SELECTED_STYLE = {
-    'width': '72px',
-    'border': 'none',
-    'background': '#a5b1cd',
-    'paddingTop': 0,
-    'paddingBottom': 0,
-    'height': '60px',
-    'font-size': 32,
-    'color': '#282b38',
-    'borderTop': '4px  #a5b1cd solid',
-    'borderLeft': '4px #a5b1cd solid',
-}
-
-TAB_STYLE = {
-    'width': '72px',
-    'boxShadow': 'none',
-    'borderLeft': '4px #ffffff solid',
-    'borderRight': '4px #282b38 solid',
-    'borderTop': '4px #ffffff solid',
-    'borderBottom': '4px #282b38 solid',
-    'background': '#a5b1cd',
-    'paddingTop': 0,
-    'paddingBottom': 0,
-    'height': '60px',
-    'font-size': 32,
-    'color': '#282b38'
-}
-
 app = dash.Dash(
     __name__,
     meta_tags=[
@@ -424,7 +396,7 @@ def main_update(
             view = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
             new_tabs = []
             for i in range(len(view)):
-                new_tabs.append(dcc.Tab(label=str(i+1),value='tab'+str(i+1),style=TAB_STYLE,selected_style=SELECTED_STYLE))
+                new_tabs.append(dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected'))
                 graphid = (view[-1]["id"])%4+1
             return  [
                 json.dumps(view), 
@@ -479,8 +451,7 @@ def main_update(
                    "wigner": 0, "id": graphid, "proton": 0, "neutron": 0}
         new_views.append(default)
         new_tabs = cur_tabs
-        new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), style=TAB_STYLE,
-            selected_style=SELECTED_STYLE))
+        new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), className='custom-tab', selected_className='custom-tab--selected'))
         l = len(new_tabs)
         if graphid == 4:
             graphid = 1
@@ -529,7 +500,7 @@ def main_update(
                       "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0}]
         return [
             json.dumps(new_views), 
-            [dcc.Tab(label="1", value='tab1', style=TAB_STYLE, selected_style=SELECTED_STYLE)],
+            [dcc.Tab(label="1", value='tab1', className='custom-tab', selected_className='custom-tab--selected')],
             json.dumps("update"),
             'tab1',
             1,
