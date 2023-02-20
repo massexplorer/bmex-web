@@ -91,7 +91,7 @@ def masses_view():
                                         ],
                                         clearable=False,
                                         searchable=False,
-                                        value="SNESplitting",
+                                        value="BE",
                                         maxHeight=160,
                                         optionHeight=80
                                     ),
@@ -207,23 +207,26 @@ def masses_view():
                     html.Div(
                         id="right-column",
                         children=[
-                            dcc.Textarea(
-                                id="textarea_id",
-                                value="Share Views URL",
-                                style={"height": 3, "width": 140},
-                            ),
-                            dcc.Clipboard(
-                                #target_id="linkmemory",
-                                # target_id="textarea_id",
-                                id="clipboard",
-                                title="Copy",
-                                content="",
-                                style={
-                                    "display": "inline-block",
-                                    "fontSize": 20,
-                                    "verticalAlign": "top",
-                                },
-                            ),
+                            drc.Card(id="copy-card", children=[
+                                html.Div(style={"display": 'inline-block'}, children=[
+                                    html.P("Copy View Link"),
+                                    dcc.Clipboard(id="clipboard",content="")
+                                    # dbc.Button(
+                                    #     [
+                                    #         "Copy Link",
+                                    #         dcc.Clipboard(
+                                    #             id="clipboard",
+                                    #             content="",
+                                    #             className="position-absolute start-0 top-0 h-100 w-100 opacity-0",
+                                    #             # style={'opacity': 100, 'height': 100, 'width': 100},
+                                    #         ),
+                                    #     ],
+                                    #     id="copy-button",
+                                    #     className="position-relative",
+                                    #     color="secondary",
+                                    # ),
+                                ]),
+                            ]),
                             drc.Card(id="reset-card", children=[
                                 html.Button('Reset Page', id='reset-button')
                             ]),

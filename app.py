@@ -141,7 +141,7 @@ def display_page(pathname):
     ],
     [
         Input(component_id='dropdown-iso-chain', component_property='value'),
-        Input('url','pathname'),
+        Input('url-store','data'),
     ]
 )
 def quantity_options(is_chain,url):
@@ -365,7 +365,7 @@ def link_update(views):
     #print(base64.urlsafe_b64encode(json_cur_views.encode()).decode())
     # data = base64.urlsafe_b64encode(json.dumps({'a': 123}).encode()).decode()
     # data = json.loads(base64.urlsafe_b64decode(query_param.encode()).decode()
-    return "https://beta.bmex.dev/masses/"+base64.urlsafe_b64encode(json.dumps(info).encode()).decode()
+    return "https://beta.bmex.dev/"+base64.urlsafe_b64encode(json.dumps(info).encode()).decode()
 
 @app.callback(
     [
@@ -420,6 +420,7 @@ def main_update(
     #url
     if "url-store" == dash.callback_context.triggered_id:
         if(len(url)>10):
+            print("YAY")
             view = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
             new_tabs = []
             for i in range(len(view)):
@@ -439,7 +440,19 @@ def main_update(
                 view[n-1]['neutron'],
             ]
         else:
-            raise PreventUpdate
+            return  [
+                json.dumps(cur_views), 
+                cur_tabs,
+                json.dumps("update"),
+                tab_n, 
+                graphid,
+                cur_views[n-1]['graphstyle'],
+                cur_views[n-1]['quantity'],
+                cur_views[n-1]['dataset'],
+                cur_views[n-1]['colorbar'],
+                cur_views[n-1]['proton'],
+                cur_views[n-1]['neutron'],
+            ]
 
     #tabs_change
     if "tabs" == dash.callback_context.triggered_id:
