@@ -337,7 +337,7 @@ def link_update(views):
     #print(base64.urlsafe_b64encode(json_cur_views.encode()).decode())
     # data = base64.urlsafe_b64encode(json.dumps({'a': 123}).encode()).decode()
     # data = json.loads(base64.urlsafe_b64decode(query_param.encode()).decode()
-    return "https://beta.bmex.dev/"+base64.urlsafe_b64encode(json.dumps(info).encode()).decode()
+    return "https://beta.bmex.dev/masses/"+base64.urlsafe_b64encode(json.dumps(info).encode()).decode()
 
 @app.callback(
     [
