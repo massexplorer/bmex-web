@@ -108,48 +108,26 @@ def display_page(pathname):
         Output(component_id='dropdown-select-quantity', component_property='options'),
         Output(component_id='protons-card', component_property='style'),
         Output(component_id='neutrons-card', component_property='style'),
+        Output(component_id='nucleons-card', component_property='style'),
         Output(component_id='colorbar-card', component_property='style'),
         Output(component_id='Wigner-card', component_property='style'),
+        Output(component_id='oneD-card', component_property='style')
     ],
     [
+        Input(component_id='dropdown-1D', component_property='value'),
         Input(component_id='dropdown-iso-chain', component_property='value'),
         Input('url-store','data'),
     ]
 )
-def quantity_options(is_chain,url):
+def quantity_options(oneD,is_chain,url):
     show = {'display': 'block'}
     hide = {'display': 'none'}
     if url[:7] == "/masses":
-        if is_chain == 'single':
-            return [[
-                # Options for Dropdown
-                {"label": "All", "value": "All"},
-                {"label": "Binding Energy", "value": "BE"},
-                {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-            ],
-            # Proton Box Visibility
-            show,
-            # Neutron Box Visibility
-            show,
-            # Colorbar Visibility
-            hide,
-            # Wigner Visibility
-            hide,
-            ]
-        elif is_chain == 'isotopic':
-            return [[
+        if "dropdown-iso-chain" == dash.callback_context.triggered_id:
+            if is_chain == 'single':
+                return [[
+                    # Options for Dropdown
+                    {"label": "All", "value": "All"},
                     {"label": "Binding Energy", "value": "BE"},
                     {"label": "One Neutron Separation Energy", "value": "OneNSE",},
                     {"label": "One Proton Separation Energy", "value": "OnePSE",},
@@ -164,69 +142,145 @@ def quantity_options(is_chain,url):
                     {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
                     {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
                     {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-            ],
-            # Proton Box Visibility
-            show,
-            # Neutron Box Visibility
-            hide,
-            # Colorbar Visibility
-            hide,
-            # Wigner Visibility
-            hide,
-            ]
-        elif is_chain == 'isotonic':
-            return [[
-                    {"label": "Binding Energy", "value": "BE"},
-                    {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                    {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                    {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                    {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                    {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                    {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                    {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                    {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                    {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                    {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                    {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                    {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                    {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-            ],
-            # Proton Box Visibility
-            hide,
-            # Neutron Box Visibility
-            show,
-            # Colorbar Visibility
-            hide,
-            # Wigner Visibility
-            hide,           
-            ]
-        elif is_chain == 'landscape':
-            return [[
-                    {"label": "Binding Energy", "value": "BE"},
-                    {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                    {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                    {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                    {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                    {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                    {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                    {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                    {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                    {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                    {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                    {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                    {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                    {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-                    {"label": "Quad Def Beta2", "value": "QDB2t",},
-            ],
-            # Proton Box Visibility
-            hide,
-            # Neutron Box Visibility
-            hide,
-            # Colorbar Visibility
-            show,
-            # Wigner Visibility
-            hide,
-            ]            
+                ],
+                # Proton Box Visibility
+                show,
+                # Neutron Box Visibility
+                show,
+                # Nucleons Box Visibility
+                hide,
+                # Colorbar Visibility
+                hide,
+                # Wigner Visibility
+                hide,
+                # 1D Visibility
+                hide,
+                ]
+            elif is_chain == 'landscape':
+                return [[
+                        {"label": "Binding Energy", "value": "BE"},
+                        {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                        {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                        {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                        {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                        {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                        {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                        {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                        {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+                        {"label": "Quad Def Beta2", "value": "QDB2t",},
+                ],
+                # Proton Box Visibility
+                hide,
+                # Neutron Box Visibility
+                hide,
+                # Nucleons Box Visibility
+                hide,
+                # Colorbar Visibility
+                show,
+                # Wigner Visibility
+                hide,
+                # 1D Visibility
+                hide,
+                ]
+            elif is_chain == "1D":
+                return [[
+                        {"label": "Binding Energy", "value": "BE"},
+                        {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                        {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                        {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                        {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                        {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                        {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                        {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                        {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+                        {"label": "Quad Def Beta2", "value": "QDB2t",},
+                ],
+                # Proton Box Visibility
+                show,
+                # Neutron Box Visibility
+                hide,
+                # Nucleons Box Visibility
+                hide,
+                # Colorbar Visibility
+                hide,
+                # Wigner Visibility
+                hide,
+                # 1D Visibility
+                show,
+                ]
+            
+        if "dropdown-1D" == dash.callback_context.triggered_id:
+            if oneD == 'isotopic':
+                return [[
+                        {"label": "Binding Energy", "value": "BE"},
+                        {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                        {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                        {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                        {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                        {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                        {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                        {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                        {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+                ],
+                # Proton Box Visibility
+                show,
+                # Neutron Box Visibility
+                hide,
+                # Nucleons Box Visibility
+                hide,
+                # Colorbar Visibility
+                hide,
+                # Wigner Visibility
+                hide,
+                # 1D Visibility
+                show,
+                ]
+            elif oneD == 'isotonic':
+                return [[
+                        {"label": "Binding Energy", "value": "BE"},
+                        {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                        {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                        {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                        {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                        {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                        {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                        {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                        {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+                ],
+                # Proton Box Visibility
+                hide,
+                # Neutron Box Visibility
+                show,
+                # Nucleons Box Visibility
+                hide,
+                # Colorbar Visibility
+                hide,
+                # Wigner Visibility
+                hide,
+                # 1D Visibility
+                show,          
+                ]
+               
     elif url == "/gpe":
         if is_chain == 'single':
             return [[
@@ -347,6 +401,7 @@ def link_update(views):
         Output("tabs", "value"),
         Output("nextgraphid", "data"),
         Output("dropdown-iso-chain", "value"),
+        Output("dropdown-1D", "value"),
         Output("dropdown-select-quantity", "value"),
         Output("dropdown-select-dataset", "value"),
         Output("dropdown-colorbar", "value"),
@@ -357,7 +412,7 @@ def link_update(views):
         State("viewsmemory", "data"),
         State("tabs", "children"),
         #url
-        Input('url-store','data'),
+        Input("url-store", "data"),
         #tabs_output
         Input("tabs", "value"),
         #new_plot
@@ -369,6 +424,7 @@ def link_update(views):
         Input("reset-button","n_clicks"),
         #dropdowns
         Input("dropdown-iso-chain","value"),
+        Input("dropdown-1D","value"),
         Input("dropdown-select-quantity", "value"),
         Input("dropdown-select-dataset", "value"),
         Input("zmin", "value"),
@@ -383,28 +439,35 @@ def link_update(views):
 )
 def main_update(
     json_cur_views, cur_tabs, url, tab_n, new_button, graphid, 
-    delete_button, reset_button, graphstyle, quantity, dataset, zmin, 
+    delete_button, reset_button, graphstyle, oneD, quantity, dataset, zmin, 
     zmax, nmin, nmax, protons, neutrons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
     n = int(tab_n[3])
 
+    def graphtype(graph):
+        oneD = 'isotopic'
+        if graph[:3]=='iso':
+            oneD = graph
+            graph = '1D'
+        return graph, oneD
+
     #url
     if "url-store" == dash.callback_context.triggered_id:
         if(len(url)>10):
-            print("YAY")
             view = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
+            dimension, new_oneD = graphtype(view[n-1]['graphstyle'])
             new_tabs = []
             for i in range(len(view)):
                 new_tabs.append(dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected'))
-                graphid = (view[-1]["id"])%4+1
+                graphid = (view[-1]['id'])%4+1
             return  [
                 json.dumps(view), 
                 new_tabs,
-                json.dumps("update"),
+                json.dumps('update'),
                 tab_n, 
                 graphid,
-                view[n-1]['graphstyle'],
+                dimension, new_oneD,
                 view[n-1]['quantity'],
                 view[n-1]['dataset'],
                 view[n-1]['colorbar'],
@@ -412,13 +475,14 @@ def main_update(
                 view[n-1]['neutron'],
             ]
         else:
+            dimension, new_oneD = graphtype(cur_views[n-1]['graphstyle'])
             return  [
                 json.dumps(cur_views), 
                 cur_tabs,
                 json.dumps("update"),
                 tab_n, 
                 graphid,
-                cur_views[n-1]['graphstyle'],
+                dimension, new_oneD,
                 cur_views[n-1]['quantity'],
                 cur_views[n-1]['dataset'],
                 cur_views[n-1]['colorbar'],
@@ -428,13 +492,14 @@ def main_update(
 
     #tabs_change
     if "tabs" == dash.callback_context.triggered_id:
+        dimension, new_oneD = graphtype(cur_views[n-1]['graphstyle'])
         return  [
             json_cur_views, 
             cur_tabs,
             json.dumps("dontupdate"),
             tab_n, 
             graphid,
-            cur_views[n-1]['graphstyle'],
+            dimension, new_oneD,
             cur_views[n-1]['quantity'],
             cur_views[n-1]['dataset'],
             cur_views[n-1]['colorbar'],
@@ -457,13 +522,14 @@ def main_update(
             graphid = 1
         else:
             graphid += 1
+        dimension, new_oneD = graphtype(new_views[-1]['graphstyle'])
         return [
             json.dumps(new_views),
             new_tabs,
             json.dumps("update"), #graph
             "tab"+str(l),
             graphid,
-            new_views[-1]['graphstyle'],
+            dimension, new_oneD,
             new_views[-1]['quantity'],
             new_views[-1]['dataset'],
             new_views[-1]['colorbar'],
@@ -478,13 +544,14 @@ def main_update(
             new_views.pop(n-1)
             new_tabs = cur_tabs
             new_tabs.pop(-1)
+            dimension, new_oneD = graphtype(new_views[-1]['graphstyle'])
             return [
                 json.dumps(new_views), 
                 new_tabs,
                 json.dumps("update"), #graph
                 "tab"+str(len(new_views)),
                 graphid,
-                new_views[-1]['graphstyle'],
+                dimension, new_oneD,
                 new_views[-1]['quantity'],
                 new_views[-1]['dataset'],
                 new_views[-1]['colorbar'],
@@ -505,6 +572,7 @@ def main_update(
             'tab1',
             1,
             'landscape',
+            'isotopic',
             'BE',
             'EXP',
             'linear',
@@ -514,8 +582,11 @@ def main_update(
 
     #dropdown_input
     new_views = cur_views
-    if "dropdown-iso-chain" == dash.callback_context.triggered_id:
-        new_views[n-1]['graphstyle'] = graphstyle
+    if ("dropdown-iso-chain" == dash.callback_context.triggered_id) or ("dropdown-1D" == dash.callback_context.triggered_id):
+        if graphstyle == "1D":      
+            new_views[n-1]['graphstyle'] = oneD
+        else:
+            new_views[n-1]['graphstyle'] = graphstyle
     if "dropdown-select-quantity" == dash.callback_context.triggered_id:
         new_views[n-1]['quantity'] = quantity
     if "dropdown-select-dataset" == dash.callback_context.triggered_id:
@@ -534,7 +605,8 @@ def main_update(
         json.dumps("update"), 
         tab_n, 
         graphid,
-        graphstyle, 
+        graphstyle,
+        oneD,
         quantity, 
         dataset,
         colorbar,

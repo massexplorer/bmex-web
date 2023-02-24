@@ -170,9 +170,18 @@
     flex-direction: column;
 }
 
+#reset-card {
+    padding-top: 3rem;
+}
+
 #reset-button {
     color: #e76f51;
     width: 100%;
+}
+
+#delete-card {
+    border-top: 0px solid #e76f51;
+    padding-top: 3rem;
 }
 
 #delete-button {
@@ -230,23 +239,44 @@
 }
 
 .card {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 0px solid rgba(255, 255, 255, 0.1);
     width: 80%;
-    padding: 2rem 0;
+    padding: 0 0;
 }
 
-#protons-card, #neutrons-card, #zmin-card, #zmax-card, #nmin-card, #nmax-card {
-    border-bottom: none;
-    padding: 0rem 0;
+#dimension-card {
+    padding-top: 1rem;
+}
+
+#oneD-card {
+    padding-bottom: 0rem;
+}
+
+.input {
+    margin-left: 0px;
+    color:#e76f51;
+}
+
+#protons-card, #neutrons-card, #nucleons-card {
+    padding-left: 0rem;
+}
+
+#protons, #neutrons, #nucleons {
+    width: 100%;
+}
+
+#quantity-card {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+}
+
+#copy-card {
+    padding-bottom: 2rem;
 }
 
 .graph-title {
     font-size: 2rem;
     margin: 15% 0 0 25%;
-}
-
-#first-card {
-    padding-top: 0;
 }
 
 @media (max-width: 1500px) {
@@ -271,16 +301,12 @@
 
 @media (min-width: 1301px) {
     #left-column {
-        flex: 1 20%;
-        margin: 0 3rem 0 0;
+        flex: 1 25%;
+        margin: 0 0 0 0;
         max-height: none;
-        max-width: 20%;
+        max-width: 25%;
         overflow-x: hidden;
         overflow-y: auto;
-    }
-
-    .card {
-        padding-left: 2rem;
     }
 }
 
@@ -359,13 +385,6 @@
     }
 }
 
-@media (max-width: 700px) {
-    #first-card {
-        margin: 0;
-        padding-right: 0;
-        padding-left: 0;
-    }
-}
 
 /* Slider
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -380,6 +399,10 @@
 
 /* Left column
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+#left-column{
+    height: 800px
+}
+
 #slider-svm-parameter-C-coef {
     padding: 5px 10px 25px;
 }
@@ -394,6 +417,10 @@
 
 /* Right column
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+#right-column{
+    height: 800px
+}
+
 #slider-svm-parameter-C-coef {
     padding: 5px 10px 25px;
 }

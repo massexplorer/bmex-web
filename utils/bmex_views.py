@@ -53,14 +53,13 @@ def masses_view():
                                 # style=TAB_STYLE, selected_style=SELECTED_STYLE
                             ]),
                             html.Div(id='tabs_output', children=[
-                                drc.Card(id="graph-card", children=[
+                                drc.Card(id="dimension-card", children=[
                                     drc.NamedDropdown(
-                                        name="Graph Style",
+                                        name="Dimension",
                                         id="dropdown-iso-chain",
                                         options=[
                                             {"label": "Single Nucleus", "value": "single"},
-                                            {"label": "Isotopic Chain", "value": "isotopic"},
-                                            {"label": "Isotonic Chain", "value": "isotonic"},
+                                            {"label": "1D Chains", "value": "1D"},
                                             {"label": "Landscape", "value": "landscape"},
                                         ],
                                         clearable=False,
@@ -68,6 +67,63 @@ def masses_view():
                                         value="landscape",
                                     ),
                                 ]),
+                                drc.Card(id="oneD-card", children=[
+                                    drc.NamedDropdown(
+                                        name='1D Chain',
+                                        id="dropdown-1D",
+                                        options=[
+                                            {"label": "Isotopic Chain", "value": "isotopic"},
+                                            {"label": "Isotonic Chain", "value": "isotonic"},
+                                            {"label": "Isobaric Chain", "value": "isobaric"},
+                                        ],
+                                        clearable=False,
+                                        searchable=False,
+                                        value="isotopic",
+                                    ),
+                                ]),
+                                drc.Card(
+                                    id="protons-card",
+                                    children=[
+                                        html.P("Protons:", style={"padding-left": '.5rem'}),
+                                        dcc.Input(
+                                            id="protons",
+                                            type="number",
+                                            min=0,
+                                            max=200,
+                                            step=1,
+                                            placeholder="Proton #",
+                                            value=40
+                                        ),
+                                    ],
+                                ),
+                                drc.Card(
+                                    id="neutrons-card",
+                                    children=[
+                                        html.P("Neutrons:", style={"padding-left": '.5rem'}),
+                                        dcc.Input(
+                                            id="neutrons",
+                                            type="number",
+                                            min=0,
+                                            max=200,
+                                            step=1,
+                                            placeholder="Neutron #",
+                                        ),
+                                    ],
+                                ),
+                                drc.Card(
+                                    id="nucleons-card",
+                                    children=[
+                                        html.P("Nucleons:", style={"padding-left": '.5rem'}),
+                                        dcc.Input(
+                                            id="nucleons",
+                                            type="number",
+                                            min=0,
+                                            max=400,
+                                            step=1,
+                                            placeholder="Nucleon #",
+                                        ),
+                                    ],
+                                ),
                                 drc.Card(id="quantity-card", children=[
                                     drc.NamedDropdown(
                                         name="Select Quantity",
@@ -94,7 +150,8 @@ def masses_view():
                                         searchable=False,
                                         value="BE",
                                         maxHeight=160,
-                                        optionHeight=80
+                                        optionHeight=80,
+                                        
                                     ),
                                 ]),
                                 drc.Card(id="dataset-card", children=[
@@ -119,37 +176,6 @@ def masses_view():
                                         value="EXP",
                                     ),
                                 ]),
-                                drc.Card(
-                                    id="protons-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Protons",
-                                            id="protons",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Proton #",
-                                            style={'width':'100%'},
-                                            value=40
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="neutrons-card",
-                                    children=[
-                                        drc.NamedInput(
-                                            name="Neutrons",
-                                            id="neutrons",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Neutron #",
-                                            style={'width':'100%'},
-                                        ),
-                                    ],
-                                ),
                                 drc.Card(
                                     id="colorbar-card",
                                     children=[
@@ -228,9 +254,6 @@ def masses_view():
                                     # ),
                                 ]),
                             ]),
-                            drc.Card(id="reset-card", children=[
-                                html.Button('Reset Page', id='reset-button')
-                            ]),
                             drc.Card(
                                 id="range-card",
                                 children=[
@@ -242,6 +265,9 @@ def masses_view():
                                     dcc.Input(id="zmax", type="number", placeholder="Z max", min=0, max=106),
                                 ]
                             ),
+                            drc.Card(id="reset-card", children=[
+                                html.Button('Reset Page', id='reset-button')
+                            ]),
                         ]
                     )                   
                 ],              
