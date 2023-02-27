@@ -32,7 +32,7 @@ def single(quantity, model, Z, N, wigner=0):
             return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result)+" MeV")
         return html.P(result)
 
-def isotopic(quantity, model, colorbar, wigner, Z, N, ZView, NView):
+def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
 
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
@@ -81,7 +81,7 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, ZView, NView):
     figure.update_layout(title_font_size=24)
     return figure
 
-def isotonic(quantity, model, colorbar, wigner, N, Z, ZView, NView):
+def isotonic(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
         
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
@@ -97,14 +97,14 @@ def isotonic(quantity, model, colorbar, wigner, N, Z, ZView, NView):
 
     protons = []
     output = []
-    for Z in list(range(0, 121)):
-        q = bmex.QuanValue(Z,N,model,quantity,wigner)
+    for z in list(range(0, 121)):
+        q = bmex.QuanValue(z,N,model,quantity,wigner)
         try: 
             q+1
         except:
             continue
         else:
-            protons.append(Z)
+            protons.append(z)
             output.append(q)
 
     trace0 = go.Scatter(
@@ -130,7 +130,56 @@ def isotonic(quantity, model, colorbar, wigner, N, Z, ZView, NView):
     figure.update_layout(title_font_size=24)
     return figure
 
-def landscape(quantity, model, colorbar, wigner, ZRange=None, NRange=None, ZView=None, NView=None):
+def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
+        
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title=f"Isobaric Chain"+"  |  A = "+str(A)+"  |  "+str(model),
+        xaxis=dict(title="Protons", gridcolor="#2f3445", title_font_size=14),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+    )
+
+    protons = []
+    output = []
+    for z in list(range(0, A)):
+        q = bmex.QuanValue(z,A-z,model,quantity,wigner)
+        try: 
+            q+1
+        except:
+            continue
+        else:
+            protons.append(z)
+            output.append(q)
+
+    trace0 = go.Scatter(
+        x=protons, y=output, mode="lines+markers", name="Test Data", marker=\
+            {
+                "color": "#13c6e9",
+                #"size": 20,
+            }
+    )
+
+    if ZView == None:
+        figure =  go.Figure(data=[trace0], layout=layout)
+    else:
+        figure = go.Figure(data=[trace0], layout=layout, layout_xaxis_range=ZView)
+        try:
+            ZView[1]-ZView[0]
+        except:
+            pass
+        else:
+            figure.update_xaxes(dtick=(int((ZView[1]-ZView[0])/8))*2)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+    return figure
+
+def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=None, NView=None):
     layout = go.Layout(
             font={"color": "#a5b1cd"},
             title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=30)),

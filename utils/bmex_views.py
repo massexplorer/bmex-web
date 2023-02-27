@@ -225,7 +225,8 @@ def masses_view():
                             children=[
                                 html.Div(id="div-graphs",
                                 children=[
-                                    views.View({"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0}).plot(),
+                                    views.View({"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', 
+                                                "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon":0}).plot(),
                                     html.Button('New Plot', id='new-button', hidden=True),
                                 ])
                             ])

@@ -75,8 +75,8 @@ app.layout = html.Div(
         dcc.Store(id='nextgraphid', data=2),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
         dcc.Store(id='viewsmemory', storage_type='memory',
-            data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', 
-                              "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0}]),
+            data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
+                               "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon": 0}]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
     ]
@@ -280,6 +280,36 @@ def quantity_options(oneD,is_chain,url):
                 # 1D Visibility
                 show,          
                 ]
+            elif oneD == 'isobaric':
+                return [[
+                        {"label": "Binding Energy", "value": "BE"},
+                        {"label": "One Neutron Separation Energy", "value": "OneNSE",},
+                        {"label": "One Proton Separation Energy", "value": "OnePSE",},
+                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
+                        {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
+                        {"label": "Alpha Separation Energy", "value": "AlphaSE",},
+                        {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
+                        {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
+                        {"label": "Double Mass Difference", "value": "DoubleMDiff",},
+                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
+                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
+                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
+                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
+                        {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
+                ],
+                # Proton Box Visibility
+                hide,
+                # Neutron Box Visibility
+                hide,
+                # Nucleons Box Visibility
+                show,
+                # Colorbar Visibility
+                hide,
+                # Wigner Visibility
+                hide,
+                # 1D Visibility
+                show,          
+                ]
                
     elif url == "/gpe":
         if is_chain == 'single':
@@ -407,6 +437,7 @@ def link_update(views):
         Output("dropdown-colorbar", "value"),
         Output("protons", "value"),
         Output("neutrons", "value"),
+        Output("nucleons", "value"),
     ],
     [
         State("viewsmemory", "data"),
@@ -433,6 +464,7 @@ def link_update(views):
         Input("nmax", "value"),
         Input("protons", "value"),
         Input("neutrons", "value"),
+        Input("nucleons", "value"),
         Input("dropdown-colorbar","value"),
         Input("radio-wigner","value"),
     ]
@@ -440,7 +472,7 @@ def link_update(views):
 def main_update(
     json_cur_views, cur_tabs, url, tab_n, new_button, graphid, 
     delete_button, reset_button, graphstyle, oneD, quantity, dataset, zmin, 
-    zmax, nmin, nmax, protons, neutrons, colorbar, wigner):
+    zmax, nmin, nmax, protons, neutrons, nucleons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
     n = int(tab_n[3])
@@ -473,6 +505,7 @@ def main_update(
                 view[n-1]['colorbar'],
                 view[n-1]['proton'],
                 view[n-1]['neutron'],
+                view[n-1]['nucleon'],
             ]
         else:
             dimension, new_oneD = graphtype(cur_views[n-1]['graphstyle'])
@@ -488,6 +521,7 @@ def main_update(
                 cur_views[n-1]['colorbar'],
                 cur_views[n-1]['proton'],
                 cur_views[n-1]['neutron'],
+                cur_views[n-1]['nucleon'],
             ]
 
     #tabs_change
@@ -505,6 +539,7 @@ def main_update(
             cur_views[n-1]['colorbar'],
             cur_views[n-1]['proton'],
             cur_views[n-1]['neutron'],
+            cur_views[n-1]['nucleon'],
         ]
 
     #new_plot
@@ -512,8 +547,8 @@ def main_update(
         if len(cur_tabs)>3 or type(new_button) != type(1):
             raise PreventUpdate
         new_views = cur_views
-        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear', 
-                   "wigner": 0, "id": graphid, "proton": 0, "neutron": 0}
+        default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
+                   "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon": 0}
         new_views.append(default)
         new_tabs = cur_tabs
         new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), className='custom-tab', selected_className='custom-tab--selected'))
@@ -535,6 +570,7 @@ def main_update(
             new_views[-1]['colorbar'],
             new_views[-1]['proton'],
             new_views[-1]['neutron'],
+            new_views[-1]['nucleon'],
         ]
  
     #delete_plot
@@ -557,14 +593,15 @@ def main_update(
                 new_views[-1]['colorbar'],
                 new_views[-1]['proton'],
                 new_views[-1]['neutron'],
+                new_views[-1]['nucleon'],
             ]
         else:
             raise PreventUpdate
     
     #reset_page
     if "reset-button" == dash.callback_context.triggered_id:
-        new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', 
-                      "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0}]
+        new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
+                      "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon": 0}]
         return [
             json.dumps(new_views), 
             [dcc.Tab(label="1", value='tab1', className='custom-tab', selected_className='custom-tab--selected')],
@@ -576,6 +613,7 @@ def main_update(
             'BE',
             'EXP',
             'linear',
+            0,
             0,
             0,
         ]
@@ -599,6 +637,8 @@ def main_update(
         new_views[n-1]['proton'] = protons
     if "neutrons" == dash.callback_context.triggered_id:
         new_views[n-1]['neutron'] = neutrons
+    if "nucleons" == dash.callback_context.triggered_id:
+        new_views[n-1]['nucleon'] = nucleons
     return [
         json.dumps(new_views), 
         cur_tabs, 
@@ -612,6 +652,7 @@ def main_update(
         colorbar,
         protons, 
         neutrons,
+        nucleons,
     ]
 
 
