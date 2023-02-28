@@ -213,6 +213,9 @@ def masses_view():
                                         ),
                                     ]
                                 ),
+                                drc.Card(id="chain-card", children=[
+                                    html.Button('+', id='chain-button', value=None)
+                                ]),
                                 drc.Card(id="delete-card", children=[
                                     html.Button('Delete Plot', id='delete-button', value=None)
                                 ]),
@@ -238,24 +241,8 @@ def masses_view():
                         id="right-column",
                         children=[
                             drc.Card(id="copy-card", children=[
-                                html.Div(style={"display": 'inline-block'}, children=[
-                                    html.P("Copy View Link"),
-                                    dcc.Clipboard(id="clipboard",content="")
-                                    # dbc.Button(
-                                    #     [
-                                    #         "Copy Link",
-                                    #         dcc.Clipboard(
-                                    #             id="clipboard",
-                                    #             content="",
-                                    #             className="position-absolute start-0 top-0 h-100 w-100 opacity-0",
-                                    #             # style={'opacity': 100, 'height': 100, 'width': 100},
-                                    #         ),
-                                    #     ],
-                                    #     id="copy-button",
-                                    #     className="position-relative",
-                                    #     color="secondary",
-                                    # ),
-                                ]),
+                                html.P("Share View:"),
+                                dcc.Clipboard(id="clipboard",content="")
                             ]),
                             drc.Card(
                                 id="range-card",

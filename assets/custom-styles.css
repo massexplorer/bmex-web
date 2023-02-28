@@ -179,6 +179,19 @@
     width: 100%;
 }
 
+#chain-card {
+    display: flex;
+}
+
+#chain-button {
+    color: #a5b1cd;
+    padding: 0 !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    vertical-align: middle !important;
+    line-height: 0;
+}
+
 #delete-card {
     border-top: 0px solid #e76f51;
     padding-top: 3rem;
@@ -192,11 +205,6 @@
     color: #a5b1cd;
     width: 50%;
     align-self: center;
-}
-
-#copy-button {
-    color: #a5b1cd;
-    width: 70%;
 }
 
 /* Text Inputs
@@ -276,6 +284,12 @@
 
 #copy-card {
     padding-bottom: 2rem;
+    display: flex !important;
+}
+
+#clipboard {
+    padding-left: 1rem;
+    cursor: pointer;
 }
 
 .graph-title {
