@@ -21,13 +21,14 @@ import pandas as pd
 import random as rand
 
 class View:
-    def __init__(self, my_dict=dict(graphstyle='landscape', quantity='BE', dataset='EXP', colorbar='linear', wigner=0, id=rand.randint(0,999999), proton=40, neutron=40, nucleon=40), zview=None, nview=None):
+    def __init__(self, my_dict=dict(graphstyle='landscape', quantity='BE', dataset='EXP', colorbar='linear', wigner=0, proton=40, neutron=40, nucleon=40), graphindex=0, zview=None, nview=None):
         for key in my_dict:
             setattr(self, key, my_dict[key])
+        self.index = graphindex
         self.ZView = zview
         self.NView = nview
 
     def plot(self):
         if self.graphstyle == 'single':
             return figs.single(self.quantity, self.dataset, self.proton, self.neutron, self.wigner)
-        return dcc.Graph(id='graph-chains'+str(self.id), figure=getattr(figs, self.graphstyle)(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.ZView, self.NView))
+        return dcc.Graph(id={'type': 'dynamic-output','index': self.index}, figure=getattr(figs, self.graphstyle)(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.ZView, self.NView))

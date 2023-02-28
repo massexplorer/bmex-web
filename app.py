@@ -76,7 +76,7 @@ app.layout = html.Div(
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
         dcc.Store(id='viewsmemory', storage_type='memory',
             data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
-                               "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon": 0}]),
+                               "wigner": 0, "proton": 0, "neutron": 0, "nucleon": 0}]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
     ]
@@ -429,7 +429,6 @@ def link_update(views):
         Output("tabs", "children"),
         Output("triggerGraph", "data"),
         Output("tabs", "value"),
-        Output("nextgraphid", "data"),
         Output("dropdown-iso-chain", "value"),
         Output("dropdown-1D", "value"),
         Output("dropdown-select-quantity", "value"),
@@ -448,7 +447,6 @@ def link_update(views):
         Input("tabs", "value"),
         #new_plot
         Input("new-button","n_clicks"),
-        State("nextgraphid", "data"),
         #delete_plot
         Input("delete-button","n_clicks"),
         #reset_page
@@ -470,9 +468,9 @@ def link_update(views):
     ]
 )
 def main_update(
-    json_cur_views, cur_tabs, url, tab_n, new_button, graphid, 
-    delete_button, reset_button, graphstyle, oneD, quantity, dataset, zmin, 
-    zmax, nmin, nmax, protons, neutrons, nucleons, colorbar, wigner):
+    json_cur_views, cur_tabs, url, tab_n, new_button, delete_button, 
+    reset_button, graphstyle, oneD, quantity, dataset, zmin, zmax, 
+    nmin, nmax, protons, neutrons, nucleons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
     n = int(tab_n[3])
@@ -492,13 +490,11 @@ def main_update(
             new_tabs = []
             for i in range(len(view)):
                 new_tabs.append(dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected'))
-                graphid = (view[-1]['id'])%4+1
             return  [
                 json.dumps(view), 
                 new_tabs,
                 json.dumps('update'),
                 tab_n, 
-                graphid,
                 dimension, new_oneD,
                 view[n-1]['quantity'],
                 view[n-1]['dataset'],
@@ -514,7 +510,6 @@ def main_update(
                 cur_tabs,
                 json.dumps("update"),
                 tab_n, 
-                graphid,
                 dimension, new_oneD,
                 cur_views[n-1]['quantity'],
                 cur_views[n-1]['dataset'],
@@ -532,7 +527,6 @@ def main_update(
             cur_tabs,
             json.dumps("dontupdate"),
             tab_n, 
-            graphid,
             dimension, new_oneD,
             cur_views[n-1]['quantity'],
             cur_views[n-1]['dataset'],
@@ -548,22 +542,17 @@ def main_update(
             raise PreventUpdate
         new_views = cur_views
         default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
-                   "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon": 0}
+                   "wigner": 0, "proton": 0, "neutron": 0, "nucleon": 0}
         new_views.append(default)
         new_tabs = cur_tabs
         new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), className='custom-tab', selected_className='custom-tab--selected'))
         l = len(new_tabs)
-        if graphid == 4:
-            graphid = 1
-        else:
-            graphid += 1
         dimension, new_oneD = graphtype(new_views[-1]['graphstyle'])
         return [
             json.dumps(new_views),
             new_tabs,
             json.dumps("update"), #graph
             "tab"+str(l),
-            graphid,
             dimension, new_oneD,
             new_views[-1]['quantity'],
             new_views[-1]['dataset'],
@@ -586,7 +575,6 @@ def main_update(
                 new_tabs,
                 json.dumps("update"), #graph
                 "tab"+str(len(new_views)),
-                graphid,
                 dimension, new_oneD,
                 new_views[-1]['quantity'],
                 new_views[-1]['dataset'],
@@ -601,13 +589,12 @@ def main_update(
     #reset_page
     if "reset-button" == dash.callback_context.triggered_id:
         new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
-                      "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon": 0}]
+                      "wigner": 0, "proton": 0, "neutron": 0, "nucleon": 0}]
         return [
             json.dumps(new_views), 
             [dcc.Tab(label="1", value='tab1', className='custom-tab', selected_className='custom-tab--selected')],
             json.dumps("update"),
             'tab1',
-            1,
             'landscape',
             'isotopic',
             'BE',
@@ -644,7 +631,6 @@ def main_update(
         cur_tabs, 
         json.dumps("update"), 
         tab_n, 
-        graphid,
         graphstyle,
         oneD,
         quantity, 
@@ -682,9 +668,11 @@ def main_output(
     if(json.loads(trigger)=="update"):
         output = []
         views_list = json.loads(json_views) # list of dicts
+        graphindex = 0
         for view_dict in views_list: # iterate through dicts in list
-            view = views.View(view_dict, zview, nview) # create a view
+            view = views.View(view_dict, graphindex, zview, nview) # create a view
             output.append(view.plot())
+            graphindex += 1
         output.append(html.Button('New Plot', id='new-button', value=None))
         return output
     raise PreventUpdate
