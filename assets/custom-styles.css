@@ -206,6 +206,10 @@
     width: 100%;
 }
 
+#protons, #neutrons, #nucleons {
+    max-height: 3.5rem;
+}
+
 /* Dropdowns
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .Select-control {
@@ -258,7 +262,7 @@
 }
 
 #protons-card, #neutrons-card, #nucleons-card {
-    padding-left: 0rem;
+    padding-bottom: 1rem;
 }
 
 #protons, #neutrons, #nucleons {
@@ -266,8 +270,8 @@
 }
 
 #quantity-card {
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 1rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+    padding-top: .2rem;
 }
 
 #copy-card {

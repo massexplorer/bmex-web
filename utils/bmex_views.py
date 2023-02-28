@@ -107,6 +107,7 @@ def masses_view():
                                             max=200,
                                             step=1,
                                             placeholder="Neutron #",
+                                            value=40
                                         ),
                                     ],
                                 ),
@@ -121,6 +122,7 @@ def masses_view():
                                             max=400,
                                             step=1,
                                             placeholder="Nucleon #",
+                                            value=40
                                         ),
                                     ],
                                 ),
