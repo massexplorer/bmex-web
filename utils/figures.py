@@ -44,6 +44,7 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
         plot_bgcolor="#282b38",
         paper_bgcolor="#282b38",
         font={"color": "#a5b1cd", "size": 14},
+        width=600,
     )
 
     neutrons = []
@@ -93,6 +94,7 @@ def isotonic(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
         plot_bgcolor="#282b38",
         paper_bgcolor="#282b38",
         font={"color": "#a5b1cd", "size": 14},
+        width=600,
     )
 
     protons = []
@@ -142,6 +144,7 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
         plot_bgcolor="#282b38",
         paper_bgcolor="#282b38",
         font={"color": "#a5b1cd", "size": 14},
+        width=600,
     )
 
     protons = []

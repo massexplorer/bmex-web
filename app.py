@@ -72,11 +72,10 @@ app.layout = html.Div(
         html.Div(id='page-content'),
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='url-store'),
-        dcc.Store(id='nextgraphid', data=2),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
         dcc.Store(id='viewsmemory', storage_type='memory',
             data=json.dumps([{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
-                               "wigner": 0, "proton": 0, "neutron": 0, "nucleon": 0}]),
+                               "wigner": 0, "proton": None, "neutron": None, "nucleon": None}]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
     ]
@@ -122,6 +121,7 @@ def display_page(pathname):
 def quantity_options(oneD,is_chain,url):
     show = {'display': 'block'}
     hide = {'display': 'none'}
+    cont = False
     if url[:7] == "/masses":
         if "dropdown-iso-chain" == dash.callback_context.triggered_id:
             if is_chain == 'single':
@@ -188,38 +188,8 @@ def quantity_options(oneD,is_chain,url):
                 hide,
                 ]
             elif is_chain == "1D":
-                return [[
-                        {"label": "Binding Energy", "value": "BE"},
-                        {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                        {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                        {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                        {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                        {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                        {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                        {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                        {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-                        {"label": "Quad Def Beta2", "value": "QDB2t",},
-                ],
-                # Proton Box Visibility
-                show,
-                # Neutron Box Visibility
-                hide,
-                # Nucleons Box Visibility
-                hide,
-                # Colorbar Visibility
-                hide,
-                # Wigner Visibility
-                hide,
-                # 1D Visibility
-                show,
-                ]
-            
-        if "dropdown-1D" == dash.callback_context.triggered_id:
+                cont = True
+        if ("dropdown-1D" == dash.callback_context.triggered_id) | cont:
             if oneD == 'isotopic':
                 return [[
                         {"label": "Binding Energy", "value": "BE"},
@@ -542,7 +512,7 @@ def main_update(
             raise PreventUpdate
         new_views = cur_views
         default = {"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
-                   "wigner": 0, "proton": 0, "neutron": 0, "nucleon": 0}
+                   "wigner": 0, "proton": None, "neutron": None, "nucleon": None}
         new_views.append(default)
         new_tabs = cur_tabs
         new_tabs.append(dcc.Tab(label=str(len(cur_tabs)+1), value='tab'+str(len(cur_tabs)+1), className='custom-tab', selected_className='custom-tab--selected'))
@@ -589,7 +559,7 @@ def main_update(
     #reset_page
     if "reset-button" == dash.callback_context.triggered_id:
         new_views = [{"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', "colorbar": 'linear',
-                      "wigner": 0, "proton": 0, "neutron": 0, "nucleon": 0}]
+                      "wigner": 0, "proton": None, "neutron": None, "nucleon": None}]
         return [
             json.dumps(new_views), 
             [dcc.Tab(label="1", value='tab1', className='custom-tab', selected_className='custom-tab--selected')],
@@ -600,9 +570,9 @@ def main_update(
             'BE',
             'EXP',
             'linear',
-            0,
-            0,
-            0,
+            None,
+            None,
+            None,
         ]
 
     #dropdown_input
