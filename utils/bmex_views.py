@@ -248,11 +248,11 @@ def masses_view():
                                 id="range-card",
                                 children=[
                                     html.P("Neutrons Range:"),
-                                    dcc.Input(id="nmin", type="number", placeholder="N min", min=0, max=156),
-                                    dcc.Input(id="nmax", type="number", placeholder="N max", min=0, max=156),
+                                    dcc.Input(id="nmin", type="number", placeholder="N min", min=0, max=300),
+                                    dcc.Input(id="nmax", type="number", placeholder="N max", min=0, max=300),
                                     html.P("Protons Range:", style={'marginTop': 25}),
-                                    dcc.Input(id="zmin", type="number", placeholder="Z min", min=0, max=106),
-                                    dcc.Input(id="zmax", type="number", placeholder="Z max", min=0, max=106),
+                                    dcc.Input(id="zmin", type="number", placeholder="Z min", min=0, max=200),
+                                    dcc.Input(id="zmax", type="number", placeholder="Z max", min=0, max=200),
                                 ]
                             ),
                             drc.Card(id="reset-card", children=[
