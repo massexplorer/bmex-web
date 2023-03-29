@@ -48,178 +48,11 @@ def masses_view():
                         # className="three columns",
                         id="left-column",
                         children=[
-                            dcc.Tabs(id="tabs", value='tab1', parent_className='custom-tabs', className='custom-tabs-container' ,children=[
+                            dcc.Tabs(id="tabs", value='tab1', parent_className='custom-tabs', className='custom-tabs-container', children=[
                                 dcc.Tab(label='1', value='tab1', className='custom-tab', selected_className='custom-tab--selected'),
                                 # style=TAB_STYLE, selected_style=SELECTED_STYLE
                             ]),
-                            html.Div(id='tabs_output', children=[
-                                drc.Card(id="dimension-card", children=[
-                                    drc.NamedDropdown(
-                                        name="Dimension",
-                                        id="dropdown-iso-chain",
-                                        options=[
-                                            {"label": "Single Nucleus", "value": "single"},
-                                            {"label": "1D Chains", "value": "1D"},
-                                            {"label": "Landscape", "value": "landscape"},
-                                        ],
-                                        clearable=False,
-                                        searchable=False,
-                                        value="landscape",
-                                    ),
-                                ]),
-                                drc.Card(id="oneD-card", children=[
-                                    drc.NamedDropdown(
-                                        name='1D Chain',
-                                        id="dropdown-1D",
-                                        options=[
-                                            {"label": "Isotopic Chain", "value": "isotopic"},
-                                            {"label": "Isotonic Chain", "value": "isotonic"},
-                                            {"label": "Isobaric Chain", "value": "isobaric"},
-                                        ],
-                                        clearable=False,
-                                        searchable=False,
-                                        value="isotopic",
-                                    ),
-                                ]),
-                                drc.Card(
-                                    id="protons-card",
-                                    children=[
-                                        html.P("Protons:", style={"padding-left": '.5rem'}),
-                                        dcc.Input(
-                                            id="protons",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Proton #",
-                                            value=40
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="neutrons-card",
-                                    children=[
-                                        html.P("Neutrons:", style={"padding-left": '.5rem'}),
-                                        dcc.Input(
-                                            id="neutrons",
-                                            type="number",
-                                            min=0,
-                                            max=200,
-                                            step=1,
-                                            placeholder="Neutron #",
-                                            value=40
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(
-                                    id="nucleons-card",
-                                    children=[
-                                        html.P("Nucleons:", style={"padding-left": '.5rem'}),
-                                        dcc.Input(
-                                            id="nucleons",
-                                            type="number",
-                                            min=0,
-                                            max=400,
-                                            step=1,
-                                            placeholder="Nucleon #",
-                                            value=40
-                                        ),
-                                    ],
-                                ),
-                                drc.Card(id="quantity-card", children=[
-                                    drc.NamedDropdown(
-                                        name="Select Quantity",
-                                        id="dropdown-select-quantity",
-                                        options=[
-                                            {"label": "All", "value": "All"},
-                                            {"label": "Binding Energy", "value": "BE"},
-                                            {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                                            {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                                            {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                                            {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                                            {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                                            {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                                            {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                                            {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                                            {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                                            {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                                            {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                                            {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                                            {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-                                            {"label": "Quad Def Beta2", "value": "QDB2t",},
-                                        ],
-                                        clearable=False,
-                                        searchable=False,
-                                        value="BE",
-                                        maxHeight=160,
-                                        optionHeight=80,
-                                        
-                                    ),
-                                ]),
-                                drc.Card(id="dataset-card", children=[
-                                    drc.NamedDropdown(
-                                        name="Select Dataset",
-                                        id="dropdown-select-dataset",
-                                        options=[
-                                            {"label": "Experiment", "value": "EXP"},
-                                            {"label": "ME2", "value": "ME2"},
-                                            {"label": "MEdelta", "value": "MEdelta"},
-                                            {"label": "PC1", "value": "PC1"},
-                                            {"label": "NL3S", "value": "NL3S"},
-                                            {"label": "SkMs", "value": "SKMS"},
-                                            {"label": "SKP", "value": "SKP"},
-                                            {"label": "SLY4", "value": "SLY4"},
-                                            {"label": "SV", "value": "SV"},
-                                            {"label": "UNEDF0", "value": "UNEDF0"},
-                                            {"label": "UNEDF1", "value": "UNEDF1"},
-                                        ],
-                                        clearable=False,
-                                        searchable=False,
-                                        value="EXP",
-                                    ),
-                                ]),
-                                drc.Card(
-                                    id="colorbar-card",
-                                    children=[
-                                        drc.NamedDropdown(
-                                            name="Colorbar Style",
-                                            id="dropdown-colorbar",
-                                            options=[
-                                                {"label": "Linear", "value": "linear"},
-                                                {"label": "Equalized", "value": "equal"},
-                                                {"label": "Monochrome", "value": "monochrome"},
-                                            ],
-                                            clearable=False,
-                                            searchable=False,
-                                            value="linear",
-                                        ),
-                                    ]
-                                ),
-                                drc.Card(
-                                    id="Wigner-card",
-                                    children=[
-                                        drc.NamedDropdown(
-                                            name="Wigner Adjustment",
-                                            id="radio-wigner",
-                                            options=[
-                                                {"label": "None", "value": 0},
-                                                {"label": "Wigner (1)", "value": 1},
-                                                {"label": "Wigner (2)", "value": 2},
-                                                #{"label": "Wigner Coefficient", "value": 3},
-                                            ],
-                                            clearable=False,
-                                            searchable=False,
-                                            value=0,
-                                        ),
-                                    ]
-                                ),
-                                drc.Card(id="chain-card", children=[
-                                    html.Button('+', id='chain-button', value=None)
-                                ]),
-                                drc.Card(id="delete-card", children=[
-                                    html.Button('Delete Plot', id='delete-button', value=None)
-                                ]),
-                            ])
+                            html.Div(id='tabs_output', children=[])
                         ]
                     ),
                     html.Div(id='div-right',
@@ -230,9 +63,9 @@ def masses_view():
                             children=[
                                 html.Div(id="div-graphs",
                                 children=[
-                                    views.View({"graphstyle": 'landscape', "quantity": 'BE', "dataset": 'EXP', 
-                                                "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon":0}).plot(),
-                                    html.Button('New Plot', id='new-button', hidden=True),
+                                    # views.View({"graphstyle": 'landscape', "quantity": ['BE'], "dataset": ['EXP'], 
+                                    #             "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon":0}).plot(),
+                                    # html.Button('New Plot', id='new-button', hidden=True),
                                 ])
                             ])
                         ])
@@ -245,7 +78,8 @@ def masses_view():
                                 dcc.Clipboard(id="clipboard",content="")
                             ]),
                             drc.Card(
-                                id="range-card",
+                                id="range-card", 
+                                # style={"display":'none'},
                                 children=[
                                     html.P("Neutrons Range:"),
                                     dcc.Input(id="nmin", type="number", placeholder="N min", min=0, max=300),
@@ -256,7 +90,7 @@ def masses_view():
                                 ]
                             ),
                             drc.Card(id="reset-card", children=[
-                                html.Button('Reset Page', id='reset-button')
+                                html.Button('Reset Page', id={"type": 'reset-button', "index": 1}, className='reset-button')
                             ]),
                         ]
                     )                   

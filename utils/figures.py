@@ -12,6 +12,9 @@ from dash import html
 
 
 def single(quantity, model, Z, N, wigner=0):
+    Z = Z[0]
+    N = N[0]
+    model = model[0]
     if quantity == 'All':
         # return html.P("All")
         output = []
@@ -34,9 +37,10 @@ def single(quantity, model, Z, N, wigner=0):
 
 def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
 
+    series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title=f"Isotopic Chain"+"  |  Z = "+str(Z)+"  |  "+str(model),
+        title="Isotopic Chain",
         xaxis=dict(title="Neutrons", gridcolor="#2f3445",title_font_size=14),
         yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
         #legend=dict(x=0, y=1.05, orientation="h"),
@@ -46,31 +50,33 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
         font={"color": "#a5b1cd", "size": 14},
         width=600,
     )
+    
+    traces = []
+    for i in range(len(Z)):
+        neutrons = []
+        output = []
+        for n in range(0,157):
+            q = bmex.QuanValue(Z[i],n,model[i],quantity,wigner)
+            try: 
+                q+1
+            except:
+                continue
+            else:
+                neutrons.append(n)
+                output.append(q)
 
-    neutrons = []
-    output = []
-    for N in range(0,157):
-        q = bmex.QuanValue(Z,N,model,quantity,wigner)
-        try: 
-            q+1
-        except:
-            continue
-        else:
-            neutrons.append(N)
-            output.append(q)
-
-    trace0 = go.Scatter(
-        x=neutrons, y=output, mode="lines+markers", name="Test Data", marker=\
-            {
-                "color": "#13c6e9",
-                #"size": 20,
-            }
-    )
+        traces.append(go.Scatter(
+            x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i]), marker=\
+                {
+                    "color": series_colors[i],
+                    #"size": 20,
+                }
+        ))
 
     if NView == None:
-        figure =  go.Figure(data=[trace0], layout=layout)
+        figure =  go.Figure(data=traces, layout=layout)
     else:
-        figure = go.Figure(data=[trace0], layout=layout, layout_xaxis_range=NView)
+        figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=NView)
         try:
             NView[1]-NView[0]
         except:
@@ -82,8 +88,60 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
     figure.update_layout(title_font_size=24)
     return figure
 
-def isotonic(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
-        
+def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
+
+    series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title="Isotonic Chain",
+        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+        width=600,
+    )
+    
+    traces = []
+    for i in range(len(N)):
+        protons = []
+        output = []
+        for z in range(120):
+            q = bmex.QuanValue(z,N[i],model[i],quantity,wigner)
+            try: 
+                q+1
+            except:
+                continue
+            else:
+                protons.append(z)
+                output.append(q)
+
+        traces.append(go.Scatter(
+            x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i]), marker=\
+                {
+                    "color": series_colors[i],
+                    #"size": 20,
+                }
+        ))
+
+    if NView == None:
+        figure =  go.Figure(data=traces, layout=layout)
+    else:
+        figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=NView)
+        try:
+            NView[1]-NView[0]
+        except:
+            pass
+        else:
+            figure.update_xaxes(dtick=(int((NView[1]-NView[0])/8))*2)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+    return figure
+    N = N[0]
+    model = model[0]
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
         title=f"Isotonic Chain"+"  |  N = "+str(N)+"  |  "+str(model),
@@ -133,7 +191,59 @@ def isotonic(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
     return figure
 
 def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
-        
+
+    series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
+    layout = go.Layout(
+        #title=f"ROC Curve (AUC = {auc_score:.3f})",
+        title="Isobaric Chain",
+        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        #legend=dict(x=0, y=1.05, orientation="h"),
+        #margin=dict(l=100, r=10, t=25, b=40),
+        plot_bgcolor="#282b38",
+        paper_bgcolor="#282b38",
+        font={"color": "#a5b1cd", "size": 14},
+        width=600,
+    )
+    
+    traces = []
+    for i in range(len(A)):
+        protons = []
+        output = []
+        for z in range(A[i]):
+            q = bmex.QuanValue(z,A[i]-z,model[i],quantity,wigner)
+            try: 
+                q+1
+            except:
+                continue
+            else:
+                protons.append(z)
+                output.append(q)
+
+        traces.append(go.Scatter(
+            x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i]), marker=\
+                {
+                    "color": series_colors[i],
+                    #"size": 20,
+                }
+        ))
+
+    if NView == None:
+        figure =  go.Figure(data=traces, layout=layout)
+    else:
+        figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=NView)
+        try:
+            NView[1]-NView[0]
+        except:
+            pass
+        else:
+            figure.update_xaxes(dtick=(int((NView[1]-NView[0])/8))*2)
+    figure.update_xaxes(title_font_size=20)
+    figure.update_yaxes(title_font_size=20)
+    figure.update_layout(title_font_size=24)
+    return figure
+    A = A[0]
+    model = model[0]        
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
         title=f"Isobaric Chain"+"  |  A = "+str(A)+"  |  "+str(model),
@@ -183,6 +293,7 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
     return figure
 
 def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=None, NView=None):
+    model = model[0]
     layout = go.Layout(
             font={"color": "#a5b1cd"},
             title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=30)),
