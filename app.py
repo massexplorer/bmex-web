@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import math
 
 import dash
 from dash import dcc, MATCH, ALL, html
@@ -154,6 +155,8 @@ def display_confirm(delete, json_cur_views):
         Input({"type": 'series-button', "index": ALL}, "n_clicks"),
         #series_tabs
         Input({'type': 'series_tabs','index': ALL}, "value"),
+        #delete_series
+        Input({'type': 'delete-series-button','index': ALL}, "n_clicks"),
         #delete_plot
         Input('confirm', 'submit_n_clicks'),
         #reset_page
@@ -171,7 +174,7 @@ def display_confirm(delete, json_cur_views):
     ]
 )
 def main_update(
-    json_cur_views, cur_tabs, cur_sidebar, url, tab_n, new_button, series_button, series_tab, delete_button, 
+    json_cur_views, cur_tabs, cur_sidebar, url, tab_n, new_button, series_button, series_tab, delete_series, delete_button, 
     reset_button, dimension, oneD, quantity, dataset, protons, neutrons, nucleons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
@@ -201,7 +204,7 @@ def main_update(
                 cur_tabs,
                 json.dumps("update"),
                 tab_n,
-                Sidebar(cur_views[n-1]).show(),
+                Sidebar(cur_views[n-1], 1, len(cur_tabs)).show(),
             ]
 
     #tabs_change
@@ -211,7 +214,7 @@ def main_update(
             cur_tabs,
             json.dumps("dontupdate"),
             tab_n, 
-            Sidebar(cur_views[n-1]).show(),
+            Sidebar(cur_views[n-1], 1, len(cur_tabs)).show(),
         ]
 
     #delete_plot
@@ -226,7 +229,7 @@ def main_update(
                 new_tabs,
                 json.dumps("update"), #graph
                 "tab"+str(len(new_views)),
-                Sidebar(new_views[-1]).show(),
+                Sidebar(new_views[-1], 1, len(new_tabs)).show(),
             ]
         else:
             raise PreventUpdate
@@ -251,23 +254,27 @@ def main_update(
             new_tabs,
             json.dumps("update"), #graph
             "tab"+str(len(new_tabs)),
-            Sidebar(new_views[-1]).show(),
+            Sidebar(new_views[-1], 1, len(new_tabs)).show(),
         ]
     
-    # #series_button
-    # if "series-button" == dash.callback_context.triggered_id['type']:
-    #     new_views = cur_views
-    #     new_views[n-1]['proton'].append(default['proton'][0])
-    #     new_views[n-1]['neutron'].append(default['neutron'][0])
-    #     new_views[n-1]['nucleon'].append(default['nucleon'][0])
-    #     new_views[n-1]['dataset'].append(default['dataset'][0])
-    #     return [
-    #         json.dumps(new_views), 
-    #         cur_tabs,
-    #         json.dumps("update"),
-    #         tab_n,
-    #         Sidebar(new_views[n-1], "new").show(),
-    #     ]
+    #delete_series
+    if 'delete-series-button' == dash.callback_context.triggered_id['type']:
+        l = len(cur_views[n-1]['proton'])
+        if  l>1:
+            new_views = cur_views
+            new_views[n-1]['proton'].pop(series_n-1)
+            new_views[n-1]['neutron'].pop(series_n-1)
+            new_views[n-1]['nucleon'].pop(series_n-1)
+            new_views[n-1]['dataset'].pop(series_n-1)
+            return [
+                json.dumps(new_views), 
+                cur_tabs,
+                json.dumps("update"), #graph
+                tab_n,
+                Sidebar(new_views[n-1], series_n-1+math.ceil(abs(series_n-l)/10), len(cur_tabs)).show(),
+            ]
+        else:
+            raise PreventUpdate
     
     #series_tabs
     if "series_tabs" == dash.callback_context.triggered_id['type']:
@@ -282,14 +289,14 @@ def main_update(
                 cur_tabs,
                 json.dumps("update"),
                 tab_n,
-                Sidebar(new_views[n-1], "new").show(),
+                Sidebar(new_views[n-1], "new", len(cur_tabs)).show(),
             ]
         return [
             json.dumps(cur_views), 
             cur_tabs,
             json.dumps("noupdate"),
             tab_n,
-            Sidebar(cur_views[n-1], series_n).show(),
+            Sidebar(cur_views[n-1], series_n, len(cur_tabs)).show(),
         ]
     
     #reset_page
@@ -327,7 +334,7 @@ def main_update(
         cur_tabs, 
         json.dumps("update"),
         tab_n,
-        Sidebar(new_views[n-1], series_n).show()
+        Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
     ]
 
 

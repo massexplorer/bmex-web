@@ -10,13 +10,14 @@ import numpy as np
 class Sidebar:
     
     def __init__(self, views_dict={"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
-           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None]}, series_tab=1):
+           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None]}, series_tab=1, maintabs_length=1):
         for key in views_dict:
             setattr(self, key, views_dict[key])
         if series_tab == "new":
             self.series_n = len(views_dict["dataset"])
         else:
             self.series_n = series_tab
+        self.maintabs_length = maintabs_length
 
     def nucleon_card(self, index):
         if self.dimension == '1D':
@@ -143,16 +144,22 @@ class Sidebar:
             ])
         )
 
+        series_button_card = None
         if self.dimension == '1D':
             print(self.series_n)
             tabs = []
             for i in range(len(self.dataset)):
-                tabs.append(dcc.Tab(label=str(i+1), value='tab'+str(i+1), className='custom-tab', selected_className='custom-tab--selected'))
-            if len(self.dataset) < 4:
-                tabs.append(dcc.Tab(label="+", value='tab0', className='custom-tab', selected_className='custom-tab--selected'))
+                tabs.append(dcc.Tab(label=str(i+1), value='tab'+str(i+1), className='series-tab', selected_className='series-tab--selected'))
+            if len(self.dataset) < 8:
+                tabs.append(dcc.Tab(label="+", value='tab0', className='series-tab', selected_className='series-tab--selected'))
             output.append(
-                dcc.Tabs(id={'type': 'series_tabs','index': 1}, value='tab'+str(self.series_n), parent_className='custom-tabs', className='custom-tabs-container', children=tabs)
+                dcc.Tabs(id={'type': 'series_tabs','index': 1}, value='tab'+str(self.series_n), className='series-tabs', children=tabs)
             )
+            if len(self.dataset) > 1:
+                series_button_card = drc.Card(id="delete-series-card", children=[
+                    html.Button('Delete Series', id={'type': 'delete-series-button','index': 1}, value=None, className='delete-button')
+                ])
+
         output.append(
             drc.Card(id='series-card', children=[
                 self.nucleon_card(self.series_n-1),
@@ -177,9 +184,11 @@ class Sidebar:
                         searchable=False,
                         value=self.dataset[self.series_n-1],
                     )
-                ])
+                ]),
+                series_button_card
             ])
         )
+
 
         if self.dimension == 'landscape':
             output.append(
@@ -207,12 +216,12 @@ class Sidebar:
         #             html.Button('+', id={'type': 'series-button','index': 1}, value=None, className='series-button')
         #         ])
         #     )
-
-        output.append(
-            drc.Card(id="delete-card", children=[
-                html.Button('Delete Plot', id={'type': 'delete-button','index': 1}, value=None, className='delete-button')
-            ])
-        )
+        if self.maintabs_length > 1:
+            output.append(
+                drc.Card(id="delete-card", children=[
+                    html.Button('Delete Plot', id={'type': 'delete-button','index': 1}, value=None, className='delete-button')
+                ])
+            )
 
         return output
         # drc.Card(

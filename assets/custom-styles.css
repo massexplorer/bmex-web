@@ -152,6 +152,37 @@
     color: #282b38  !important;
 }
 
+.series-tabs {
+    width: 100% !important;
+    background-color: #282b38 !important;
+    flex-direction: column !important;
+}
+
+.series-tab {
+    width: 80% !important;
+    height: 50px !important;
+    border-radius: 3% !important;
+    border: 3px solid #ffff !important;
+    background: #a5b1cd !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 175% !important;
+    color: #282b38 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.series-tab--selected {
+    border: 3px solid #ffffff76 !important;
+    background: #e76f51 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    height: 50px !important;
+    font-size: 32 !important;
+    color: #282b38  !important; 
+}
+
 /* Buttons
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
