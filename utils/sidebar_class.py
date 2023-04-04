@@ -75,6 +75,20 @@ class Sidebar:
             else:
                 return html.P("ERROR")
 
+    def get_letter(self):
+        if self.chain=='isotopic':
+            return "Z"
+        if self.chain=='isotonic':
+            return "N"
+        return "A"
+
+    def get_nucleon_count(self, i):
+        if self.chain=='isotopic':
+            return self.proton[i]
+        if self.chain=='isotonic':
+            return self.neutron[i]
+        return self.nucleon[i]
+
     def show(self):
         
         output = [
@@ -144,25 +158,50 @@ class Sidebar:
             ])
         )
 
-        series_button_card = None
+        tabs_component, series_button_card = None, None
         if self.dimension == '1D':
-            print(self.series_n)
             tabs = []
             for i in range(len(self.dataset)):
-                tabs.append(dcc.Tab(label=str(i+1), value='tab'+str(i+1), className='series-tab', selected_className='series-tab--selected'))
+                tabs.append(dcc.Tab(label=self.get_letter()+"="+str(self.get_nucleon_count(i))+" | "+str(self.dataset[i]), value='tab'+str(i+1), className='series-tab', selected_className='series-tab--selected'))
             if len(self.dataset) < 8:
-                tabs.append(dcc.Tab(label="+", value='tab0', className='series-tab', selected_className='series-tab--selected'))
-            output.append(
-                dcc.Tabs(id={'type': 'series_tabs','index': 1}, value='tab'+str(self.series_n), className='series-tabs', children=tabs)
-            )
+                tabs.append(dcc.Tab(label="+", value='tab0', className='series-tab', selected_className='series-tab--selected'))  
+            tabs_component = dcc.Tabs(id={'type': 'series_tabs','index': 1}, value='tab'+str(self.series_n), className='series-tabs', children=tabs)
             if len(self.dataset) > 1:
                 series_button_card = drc.Card(id="delete-series-card", children=[
                     html.Button('Delete Series', id={'type': 'delete-series-button','index': 1}, value=None, className='delete-button')
                 ])
 
-        output.append(
-            drc.Card(id='series-card', children=[
-                self.nucleon_card(self.series_n-1),
+            output.append(
+                drc.Card(id='series-card', children=[
+                    tabs_component,
+                    self.nucleon_card(self.series_n-1),
+                    drc.Card(id="dataset-card", children=[
+                        drc.NamedDropdown(
+                            name="Select Dataset",
+                            id={'type': 'dropdown-dataset','index': self.series_n},
+                            options=[
+                                {"label": "Experiment", "value": "EXP"},
+                                {"label": "ME2", "value": "ME2"},
+                                {"label": "MEdelta", "value": "MEdelta"},
+                                {"label": "PC1", "value": "PC1"},
+                                {"label": "NL3S", "value": "NL3S"},
+                                {"label": "SkMs", "value": "SKMS"},
+                                {"label": "SKP", "value": "SKP"},
+                                {"label": "SLY4", "value": "SLY4"},
+                                {"label": "SV", "value": "SV"},
+                                {"label": "UNEDF0", "value": "UNEDF0"},
+                                {"label": "UNEDF1", "value": "UNEDF1"},
+                            ],
+                            clearable=False,
+                            searchable=False,
+                            value=self.dataset[self.series_n-1],
+                        )
+                    ]),
+                    series_button_card
+                ])
+            )
+        else:
+            output.append(
                 drc.Card(id="dataset-card", children=[
                     drc.NamedDropdown(
                         name="Select Dataset",
@@ -184,11 +223,8 @@ class Sidebar:
                         searchable=False,
                         value=self.dataset[self.series_n-1],
                     )
-                ]),
-                series_button_card
-            ])
-        )
-
+                ]) 
+            )
 
         if self.dimension == 'landscape':
             output.append(

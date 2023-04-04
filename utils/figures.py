@@ -203,10 +203,10 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=N
     model = model[0]
     layout = go.Layout(
             font={"color": "#a5b1cd"},
-            title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=30)),
-            xaxis=dict(title=dict(text="Neutrons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
+            title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=22)),
+            xaxis=dict(title=dict(text="Neutrons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
             showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,156]),
-            yaxis=dict(title=dict(text="Protons", font=dict(size=20)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
+            yaxis=dict(title=dict(text="Protons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
             showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,104]),
             #legend=dict(x=0, y=1.05, orientation="h"),
             #margin=dict(l=100, r=10, t=25, b=40),

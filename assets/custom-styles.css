@@ -153,20 +153,20 @@
 }
 
 .series-tabs {
-    width: 100% !important;
+    width: 14rem !important;
+    display: flex !important;
     background-color: #282b38 !important;
     flex-direction: column !important;
 }
 
 .series-tab {
-    width: 80% !important;
+    width: 100% !important;
     height: 50px !important;
     border-radius: 3% !important;
     border: 3px solid #ffff !important;
     background: #a5b1cd !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    font-size: 175% !important;
+    padding: 0 !important;
+    font-size: 100% !important;
     color: #282b38 !important;
     display: flex !important;
     justify-content: center !important;
@@ -229,7 +229,10 @@
 }
 
 .delete-button {
+    width: 100%;
     color: #e76f51;
+    justify-content: center;
+    padding: 0;
 }
 
 .new-button {
@@ -306,7 +309,7 @@
 #series-card {
     width: 70%;
     background-color: #264653;
-    border-radius: 15%;
+    border-radius: 0%;
     padding: 5%;
     padding-top: 5%;
     border: 2px outset #a5b1cd;
@@ -319,7 +322,7 @@
 }
 
 #protons-card, #neutrons-card, #nucleons-card {
-    width: 100%;
+    padding-top: 1rem;
     padding-bottom: 1rem;
 
 }
@@ -329,17 +332,24 @@
 }
 
 #dataset-card {
-    width: 100%
+    width: 80%
 }
 
 
 #copy-card {
     padding-bottom: 2rem;
     display: flex !important;
+    background-color: #264653;
+    margin-bottom: 2rem;
+    border: 3px outset #a5b1cd;
+    border-radius: 15%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
 }
 
 #clipboard {
-    padding-left: 1rem;
     cursor: pointer;
 }
 

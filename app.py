@@ -77,7 +77,7 @@ app.layout = html.Div(
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='url-store'),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
-        dcc.Store(id='viewsmemory', storage_type='memory',
+        dcc.Store(id='viewsmemory', storage_type='local',
             data=json.dumps([default]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
