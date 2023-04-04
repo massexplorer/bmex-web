@@ -77,11 +77,12 @@ app.layout = html.Div(
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='url-store'),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
-        dcc.Store(id='viewsmemory', storage_type='local',
+        dcc.Store(id='viewsmemory', storage_type='memory',
             data=json.dumps([default]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
         dcc.ConfirmDialog(id='confirm', message='Warning! Are you sure you want to delete this view?'),
+        dcc.Download(id="download-figs"),
     ]
 )
 
@@ -133,6 +134,27 @@ def display_confirm(delete, json_cur_views):
         pass
 
 
+@app.callback(
+    Output("download-figs", "data"),
+    Input("download-button", "n_clicks"),
+    State("viewsmemory", "data"),
+    prevent_initial_call=True,
+)
+def download(n_clicks, json_cur_views):
+    try:
+        if n_clicks>0:
+            cur_views = json.loads(json_cur_views)
+            View(cur_views[0]).plot().figure.write_image("images/fig1.pdf")
+            return dcc.send_file(
+                "images/fig1.pdf"
+            )
+    except:
+        raise PreventUpdate
+    #display image
+        # img_bytes = View(cur_views[0]).plot().figure.to_image(format="png")
+        # encoding = base64.b64encode(img_bytes).decode()
+        # img_b64 = "data:image/png;base64," + encoding
+        # return html.Img(src=img_b64, style={'height': '500px'})
 @app.callback(
     [
         Output("viewsmemory", "data"),

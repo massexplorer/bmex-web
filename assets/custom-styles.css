@@ -201,9 +201,9 @@
     flex-direction: column;
 }
 
-/* #reset-card {
-    padding-top: 3rem;
-} */
+#reset-card {
+    width: 100%;
+}
 
 .reset-button {
     color: #e76f51;
@@ -337,6 +337,7 @@
 
 
 #copy-card {
+
     padding-bottom: 2rem;
     display: flex !important;
     background-color: #264653;
@@ -351,6 +352,17 @@
 
 #clipboard {
     cursor: pointer;
+}
+
+#download-card {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+#download-button {
+    width: 100%;
+    padding: 0;
+    color: #a5b1cd;
 }
 
 #range-card {
