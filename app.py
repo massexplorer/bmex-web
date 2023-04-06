@@ -26,6 +26,7 @@ import random as rand
 import h5py
 import base64, io
 import re
+import zipfile
 
 
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
@@ -142,19 +143,29 @@ def display_confirm(delete, json_cur_views):
 )
 def download(n_clicks, json_cur_views):
     try:
-        if n_clicks>0:
-            cur_views = json.loads(json_cur_views)
-            View(cur_views[0]).plot().figure.write_image("images/fig1.pdf")
-            return dcc.send_file(
-                "images/fig1.pdf"
-            )
+        n_clicks>0
     except:
         raise PreventUpdate
-    #display image
-        # img_bytes = View(cur_views[0]).plot().figure.to_image(format="png")
-        # encoding = base64.b64encode(img_bytes).decode()
-        # img_b64 = "data:image/png;base64," + encoding
-        # return html.Img(src=img_b64, style={'height': '500px'})
+            # cur_views = json.loads(json_cur_views)
+            # zip_file_name = "BMEX.zip"
+            # with zipfile.ZipFile(zip_file_name, mode="w") as zf:
+            #     for i in range(len(cur_views)):
+            #         filename = "download-figs/fig"+str(i+1)+".pdf"
+            #         View(cur_views[i]).plot().figure.write_image(filename)
+            #         zf.write(filename)  
+            # return dcc.send_file(zip_file_name)
+    cur_views = json.loads(json_cur_views)
+    zip_file_name = "BMEX.zip"
+    def write_archive(bytes_io):
+        with zipfile.ZipFile(bytes_io, mode="w") as zf:
+            for i in range(len(cur_views)):
+                filename = "Fig_"+str(i+1)+".pdf"
+                buf = io.BytesIO()
+                View(cur_views[i]).plot().figure.write_image(buf, format='pdf')
+                zf.writestr(filename, buf.getvalue())
+    return dcc.send_bytes(write_archive, zip_file_name)
+
+
 @app.callback(
     [
         Output("viewsmemory", "data"),
@@ -205,8 +216,6 @@ def main_update(
         series_n = 1
     else:
         series_n = int(series_tab[0][3])
-
-    print(dash.callback_context.triggered_id)
 
     #url
     if "url-store" == dash.callback_context.triggered_id:
@@ -389,7 +398,6 @@ def main_output(
         views_list = json.loads(json_views) # list of dicts
         graphindex = 1
         for view_dict in views_list: # iterate through dicts in list
-            print(view_dict['neutron'])
             view = View(view_dict, graphindex, zview, nview) # create a view
             output.append(view.plot())
             graphindex += 1
