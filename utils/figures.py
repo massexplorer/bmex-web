@@ -73,7 +73,7 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
                     }
             ))
         except:
-            traces.append(go.Scatter(x=neutrons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i])))
+            traces.append(go.Scatter(x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i])))
 
     if NView == None:
         figure =  go.Figure(data=traces, layout=layout)
@@ -182,7 +182,7 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
                     }
             ))
         except:
-            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i])))
+            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i])))
 
     if NView == None:
         figure =  go.Figure(data=traces, layout=layout)
