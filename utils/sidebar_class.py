@@ -19,42 +19,48 @@ class Sidebar:
             self.series_n = series_tab
         self.maintabs_length = maintabs_length
 
+    def proton_card(self, index):
+        return drc.Card(
+            id="protons-card",
+            children=[
+                html.P("Protons:", style={"padding-left": '.5rem'}),
+                dcc.Input(
+                    id={'type': 'input-protons','index': index+1},
+                    type="number",
+                    min=0,
+                    max=200,
+                    step=1,
+                    placeholder="Proton #",
+                    value=self.proton[index],
+                    className="nucleon-input"
+                ),
+            ],
+        )
+
+    def neutron_card(self, index):
+        return drc.Card(
+            id="neutrons-card",
+            children=[
+                html.P("Neutrons:", style={"padding-left": '.5rem'}),
+                dcc.Input(
+                    id={'type': 'input-neutrons','index': index+1},
+                    type="number",
+                    min=0,
+                    max=200,
+                    step=1,
+                    placeholder="Neutron #",
+                    value=self.neutron[index],
+                    className="nucleon-input"
+                ),
+            ],
+        )
+
     def nucleon_card(self, index):
         if self.dimension == '1D':
             if self.chain == "isotopic":
-                return drc.Card(
-                    id="protons-card",
-                    children=[
-                        html.P("Protons:", style={"padding-left": '.5rem'}),
-                        dcc.Input(
-                            id={'type': 'input-protons','index': index+1},
-                            type="number",
-                            min=0,
-                            max=200,
-                            step=1,
-                            placeholder="Proton #",
-                            value=self.proton[index],
-                            className="nucleon-input"
-                        ),
-                    ],
-                )
+                return self.proton_card(index)
             elif self.chain == "isotonic":
-                return drc.Card(
-                    id="neutrons-card",
-                    children=[
-                        html.P("Neutrons:", style={"padding-left": '.5rem'}),
-                        dcc.Input(
-                            id={'type': 'input-neutrons','index': index+1},
-                            type="number",
-                            min=0,
-                            max=200,
-                            step=1,
-                            placeholder="Neutron #",
-                            value=self.neutron[index],
-                            className="nucleon-input"
-                        ),
-                    ],
-                )
+                return self.neutron_card(index)
             elif self.chain == "isobaric":
                 return drc.Card(
                     id="nucleons-card",
@@ -134,20 +140,20 @@ class Sidebar:
                     options=[
                         {"label": "All", "value": "All"},
                         {"label": "Binding Energy", "value": "BE"},
-                        {"label": "One Neutron Separation Energy", "value": "OneNSE",},
-                        {"label": "One Proton Separation Energy", "value": "OnePSE",},
-                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE",},
-                        {"label": "Two Proton Separation Energy", "value": "TwoPSE",},
-                        {"label": "Alpha Separation Energy", "value": "AlphaSE",},
-                        {"label": "Two Proton Shell Gap", "value": "TwoNSGap",},
-                        {"label": "Two Neutron Shell Gap", "value": "TwoPSGap",},
-                        {"label": "Double Mass Difference", "value": "DoubleMDiff",},
-                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED",},
-                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED",},
-                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting",},
-                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting",},
-                        {"label": "Wigner Energy Coefficient", "value": "WignerEC",},
-                        {"label": "Quad Def Beta2", "value": "QDB2t",},
+                        {"label": "One Neutron Separation Energy", "value": "OneNSE"},
+                        {"label": "One Proton Separation Energy", "value": "OnePSE"},
+                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE"},
+                        {"label": "Two Proton Separation Energy", "value": "TwoPSE"},
+                        {"label": "Alpha Separation Energy", "value": "AlphaSE"},
+                        {"label": "Two Neutron Shell Gap", "value": "TwoNSGap"},
+                        {"label": "Two Proton Shell Gap", "value": "TwoPSGap"},
+                        {"label": "Double Mass Difference", "value": "DoubleMDiff"},
+                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED"},
+                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED"},
+                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting"},
+                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting"},
+                        # {"label": "Wigner Energy Coefficient", "value": "WignerEC"},
+                        {"label": "Quad Def Beta2", "value": "QDB2t"},
                     ],
                     clearable=False,
                     searchable=False,
@@ -201,6 +207,9 @@ class Sidebar:
                 ])
             )
         else:
+            if self.dimension == 'single':
+                output.append(self.proton_card(self.series_n-1))
+                output.append(self.neutron_card(self.series_n-1))
             output.append(
                 drc.Card(id="dataset-card", children=[
                     drc.NamedDropdown(

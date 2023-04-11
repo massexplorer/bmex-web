@@ -234,7 +234,6 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=N
             c=ci
             break
     values = values0[:r,:c]
-    print(r, c)
 
     filtered = []
     for e in values.flatten():

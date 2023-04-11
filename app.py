@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import math
+from datetime import date
 
 import dash
 from dash import dcc, MATCH, ALL, html
@@ -78,7 +79,7 @@ app.layout = html.Div(
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='url-store'),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
-        dcc.Store(id='viewsmemory', storage_type='memory',
+        dcc.Store(id='viewsmemory', storage_type='session',
             data=json.dumps([default]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
@@ -155,13 +156,24 @@ def download(n_clicks, json_cur_views):
             #         zf.write(filename)  
             # return dcc.send_file(zip_file_name)
     cur_views = json.loads(json_cur_views)
-    zip_file_name = "BMEX.zip"
+    zip_file_name = "BMEX-"+str(date.today().strftime("%b-%d-%Y"))+".zip"
     def write_archive(bytes_io):
         with zipfile.ZipFile(bytes_io, mode="w") as zf:
             for i in range(len(cur_views)):
                 filename = "Fig_"+str(i+1)+".pdf"
                 buf = io.BytesIO()
-                View(cur_views[i]).plot().figure.write_image(buf, format='pdf')
+                fig = View(cur_views[i]).plot().figure
+
+                fig.update_layout(
+                    font={"color": "#000000"},
+                    xaxis=dict(linecolor='black', title=dict(text="Neutrons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
+                    showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=cur_views[i]['range']['x']),
+                    yaxis=dict(linecolor='black', title=dict(text="Protons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
+                    showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=cur_views[i]['range']['y']),
+                    plot_bgcolor="#ffffff", 
+                    paper_bgcolor="#ffffff")
+                
+                fig.write_image(buf, format='pdf')
                 zf.writestr(filename, buf.getvalue())
     return dcc.send_bytes(write_archive, zip_file_name)
 
@@ -276,7 +288,10 @@ def main_update(
     #relayout_data
     if 'graph' == dash.callback_context.triggered_id['type']:
         new_views = cur_views
+        print("WHOLE",relayout_data)
         for i in range(len(new_views)):
+            if relayout_data[i] == None:
+                continue
             try:
                 print(relayout_data[i])
                 new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = relayout_data[i]['xaxis.range[0]'], relayout_data[i]['xaxis.range[1]']

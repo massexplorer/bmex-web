@@ -32,7 +32,10 @@ class View:
         if self.dimension == 'single':
             return figs.single(self.quantity, self.dataset, self.proton, self.neutron, self.wigner)
         elif self.dimension == 'landscape':
-            return dcc.Graph(id={'type': 'graph','index': self.index}, figure=figs.landscape(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.ZView, self.NView))
+            try:
+                return dcc.Graph(id={'type': 'graph','index': self.index}, figure=figs.landscape(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.ZView, self.NView))
+            except:
+                return html.P('This particular plot is not available', style={'font-size':'20px','padding-left': '0px', 'padding-right': '0px'})
         elif self.dimension == '1D':
             if {'isotopic': self.proton,'isotonic': self.neutron,'isobaric': self.nucleon}[self.chain] == None:
                 return html.P('Please Enter a Valid Chain', style={'padding-left': '180px', 'padding-right': '180px'})
