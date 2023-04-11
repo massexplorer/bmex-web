@@ -9,7 +9,7 @@ data_dict = {modelNames[i]: models[i] for i in range(len(modelNames))}
 # Make dictionary to convert quantity code to full quantity name
 qinput = ['BE', 'OneNSE', 'OnePSE', 'TwoNSE', 'TwoPSE', 'AlphaSE', 'TwoNSGap', 'TwoPSGap', 'DoubleMDiff', 'N3PointOED', 'P3PointOED', 'SNESplitting', 'SPESplitting', 'WignerEC', 'QDB2t']
 qnames = ['Binding_Energy_(MeV)', 'One Neutron Separation Energy', 'One Proton Separation Energy', 'Two Neutron Separation Energy', 
-'Two Proton Separation Energy', 'Alpha Separation Energy', 'Two Proton Shell Gap', 'Two Neutron Shell Gap', 
+'Two Proton Separation Energy', 'Alpha Separation Energy',  'Two Neutron Shell Gap', 'Two Proton Shell Gap',
 'Double Mass Difference', 'Neutron 3-Point Odd-Even Binding Energy Difference', 'Proton 3-Point Odd-Even Binding Energy Difference',
 'Single-Neutron Energy Splitting', 'Single-Proton Energy Splitting', 'Wigner Energy Coeffienct', 'Quad_Def_Beta2_total']
 q_dict = {qinput[j]: qnames[j] for j in range(len(qinput))}

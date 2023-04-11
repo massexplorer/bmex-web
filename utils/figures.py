@@ -219,12 +219,23 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=N
 
     step = 2
 
-    values = np.full((200//step,350//step), None)
+    values0 = np.full((200//step,350//step), None)
     for Z in range(2, 105, step):
         chain = bmex.IsotopicChain(Z, model, quantity, step, wigner)
         for N in chain["N"]:
-            values[Z//2,N//2] = chain[chain["N"]==N].iloc[0,0]
-    
+            values0[Z//2,N//2] = chain[chain["N"]==N].iloc[0,0]
+
+    for ri in range(40,len(values0)):
+        if np.all(values0[ri]==None):
+            r=ri
+            break
+    for ci in range(70,len(values0[0])):
+        if np.all(values0[:, ci]==None):
+            c=ci
+            break
+    values = values0[:r,:c]
+    print(r, c)
+
     filtered = []
     for e in values.flatten():
         try:

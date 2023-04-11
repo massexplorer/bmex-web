@@ -30,7 +30,7 @@ import zipfile
 
 
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
-           "colorbar": 'linear', "wigner": 0, "proton": [40], "neutron": [40], "nucleon": [40]}
+           "colorbar": 'linear', "wigner": 0, "proton": [40], "neutron": [40], "nucleon": [40], "range": {"x": [None, None], "y": [None, None]}}
 
 
 app = dash.Dash(
@@ -182,6 +182,8 @@ def download(n_clicks, json_cur_views):
         Input("url-store", "data"),
         #tabs_output
         Input("tabs", "value"),
+        #relayout_data
+        Input({'type': 'graph','index': ALL}, "relayoutData"),
         #new_plot
         Input({'type': 'new-button','index': ALL},"n_clicks"),
         #new_series
@@ -207,7 +209,7 @@ def download(n_clicks, json_cur_views):
     ]
 )
 def main_update(
-    json_cur_views, cur_tabs, cur_sidebar, url, tab_n, new_button, series_button, series_tab, delete_series, delete_button, 
+    json_cur_views, cur_tabs, cur_sidebar, url, tab_n, relayout_data, new_button, series_button, series_tab, delete_series, delete_button, 
     reset_button, dimension, oneD, quantity, dataset, protons, neutrons, nucleons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
@@ -268,11 +270,32 @@ def main_update(
     try:
         dash.callback_context.triggered_id['type']
     except:
-        print("ERROR")
+        print('ERROR')
         raise PreventUpdate
 
+    #relayout_data
+    if 'graph' == dash.callback_context.triggered_id['type']:
+        new_views = cur_views
+        for i in range(len(new_views)):
+            try:
+                print(relayout_data[i])
+                new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = relayout_data[i]['xaxis.range[0]'], relayout_data[i]['xaxis.range[1]']
+                new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = relayout_data[i]['yaxis.range[0]'], relayout_data[i]['yaxis.range[1]']
+            except:
+                if relayout_data[i] == {'dragmode': 'pan'} or relayout_data[i] == {'dragmode': 'zoom'}:
+                    raise PreventUpdate
+                new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = None, None
+                new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = None, None
+        return [
+            json.dumps(new_views),
+            cur_tabs,
+            json.dumps("noupdate"), #graph
+            tab_n,
+            Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
+        ]
+
     #new_plot
-    if "new-button" == dash.callback_context.triggered_id['type']:
+    if 'new-button' == dash.callback_context.triggered_id['type']:
         if len(cur_tabs)>3 or type(new_button) != type([1]):
             raise PreventUpdate
         new_views = cur_views
@@ -398,6 +421,7 @@ def main_output(
         views_list = json.loads(json_views) # list of dicts
         graphindex = 1
         for view_dict in views_list: # iterate through dicts in list
+            zview, nview = view_dict["range"]["y"], view_dict["range"]["x"]
             view = View(view_dict, graphindex, zview, nview) # create a view
             output.append(view.plot())
             graphindex += 1
