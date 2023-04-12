@@ -161,9 +161,9 @@
 
 .series-tab {
     width: 100% !important;
-    height: 50px !important;
-    border-radius: 3% !important;
-    border: 3px solid #ffff !important;
+    height: 35px !important;
+    border-radius: 0% !important;
+    border: 2px solid #ffff !important;
     background: #a5b1cd !important;
     padding: 0 !important;
     font-size: 100% !important;
@@ -174,11 +174,10 @@
 }
 
 .series-tab--selected {
-    border: 3px solid #ffffff76 !important;
+    border: 2px solid #ffffff76 !important;
     background: #e76f51 !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
-    height: 50px !important;
     font-size: 32 !important;
     color: #282b38  !important; 
 }
@@ -202,7 +201,7 @@
 }
 
 #reset-card {
-    width: 100%;
+    width: 90%;
 }
 
 .reset-button {
@@ -239,13 +238,6 @@
     color: #a5b1cd;
     width: 50%;
     align-self: center;
-}
-
-/* Text Inputs
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-#nmin, #nmax, #zmin, #zmax {
-    width: 100%;
 }
 
 /* Dropdowns
@@ -335,15 +327,13 @@
     width: 80%
 }
 
-
 #copy-card {
-
+    width: 88%;
     padding-bottom: 2rem;
     display: flex !important;
     background-color: #264653;
     margin-bottom: 2rem;
     border: 3px outset #a5b1cd;
-    border-radius: 15%;
     align-items: center;
     display: flex;
     justify-content: center;
@@ -355,7 +345,7 @@
 }
 
 #download-card {
-    width: 100%;
+    width: 90%;
     margin-bottom: 2rem;
 }
 
