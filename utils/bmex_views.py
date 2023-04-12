@@ -78,7 +78,7 @@ def masses_view():
                                 dcc.Clipboard(id="clipboard",content="")
                             ]),
                             drc.Card(id="download-card", children=[
-                                html.Button("Download Figures", id="download-button"),
+                                html.Button("Export Pub. PDFs", id="download-button"),
                             ]),
                             drc.Card(
                                 id="range-card", 
