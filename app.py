@@ -1,7 +1,7 @@
 import time
 import numpy as np
 import math
-from datetime import date
+from datetime import date, datetime
 
 import dash
 from dash import dcc, MATCH, ALL, html
@@ -28,6 +28,7 @@ import h5py
 import base64, io
 import re
 import zipfile
+import plotly.io as pio
 
 
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
@@ -147,35 +148,27 @@ def download(n_clicks, json_cur_views):
         n_clicks>0
     except:
         raise PreventUpdate
-            # cur_views = json.loads(json_cur_views)
-            # zip_file_name = "BMEX.zip"
-            # with zipfile.ZipFile(zip_file_name, mode="w") as zf:
-            #     for i in range(len(cur_views)):
-            #         filename = "download-figs/fig"+str(i+1)+".pdf"
-            #         View(cur_views[i]).plot().figure.write_image(filename)
-            #         zf.write(filename)  
-            # return dcc.send_file(zip_file_name)
     cur_views = json.loads(json_cur_views)
-    zip_file_name = "BMEX-"+str(date.today().strftime("%b-%d-%Y"))+".zip"
-    def write_archive(bytes_io):
+    zip_file_name = "BMEX-"+str(date.today().strftime("%b-%d-%Y"))+"_"+str(datetime.now().strftime("%H-%M-%S"))+".zip"
+    def write_zip(bytes_io):
         with zipfile.ZipFile(bytes_io, mode="w") as zf:
             for i in range(len(cur_views)):
                 filename = "Fig_"+str(i+1)+".pdf"
                 buf = io.BytesIO()
                 fig = View(cur_views[i]).plot().figure
+                pio.full_figure_for_development(fig, warn=False)
 
                 fig.update_layout(
-                    font={"color": "#000000"},
-                    xaxis=dict(linecolor='black', title=dict(text="Neutrons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
-                    showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=cur_views[i]['range']['x']),
-                    yaxis=dict(linecolor='black', title=dict(text="Protons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
-                    showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=cur_views[i]['range']['y']),
-                    plot_bgcolor="#ffffff", 
-                    paper_bgcolor="#ffffff")
+                    font={"color": "#000000"}, title=None,
+                    xaxis=dict(linecolor='black', showgrid=False,  minor=dict(showgrid=False), mirror="ticks", range=cur_views[i]['range']['x']),
+                    yaxis=dict(linecolor='black', showgrid=False, minor=dict(showgrid=False), mirror="ticks", range=cur_views[i]['range']['y']),
+                    plot_bgcolor="#ffffff", paper_bgcolor="#ffffff")
                 
-                fig.write_image(buf, format='pdf')
+                fig.update_traces(dict(marker=dict(color='#000000')), dict(marker=dict(color='#ffffff')))
+
+                fig.write_image(buf, format='pdf', engine="kaleido")
                 zf.writestr(filename, buf.getvalue())
-    return dcc.send_bytes(write_archive, zip_file_name)
+    return dcc.send_bytes(write_zip, zip_file_name)
 
 
 @app.callback(
@@ -231,6 +224,7 @@ def main_update(
     else:
         series_n = int(series_tab[0][3])
 
+    print(dash.callback_context.triggered_id)
     #url
     if "url-store" == dash.callback_context.triggered_id:
         if(len(url)>10):
@@ -244,12 +238,13 @@ def main_update(
                 Sidebar(loaded_views[n-1]).show(),
             ]
         else:
+            new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(cur_views))]
             return  [
                 json_cur_views, 
-                cur_tabs,
+                new_tabs,
                 json.dumps("update"),
                 tab_n,
-                Sidebar(cur_views[n-1], 1, len(cur_tabs)).show(),
+                Sidebar(cur_views[n-1], 1, len(new_tabs)).show(),
             ]
 
     #tabs_change

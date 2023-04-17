@@ -74,8 +74,8 @@ def masses_view():
                         id="right-column",
                         children=[
                             drc.Card(id="copy-card", children=[
-                                html.P("Share View:"),
-                                dcc.Clipboard(id="clipboard",content="")
+                                html.P("Share View"),
+                                dcc.Clipboard(id="clipboard",content=""),
                             ]),
                             drc.Card(id="download-card", children=[
                                 html.Button("Export Pub. PDFs", id="download-button"),
