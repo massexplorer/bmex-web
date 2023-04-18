@@ -29,6 +29,8 @@ import base64, io
 import re
 import zipfile
 import plotly.io as pio
+import sqlite3 as sl
+import string
 
 
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
@@ -116,8 +118,13 @@ def display_page(pathname):
     Input("viewsmemory", "data")
 )
 def link_update(views):
-    info = json.loads(views)
-    return "https://beta.bmex.dev/masses/"+base64.urlsafe_b64encode(json.dumps(info).encode()).decode()
+    con = sl.connect('utils/view_hashes.db')
+    sql = 'INSERT INTO hashes (hash, info) values(?, ?)'
+    hash = ''.join(rand.choices(string.ascii_letters, k=6))
+    with con:
+        con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
+    # return "https://beta.bmex.dev/masses/"+base64.urlsafe_b64encode(views.encode()).decode()
+    return "https://beta.bmex.dev/masses/"+hash
 
 
 @app.callback(
@@ -227,15 +234,29 @@ def main_update(
     print(dash.callback_context.triggered_id)
     #url
     if "url-store" == dash.callback_context.triggered_id:
+        # if(len(url)>10):
+        #     loaded_views = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
+        #     new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(loaded_views))]
+        #     return  [
+        #         json.dumps(loaded_views), 
+        #         new_tabs,
+        #         json.dumps('update'),
+        #         tab_n,
+        #         Sidebar(loaded_views[n-1]).show(),
+        #     ]
         if(len(url)>10):
-            loaded_views = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
+            con = sl.connect('utils/view_hashes.db')
+            hash = url[8:]
+            with con:
+                loaded_views = json.loads(list(con.execute("SELECT info FROM hashes WHERE hash == (?)", (hash,)))[0][0])
+            print(loaded_views)
             new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(loaded_views))]
             return  [
                 json.dumps(loaded_views), 
                 new_tabs,
                 json.dumps('update'),
                 tab_n,
-                Sidebar(loaded_views[n-1]).show(),
+                Sidebar(loaded_views[n-1]).show(), 
             ]
         else:
             new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(cur_views))]
@@ -283,12 +304,10 @@ def main_update(
     #relayout_data
     if 'graph' == dash.callback_context.triggered_id['type']:
         new_views = cur_views
-        print("WHOLE",relayout_data)
         for i in range(len(new_views)):
             if relayout_data[i] == None:
                 continue
             try:
-                print(relayout_data[i])
                 new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = relayout_data[i]['xaxis.range[0]'], relayout_data[i]['xaxis.range[1]']
                 new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = relayout_data[i]['yaxis.range[0]'], relayout_data[i]['yaxis.range[1]']
             except:
