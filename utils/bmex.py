@@ -173,34 +173,34 @@ def Wig2(z, n):
 def OutputString(quantity):
     out_str = "Quantity not found!"
     if (quantity == "BE"):
-        out_str = "Binding Energy"
+        out_str = "Binding Energy (MeV)"
     elif (quantity == "OneNSE"):
-        out_str = "One Neutron Separation Energy"
+        out_str = "One Neutron Separation Energy (MeV)"
     elif (quantity == "OnePSE"):
-        out_str = "One Proton Separation Energy"
+        out_str = "One Proton Separation Energy (MeV)"
     elif (quantity == "TwoNSE"):
-        out_str = "Two Neutron Separation Energy"
+        out_str = "Two Neutron Separation Energy (MeV)"
     elif (quantity == "TwoPSE"):
-        out_str = "Two Proton Separation Energy"
+        out_str = "Two Proton Separation Energy (MeV)"
     elif (quantity == "AlphaSE"):
-        out_str = "Alpha Separation Energy"
+        out_str = "Alpha Separation Energy (MeV)"
     elif (quantity == "TwoPSGap"):
-        out_str = "Two Proton Shell Gap"
+        out_str = "Two Proton Shell Gap (MeV)"
     elif (quantity == "TwoNSGap"):
-        out_str = "Two Neutron Shell Gap"
+        out_str = "Two Neutron Shell Gap (MeV)"
     elif (quantity == "DoubleMDiff"):
-        out_str = "Double Mass Difference"
+        out_str = "Double Mass Difference (MeV)"
     elif (quantity == "N3PointOED"):
-        out_str = "Neutron 3-Point Odd-Even Binding Energy Difference"
+        out_str = "Neutron 3-Point Odd-Even Binding Energy Difference (MeV)"
     elif (quantity == "P3PointOED"):
-        out_str = "Proton 3-Point Odd-Even Binding Energy Difference"
+        out_str = "Proton 3-Point Odd-Even Binding Energy Difference (MeV)"
     elif (quantity == "SNESplitting"):
-        out_str = "Single-Neutron Energy Splitting"
+        out_str = "Single-Neutron Energy Splitting (MeV)"
     elif (quantity == "SPESplitting"):
-        out_str = "Single-Proton Energy Splitting"
+        out_str = "Single-Proton Energy Splitting (MeV)"
     elif (quantity == "WignerEC"):
-        out_str = "Wigner Energy Coefficient"
+        out_str = "Wigner Energy Coefficient (MeV)"
     elif (quantity == "QDB2t"):
-        out_str = "Quad Def Beta2"
+        out_str = "Quad Def Beta2 (MeV)"
     return out_str
 

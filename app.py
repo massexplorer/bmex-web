@@ -80,6 +80,7 @@ app.layout = html.Div(
         ),
         html.Div(id='page-content'),
         dcc.Store(id='intermediate-value'),
+        html.P(id='placeholder', hidden=True),
         dcc.Store(id='url-store'),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
         dcc.Store(id='viewsmemory', storage_type='session',
@@ -117,14 +118,36 @@ def display_page(pathname):
     Output("clipboard", "content"),
     Input("viewsmemory", "data")
 )
-def link_update(views):
-    con = sl.connect('utils/view_hashes.db')
-    sql = 'INSERT INTO hashes (hash, info) values(?, ?)'
+def link_update(views):   
     hash = ''.join(rand.choices(string.ascii_letters, k=6))
-    with con:
-        con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
     # return "https://beta.bmex.dev/masses/"+base64.urlsafe_b64encode(views.encode()).decode()
     return "https://beta.bmex.dev/masses/"+hash
+
+@app.callback(
+    Output("placeholder", "hidden"),
+    State("clipboard", "content"),
+    State("viewsmemory", "data"),
+    Input("clipboard", "n_clicks"),  
+    prevent_initial_call=True, 
+)
+def hash_store(link, views, clicks):
+    try:
+        hash = link.split("masses/")[1]
+    except:
+        raise PreventUpdate
+    con = sl.connect('view_hashes.db')
+    with con:
+        try:
+            con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
+        except:
+            con.execute("""
+                CREATE TABLE hashes (
+                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                    hash TEXT,
+                    info TEXT
+                );
+            """)
+            con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
 
 
 @app.callback(
@@ -245,7 +268,7 @@ def main_update(
         #         Sidebar(loaded_views[n-1]).show(),
         #     ]
         if(len(url)>10):
-            con = sl.connect('utils/view_hashes.db')
+            con = sl.connect('view_hashes.db')
             hash = url[8:]
             with con:
                 loaded_views = json.loads(list(con.execute("SELECT info FROM hashes WHERE hash == (?)", (hash,)))[0][0])

@@ -32,7 +32,7 @@ def single(quantity, model, Z, N, wigner=0):
         try:
             result+"a"
         except:
-            return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result)+" MeV")
+            return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result))
         return html.P(result)
 
 def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
@@ -280,9 +280,7 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=N
                 x=np.arange(2,155,step), y=np.arange(2,105,step), z=values, 
                 zmin=0, zmax=max_z, name = "",
                 colorscale=cb(colorbar),
-                colorbar=dict(
-                    title="",
-                ),
+                colorbar=dict(title=""),
                 hovertemplate = '<b><i>N</i></b>: %{x}<br>'+
                         '<b><i>Z</i></b>: %{y}<br>'+
                         '<b><i>Value</i></b>: %{z}',          
