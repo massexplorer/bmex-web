@@ -83,7 +83,7 @@ app.layout = html.Div(
         html.P(id='placeholder', hidden=True),
         dcc.Store(id='url-store'),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
-        dcc.Store(id='viewsmemory', storage_type='session',
+        dcc.Store(id='viewsmemory', storage_type='memory',
             data=json.dumps([default]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
@@ -202,6 +202,36 @@ def download(n_clicks, json_cur_views):
 
 
 @app.callback(
+    Output({'type': 'graph','index': ALL}, "figure"),
+    State({'type': 'graph','index': ALL}, "figure"),
+    Input("colorbar-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def colorbar_button(figures, clicks):
+    new_figures = figures
+
+    float_datas = []
+    for i in range(len(figures)):
+        data = np.array(figures[i]['data'][0]['z']).flatten()
+        types = [type(j) for j in data]
+        float_datas.append( np.array( [data[k] for k in range(len(types)) if types[k]==type(1.0)] ) )
+
+    maxes = np.array( [ np.max( float_datas[i] ) for i in range(len(figures)) ] )
+    mins = np.array( [ np.min( float_datas[i] ) for i in range(len(figures)) ] )
+    max_i, min_i = maxes.argmax(), mins.argmax()
+    print(max_i, min_i)
+    for i in range(len(figures)):
+        # factor = max_val/maxes[i]
+        # print(factor)
+        # new_figures[i]['layout']['range_color'] = colorrange
+        print(figures[min_i]['data'][0]['zmin'], figures[max_i]['data'][0]['zmax'])
+        new_figures[i]['data'][0]['zmin'] = figures[min_i]['data'][0]['zmin']
+        new_figures[i]['data'][0]['zmax'] = figures[max_i]['data'][0]['zmax']
+ 
+    return new_figures
+
+
+@app.callback(
     [
         Output("viewsmemory", "data"),
         Output("tabs", "children"),
@@ -254,7 +284,8 @@ def main_update(
     else:
         series_n = int(series_tab[0][3])
 
-    print(dash.callback_context.triggered_id)
+    #print(dash.callback_context.triggered_id)
+
     #url
     if "url-store" == dash.callback_context.triggered_id:
         # if(len(url)>10):
@@ -272,7 +303,6 @@ def main_update(
             hash = url[8:]
             with con:
                 loaded_views = json.loads(list(con.execute("SELECT info FROM hashes WHERE hash == (?)", (hash,)))[0][0])
-            print(loaded_views)
             new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(loaded_views))]
             return  [
                 json.dumps(loaded_views), 

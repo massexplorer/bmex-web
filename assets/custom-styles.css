@@ -356,6 +356,17 @@
     color: #a5b1cd;
 }
 
+#colorbar-button-card {
+    width: 90%;
+    margin-bottom: 2rem;
+}
+
+#colorbar-button {
+    width: 100%;
+    padding: 0;
+    color: #a5b1cd;
+}
+
 #range-card {
     display: none;
 }

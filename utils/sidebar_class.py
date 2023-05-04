@@ -250,7 +250,7 @@ class Sidebar:
                             ],
                             clearable=False,
                             searchable=False,
-                            value="linear",
+                            value=self.colorbar[self.series_n-1],
                         )
                     ]
                 )

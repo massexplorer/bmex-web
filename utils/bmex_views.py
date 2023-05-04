@@ -92,6 +92,9 @@ def masses_view():
                                     dcc.Input(id="zmax", type="number", placeholder="Z max", min=0, max=200),
                                 ]
                             ),
+                            drc.Card(id="colorbar-button-card", children=[
+                                html.Button("Link Colorbars", id="colorbar-button"),
+                            ]),
                             drc.Card(id="reset-card", children=[
                                 html.Button('Reset Page', id={"type": 'reset-button', "index": 1}, className='reset-button')
                             ]),
