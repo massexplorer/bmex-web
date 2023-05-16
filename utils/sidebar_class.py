@@ -250,17 +250,18 @@ class Sidebar:
                             ],
                             clearable=False,
                             searchable=False,
-                            value=self.colorbar[self.series_n-1],
+                            value=self.colorbar,
                         )
                     ]
                 )
             )
-        # elif self.dimension == '1D':
-        #     output.append(
-        #         drc.Card(id="series-card", children=[
-        #             html.Button('+', id={'type': 'series-button','index': 1}, value=None, className='series-button')
-        #         ])
-        #     )
+            output.append(
+                drc.Card(id="colorbar-scale-card", children=[
+                    html.Button("Rescale Colorbar", id={'type': 'rescale-colorbar-button','index': 1}, className='rescale-colorbar-button'),
+                    html.Img(src="assets/help.png", id='rescale-help', title='Rescales the colorbar of the selected figure based on the min and max of its currently visable values')
+                ]),
+            )
+
         if self.maintabs_length > 1:
             output.append(
                 drc.Card(id="delete-card", children=[

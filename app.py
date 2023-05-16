@@ -34,7 +34,8 @@ import string
 
 
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
-           "colorbar": 'linear', "wigner": 0, "proton": [40], "neutron": [40], "nucleon": [40], "range": {"x": [None, None], "y": [None, None]}}
+           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None], 
+           "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None]}
 
 
 app = dash.Dash(
@@ -76,10 +77,25 @@ app.layout = html.Div(
                         ),
                     ],
                 ),
-            ],
+                html.Div(
+                    className="issues-report",
+                    children=[
+                        # html.P("Report Issues", className="issues-title"),
+                        html.A(
+                            id="issues-logo",
+                            children=[
+                                html.Img(src=app.get_asset_url("Submit-Issues.png"),className="issues-img")
+                            ],
+                            href="https://github.com/massexplorer/bmex-web/issues/new", 
+                            className="issues-img-div"                 
+                        )   
+                    ],
+                ),
+            ]
         ),
         html.Div(id='page-content'),
         dcc.Store(id='intermediate-value'),
+        dcc.Store(id='intermediate-colorbar-range'),
         html.P(id='placeholder', hidden=True),
         dcc.Store(id='url-store'),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
@@ -112,7 +128,6 @@ def display_page(pathname):
             className="container scalable",
             children=[html.P("How did you get here? Click the banner to make it back to safety!")])
     return pathname, out
-
 
 @app.callback(
     Output("clipboard", "content"),
@@ -203,32 +218,82 @@ def download(n_clicks, json_cur_views):
 
 @app.callback(
     Output({'type': 'graph','index': ALL}, "figure"),
+    Output('intermediate-colorbar-range', 'data'),
     State({'type': 'graph','index': ALL}, "figure"),
-    Input("colorbar-button", "n_clicks"),
+    State("tabs", "value"),
+    State("viewsmemory", "data"),
+    Input("link-colorbar-button", "n_clicks"),
+    Input({'type': 'rescale-colorbar-button', 'index': ALL}, 'n_clicks'),
     prevent_initial_call=True,
 )
-def colorbar_button(figures, clicks):
+def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorbar):
     new_figures = figures
 
-    float_datas = []
-    for i in range(len(figures)):
-        data = np.array(figures[i]['data'][0]['z']).flatten()
-        types = [type(j) for j in data]
-        float_datas.append( np.array( [data[k] for k in range(len(types)) if types[k]==type(1.0)] ) )
+    # write a function that inputs an array of different data types and only keeps the floats
+    def float_array(array):
+        return np.array( [array[i] for i in range(len(array)) if type(array[i])==type(1.0)] )
+    
+    if "link-colorbar-button" == dash.callback_context.triggered_id:
+        # float_datas = []
+        # for i in range(len(figures)):
+        #     data = np.array(figures[i]['data'][0]['z']).flatten()
+        #     float_datas.append( float_array(data) )
+        # maxes = np.array( [ np.max( float_datas[i] ) for i in range(len(figures)) ] )
+        # mins = np.array( [ np.min( float_datas[i] ) for i in range(len(figures)) ] )
+        # try:
+        #     max_i, min_i = maxes.argmax(), mins.argmax()
+        # except:
+        #     raise PreventUpdate
+        # for i in range(len(figures)):
+        #     new_figures[i]['data'][0]['zmin'] = figures[min_i]['data'][0]['zmin']
+        #     new_figures[i]['data'][0]['zmax'] = figures[max_i]['data'][0]['zmax']
+        mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures))] )
+        maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures))] )
+        print(mins, maxes)
+        try:
+            minz, maxz = min(mins), max(maxes)
+        except:
+            raise PreventUpdate
+        for i in range(len(figures)):
+            new_figures[i]['data'][0]['zmin'] = minz
+            new_figures[i]['data'][0]['zmax'] = maxz
 
-    maxes = np.array( [ np.max( float_datas[i] ) for i in range(len(figures)) ] )
-    mins = np.array( [ np.min( float_datas[i] ) for i in range(len(figures)) ] )
-    max_i, min_i = maxes.argmax(), mins.argmax()
-    print(max_i, min_i)
-    for i in range(len(figures)):
-        # factor = max_val/maxes[i]
-        # print(factor)
-        # new_figures[i]['layout']['range_color'] = colorrange
-        print(figures[min_i]['data'][0]['zmin'], figures[max_i]['data'][0]['zmax'])
-        new_figures[i]['data'][0]['zmin'] = figures[min_i]['data'][0]['zmin']
-        new_figures[i]['data'][0]['zmax'] = figures[max_i]['data'][0]['zmax']
- 
-    return new_figures
+        return new_figures, {"index": 'ALL', "range": [minz, maxz]}
+    
+    try:
+        dash.callback_context.triggered_id['type']
+    except:
+        print('ERROR_1')
+        raise PreventUpdate
+    
+    if "rescale-colorbar-button" == dash.callback_context.triggered_id['type']:
+        if type(rescale_colorbar[0])==type(1):
+            cur_views = json.loads(json_cur_views)
+            n = int(tab_n[3])
+            new_figures = figures
+            x_range, y_range = cur_views[n-1]['range']['x'], cur_views[n-1]['range']['y']
+            print(x_range, y_range)
+            if x_range[0] == None:
+                x_range[0] = -9999
+            if x_range[1] == None:
+                x_range[1] = 9999
+            if y_range[0] == None:
+                y_range[0] = -9999
+            if y_range[1] == None:
+                y_range[1] = 9999
+            xmin, xmax = math.floor(x_range[0])+math.floor(x_range[0])%2, math.ceil(x_range[1])-math.ceil(x_range[1])%2
+            ymin, ymax = math.floor(y_range[0])+math.floor(y_range[0])%2, math.ceil(y_range[1])-math.ceil(y_range[1])%2
+            x, y = np.array(figures[n-1]['data'][0]['x']), np.array(figures[n-1]['data'][0]['y'])
+            xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
+            ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
+            values = float_array(np.array(figures[n-1]['data'][0]['z'])[ymin_i:ymax_i, xmin_i:xmax_i].flatten())
+            val_min, val_max = np.min(values), np.max(values)
+            new_figures[n-1]['data'][0]['zmin'] = val_min
+            new_figures[n-1]['data'][0]['zmax'] = val_max
+
+            return new_figures, {"index": n-1, "range": [val_min, val_max]}
+
+        raise PreventUpdate
 
 
 @app.callback(
@@ -247,6 +312,8 @@ def colorbar_button(figures, clicks):
         Input("url-store", "data"),
         #tabs_output
         Input("tabs", "value"),
+        #colorbar_range
+        Input('intermediate-colorbar-range', 'data'),
         #relayout_data
         Input({'type': 'graph','index': ALL}, "relayoutData"),
         #new_plot
@@ -274,7 +341,7 @@ def colorbar_button(figures, clicks):
     ]
 )
 def main_update(
-    json_cur_views, cur_tabs, cur_sidebar, url, tab_n, relayout_data, new_button, series_button, series_tab, delete_series, delete_button, 
+    json_cur_views, cur_tabs, cur_sidebar, url, tab_n, colorbar_range, relayout_data, new_button, series_button, series_tab, delete_series, delete_button, 
     reset_button, dimension, oneD, quantity, dataset, protons, neutrons, nucleons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
@@ -348,11 +415,31 @@ def main_update(
         else:
             raise PreventUpdate
 
+    #colorbar_range
+    if 'intermediate-colorbar-range' == dash.callback_context.triggered_id:
+        if colorbar_range == None:
+            raise PreventUpdate
+        new_views = cur_views
+        if colorbar_range['index'] == 'ALL':
+            for i in range(len(new_views)):
+                new_views[i]['colorbar_range'] = colorbar_range['range']
+        else:
+            new_views[colorbar_range['index']]['colorbar_range'] = colorbar_range['range']
+        return [
+            json.dumps(new_views),
+            cur_tabs,
+            json.dumps("update"), #graph
+            tab_n,
+            Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
+        ]
+
+
     try:
         dash.callback_context.triggered_id['type']
     except:
         print('ERROR')
         raise PreventUpdate
+
 
     #relayout_data
     if 'graph' == dash.callback_context.triggered_id['type']:

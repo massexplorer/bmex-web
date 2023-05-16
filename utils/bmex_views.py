@@ -82,7 +82,6 @@ def masses_view():
                             ]),
                             drc.Card(
                                 id="range-card", 
-                                # style={"display":'none'},
                                 children=[
                                     html.P("Neutrons Range:"),
                                     dcc.Input(id="nmin", type="number", placeholder="N min", min=0, max=300),
@@ -93,7 +92,8 @@ def masses_view():
                                 ]
                             ),
                             drc.Card(id="colorbar-button-card", children=[
-                                html.Button("Link Colorbars", id="colorbar-button"),
+                                html.Button("Link Colorbars", id="link-colorbar-button"),
+                                html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures to include the all visible values')
                             ]),
                             drc.Card(id="reset-card", children=[
                                 html.Button('Reset Page', id={"type": 'reset-button', "index": 1}, className='reset-button')

@@ -15,6 +15,8 @@ def single(quantity, model, Z, N, wigner=0):
     Z = Z[0]
     N = N[0]
     model = model[0]
+    if Z==None and N==None:
+        return html.P("Please enter a proton and neutron value")
     if quantity == 'All':
         # return html.P("All")
         output = []
@@ -199,7 +201,7 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
     figure.update_layout(title_font_size=24)
     return figure
     
-def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=None, NView=None):
+def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorbar_range=[None, None], ZView=None, NView=None):
     model = model[0]
     layout = go.Layout(
             font={"color": "#a5b1cd"},
@@ -244,9 +246,13 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=N
         else:
             filtered.append(e)
     filtered = np.array(filtered)
-    max_z=float(np.percentile(filtered, [97]))
+    minz, maxz = colorbar_range[0], colorbar_range[1]
+    if minz == None:
+        minz = 0
+    if maxz == None:
+        maxz=float(np.percentile(filtered, [97]))
     equalized_color = filtered[filtered>=0]
-    equalized_color = equalized_color[equalized_color<=max_z]
+    equalized_color = equalized_color[equalized_color<=maxz]
     
     def cb(colorbar):
         if(colorbar == 'linear'):
@@ -278,9 +284,9 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, ZView=N
 
     trace = go.Heatmap(
                 x=np.arange(2,155,step), y=np.arange(2,105,step), z=values, 
-                zmin=0, zmax=max_z, name = "",
+                zmin=minz, zmax=maxz, name = "",
                 colorscale=cb(colorbar),
-                colorbar=dict(title=""),
+                colorbar=dict(title="MeV"),
                 hovertemplate = '<b><i>N</i></b>: %{x}<br>'+
                         '<b><i>Z</i></b>: %{y}<br>'+
                         '<b><i>Value</i></b>: %{z}',          

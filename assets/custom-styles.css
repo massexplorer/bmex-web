@@ -30,15 +30,44 @@
     padding: 0rem 0;
     width: 100%;
     margin-bottom: 2rem;
+    flex-direction: row ;
+    height: auto;
+    display: flex;
+    align-items: flex-start;
 }
 
-.banner h2 {
+.container.scalable {
+    display:flex;
+}
+
+.issues-report {
+    width: 15%;
+    padding: 3%;
+    display: flex;
+    height: auto;
+    flex-direction: row;
+    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
+}
+
+.issues-title {
     color: #a5b1cd;
     display: inline-block;
     font-family: 'Playfair Display', sans-serif;
-    font-size: 4rem;
+    font-size: 2rem;
     line-height: 1;
     text-align: center;
+    vertical-align: middle;
+}
+
+.issues-img-div {
+    vertical-align: middle;
+}
+
+.issues-img {
+    max-width: 50% !important;
+    height: auto !important;
 }
 
 .banner h2:hover {
@@ -57,7 +86,6 @@
 
     .banner .container.scalable {
         display: flex;
-        flex-direction: column-reverse;
         justify-content: space-between;
         align-items: center;
     }
@@ -283,6 +311,9 @@
     padding: 0 0;
 }
 
+/* Left Column Contents
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 #dimension-card {
     padding-top: 1rem;
 }
@@ -290,7 +321,6 @@
 #oneD-card {
     padding-bottom: 0rem;
 }
-
 
 #quantity-card {
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
@@ -327,6 +357,29 @@
     width: 80%
 }
 
+#colorbar-scale-card {
+    width: 80%;
+    margin-top: 3rem;
+    flex-direction: row;
+    height: 3rem;
+}
+
+.rescale-colorbar-button {
+    width: 79%;
+    padding: 0;
+    color: #a5b1cd;
+}
+
+#rescale-help {
+    margin-left: 6%;
+    max-width: 15%;
+    height:inherit;
+    vertical-align: middle;
+}
+
+/* Right Column Contents
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 #copy-card {
     width: 88%;
     padding-bottom: 2rem;
@@ -361,10 +414,17 @@
     margin-bottom: 2rem;
 }
 
-#colorbar-button {
-    width: 100%;
+#link-colorbar-button {
+    width: 79%;
     padding: 0;
     color: #a5b1cd;
+}
+
+#link-colorbar-help {
+    margin-left: 6%;
+    max-width: 15%;
+    height: inherit;
+    vertical-align: middle;
 }
 
 #range-card {

@@ -21,7 +21,7 @@ import pandas as pd
 import random as rand
 
 class View:
-    def __init__(self, my_dict=dict(dimension='landscape', chain=None, quantity='BE', dataset=['EXP'], colorbar='linear', wigner=0, proton=[40], neutron=[40], nucleon=[40]), graphindex=0, zview=None, nview=None):
+    def __init__(self, my_dict, graphindex=0, zview=None, nview=None):
         for key in my_dict:
             setattr(self, key, my_dict[key])
         self.index = graphindex
@@ -33,7 +33,7 @@ class View:
             return figs.single(self.quantity, self.dataset, self.proton, self.neutron, self.wigner)
         elif self.dimension == 'landscape':
             try:
-                return dcc.Graph(id={'type': 'graph','index': self.index}, figure=figs.landscape(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.ZView, self.NView))
+                return dcc.Graph(id={'type': 'graph','index': self.index}, figure=figs.landscape(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.colorbar_range, self.ZView, self.NView))
             except:
                 return html.P('This particular plot is not available', style={'font-size':'20px','padding-left': '0px', 'padding-right': '0px'})
         elif self.dimension == '1D':
