@@ -228,27 +228,15 @@ def download(n_clicks, json_cur_views):
 )
 def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorbar):
     new_figures = figures
+    cur_views = json.loads(json_cur_views)
 
     # write a function that inputs an array of different data types and only keeps the floats
     def float_array(array):
         return np.array( [array[i] for i in range(len(array)) if type(array[i])==type(1.0)] )
     
     if "link-colorbar-button" == dash.callback_context.triggered_id:
-        # float_datas = []
-        # for i in range(len(figures)):
-        #     data = np.array(figures[i]['data'][0]['z']).flatten()
-        #     float_datas.append( float_array(data) )
-        # maxes = np.array( [ np.max( float_datas[i] ) for i in range(len(figures)) ] )
-        # mins = np.array( [ np.min( float_datas[i] ) for i in range(len(figures)) ] )
-        # try:
-        #     max_i, min_i = maxes.argmax(), mins.argmax()
-        # except:
-        #     raise PreventUpdate
-        # for i in range(len(figures)):
-        #     new_figures[i]['data'][0]['zmin'] = figures[min_i]['data'][0]['zmin']
-        #     new_figures[i]['data'][0]['zmax'] = figures[max_i]['data'][0]['zmax']
-        mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures))] )
-        maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures))] )
+        mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
+        maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
         print(mins, maxes)
         try:
             minz, maxz = min(mins), max(maxes)
@@ -268,7 +256,6 @@ def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorba
     
     if "rescale-colorbar-button" == dash.callback_context.triggered_id['type']:
         if type(rescale_colorbar[0])==type(1):
-            cur_views = json.loads(json_cur_views)
             n = int(tab_n[3])
             new_figures = figures
             x_range, y_range = cur_views[n-1]['range']['x'], cur_views[n-1]['range']['y']

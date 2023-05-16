@@ -261,6 +261,11 @@ class Sidebar:
                     html.Img(src="assets/help.png", id='rescale-help', title='Rescales the colorbar of the selected figure based on the min and max of its currently visable values')
                 ]),
             )
+            # output.append(
+            #     drc.Card(id="colorbar-slider-card", children=[
+            #         dcc.Slider("Colorbar Slider", id={'type': 'rescale-colorbar-button','index': 1}, className='rescale-colorbar-button'),
+            #     ]),
+            # )
 
         if self.maintabs_length > 1:
             output.append(
