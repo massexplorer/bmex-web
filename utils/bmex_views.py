@@ -55,27 +55,20 @@ def masses_view():
                             html.Div(id='tabs_output', children=[])
                         ]
                     ),
-                    html.Div(id='div-right',
-                    children=[
-                        dcc.Loading(id="loading-1",
+                    html.Div(
+                        id='center-column',
                         children=[
-                            html.Div(id="div-graphs-loading",style={'width':'100%'},
+                            dcc.Loading(id="loading-1",
                             children=[
-                                html.Div(id="div-graphs",
-                                children=[
-                                    # views.View({"graphstyle": 'landscape', "quantity": ['BE'], "dataset": ['EXP'], 
-                                    #             "colorbar": 'linear', "wigner": 0, "id": 1, "proton": 0, "neutron": 0, "nucleon":0}).plot(),
-                                    # html.Button('New Plot', id='new-button', hidden=True),
-                                ])
+                                html.Div(id="div-graphs")
                             ])
-                        ])
-                    ]),
+                        ]),
                     html.Div(
                         id="right-column",
                         children=[
                             drc.Card(id="copy-card", children=[
-                                html.P("Share View"),
-                                dcc.Clipboard(id="clipboard",content=""),
+                                html.P("Share View", id="clipboard-title"),
+                                dcc.Clipboard(id="clipboard", content=""),
                             ]),
                             drc.Card(id="download-card", children=[
                                 html.Button("Export Pub. PDFs", id="download-button"),
@@ -93,10 +86,10 @@ def masses_view():
                             ),
                             drc.Card(id="colorbar-button-card", children=[
                                 html.Button("Link Colorbars", id="link-colorbar-button"),
-                                html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures to include the all visible values')
+                                html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures, retaining the furthest extrema of the original colorbars')
                             ]),
                             drc.Card(id="reset-card", children=[
-                                html.Button('Reset Page', id={"type": 'reset-button', "index": 1}, className='reset-button')
+                                html.Button('Reset Page', id='reset-button')
                             ]),
                         ]
                     )                   

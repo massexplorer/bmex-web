@@ -54,43 +54,23 @@ server = app.server
 app.layout = html.Div(
     children=[
         dcc.Location(id='url', refresh=False),
-        # .container class is fixed, .container.scalable is scalable
         html.Div(
             className="banner",
             children=[
-                # Change App Name here
-                html.Div(
-                    className="container scalable",
+                html.A(
+                    id="logo",
                     children=[
-                        # Change App Name here
-                        html.H2(
-                            id="banner-title",
-                            children=[
-                                html.A(
-                            id="banner-logo",
-                            children=[
-                                html.Img(src=app.get_asset_url("BMEX-logo-beta.png"))
-                            ],
-                            href="https://bmex.dev",
-                        )
-                            ],
-                        ),
+                        html.Img(src=app.get_asset_url("BMEX-logo-beta.png"), id="logo-img")
                     ],
+                    href="https://bmex.dev",
                 ),
-                html.Div(
-                    className="issues-report",
+                html.A(
+                    id="issues",
                     children=[
-                        # html.P("Report Issues", className="issues-title"),
-                        html.A(
-                            id="issues-logo",
-                            children=[
-                                html.Img(src=app.get_asset_url("Submit-Issues.png"),className="issues-img")
-                            ],
-                            href="https://github.com/massexplorer/bmex-web/issues/new", 
-                            className="issues-img-div"                 
-                        )   
+                        html.Img(src=app.get_asset_url("Submit-Issues.png"), id="issues-img")
                     ],
-                ),
+                    href="https://github.com/massexplorer/bmex-web/issues/new",             
+                )   
             ]
         ),
         html.Div(id='page-content'),
@@ -99,11 +79,11 @@ app.layout = html.Div(
         html.P(id='placeholder', hidden=True),
         dcc.Store(id='url-store'),
         #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
-        dcc.Store(id='viewsmemory', storage_type='memory',
-            data=json.dumps([default]),
+        dcc.Store(id='viewsmemory', storage_type='session', data=json.dumps([default]),
         ),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
         dcc.ConfirmDialog(id='confirm', message='Warning! Are you sure you want to delete this view?'),
+        dcc.ConfirmDialog(id='confirm-reset', message='Warning! Are you sure you want to reset this page?'),
         dcc.Download(id="download-figs"),
     ]
 )
@@ -134,35 +114,37 @@ def display_page(pathname):
     Input("viewsmemory", "data")
 )
 def link_update(views):   
-    hash = ''.join(rand.choices(string.ascii_letters, k=6))
+    # hash = ''.join(rand.choices(string.ascii_letters, k=6))
+    # return "https://beta.bmex.dev/masses/"+hash
+    cur_views = json.loads(views)
+    return "https://beta.bmex.dev/masses/"+base64.urlsafe_b64encode( json.dumps( [list(cur_views[i].values()) for i in range(len(cur_views))] ).encode()).decode()
     # return "https://beta.bmex.dev/masses/"+base64.urlsafe_b64encode(views.encode()).decode()
-    return "https://beta.bmex.dev/masses/"+hash
 
-@app.callback(
-    Output("placeholder", "hidden"),
-    State("clipboard", "content"),
-    State("viewsmemory", "data"),
-    Input("clipboard", "n_clicks"),  
-    prevent_initial_call=True, 
-)
-def hash_store(link, views, clicks):
-    try:
-        hash = link.split("masses/")[1]
-    except:
-        raise PreventUpdate
-    con = sl.connect('view_hashes.db')
-    with con:
-        try:
-            con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
-        except:
-            con.execute("""
-                CREATE TABLE hashes (
-                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                    hash TEXT,
-                    info TEXT
-                );
-            """)
-            con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
+# @app.callback(
+#     Output("placeholder", "hidden"),
+#     State("clipboard", "content"),
+#     State("viewsmemory", "data"),
+#     Input("clipboard", "n_clicks"),  
+#     prevent_initial_call=True, 
+# )
+# def hash_store(link, views, clicks):
+#     try:
+#         hash = link.split("masses/")[1]
+#     except:
+#         raise PreventUpdate
+#     con = sl.connect('view_hashes.db')
+#     with con:
+#         try:
+#             con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
+#         except:
+#             con.execute("""
+#                 CREATE TABLE hashes (
+#                     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+#                     hash TEXT,
+#                     info TEXT
+#                 );
+#             """)
+#             con.execute("""INSERT INTO hashes (hash, info) VALUES (?,?);""", (hash, views))
 
 
 @app.callback(
@@ -172,12 +154,28 @@ def hash_store(link, views, clicks):
 )
 def display_confirm(delete, json_cur_views):
     try:
-        if delete[0] > 0:
-            l = len(json.loads(json_cur_views))
-            if l < 2:
-                pass
-            else:
-                return True
+        dash.callback_context.triggered_id['type']
+    except:
+        raise PreventUpdate
+    if 'delete-button' == dash.callback_context.triggered_id['type']:
+        try:
+            if delete[0] > 0:
+                l = len(json.loads(json_cur_views))
+                if l < 2:
+                    pass
+                else:
+                    return True
+        except:
+            pass
+
+@app.callback(
+    Output('confirm-reset', 'displayed'),
+    Input('reset-button', "n_clicks"),
+)
+def display_reset_confirm(reset):
+    try:
+        if reset > 0:
+            return True
     except:
         pass
 
@@ -237,7 +235,6 @@ def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorba
     if "link-colorbar-button" == dash.callback_context.triggered_id:
         mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
         maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
-        print(mins, maxes)
         try:
             minz, maxz = min(mins), max(maxes)
         except:
@@ -251,7 +248,6 @@ def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorba
     try:
         dash.callback_context.triggered_id['type']
     except:
-        print('ERROR_1')
         raise PreventUpdate
     
     if "rescale-colorbar-button" == dash.callback_context.triggered_id['type']:
@@ -259,7 +255,6 @@ def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorba
             n = int(tab_n[3])
             new_figures = figures
             x_range, y_range = cur_views[n-1]['range']['x'], cur_views[n-1]['range']['y']
-            print(x_range, y_range)
             if x_range[0] == None:
                 x_range[0] = -9999
             if x_range[1] == None:
@@ -274,7 +269,7 @@ def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorba
             xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
             ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
             values = float_array(np.array(figures[n-1]['data'][0]['z'])[ymin_i:ymax_i, xmin_i:xmax_i].flatten())
-            val_min, val_max = np.min(values), np.max(values)
+            val_min, val_max = np.round(np.min(values),3), np.round(np.max(values),3)
             new_figures[n-1]['data'][0]['zmin'] = val_min
             new_figures[n-1]['data'][0]['zmax'] = val_max
 
@@ -314,7 +309,7 @@ def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorba
         #delete_plot
         Input('confirm', 'submit_n_clicks'),
         #reset_page
-        Input({"type": 'reset-button', "index": ALL}, "n_clicks"),
+        Input('confirm-reset', "submit_n_clicks"),
         #dropdowns
         Input({'type': 'dropdown-dimension', 'index': ALL}, 'value'),
         Input({'type': 'dropdown-1D', 'index': ALL}, 'value'),
@@ -342,29 +337,33 @@ def main_update(
 
     #url
     if "url-store" == dash.callback_context.triggered_id:
-        # if(len(url)>10):
-        #     loaded_views = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
-        #     new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(loaded_views))]
-        #     return  [
-        #         json.dumps(loaded_views), 
-        #         new_tabs,
-        #         json.dumps('update'),
-        #         tab_n,
-        #         Sidebar(loaded_views[n-1]).show(),
-        #     ]
         if(len(url)>10):
-            con = sl.connect('view_hashes.db')
-            hash = url[8:]
-            with con:
-                loaded_views = json.loads(list(con.execute("SELECT info FROM hashes WHERE hash == (?)", (hash,)))[0][0])
+            loaded_list = json.loads(base64.urlsafe_b64decode(url[8:].encode()).decode())
+            loaded_views = [{} for i in range(len(loaded_list))]
+            for j in range(len(loaded_list)):
+                for key, k in zip(default, range(len(default))):
+                    loaded_views[j][key] = loaded_list[j][k]
             new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(loaded_views))]
             return  [
                 json.dumps(loaded_views), 
                 new_tabs,
                 json.dumps('update'),
                 tab_n,
-                Sidebar(loaded_views[n-1]).show(), 
+                Sidebar(loaded_views[n-1], 1, len(new_tabs)).show(),
             ]
+        # if(len(url)>10):
+        #     con = sl.connect('view_hashes.db')
+        #     hash = url[8:]
+        #     with con:
+        #         loaded_views = json.loads(list(con.execute("SELECT info FROM hashes WHERE hash == (?)", (hash,)))[0][0])
+        #     new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(loaded_views))]
+        #     return  [
+        #         json.dumps(loaded_views), 
+        #         new_tabs,
+        #         json.dumps('update'),
+        #         tab_n,
+        #         Sidebar(loaded_views[n-1]).show(), 
+        #     ]
         else:
             new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(cur_views))]
             return  [
@@ -402,6 +401,16 @@ def main_update(
         else:
             raise PreventUpdate
 
+    #reset_page
+    if "confirm-reset" == dash.callback_context.triggered_id:
+        return [
+            json.dumps([default]), 
+            [dcc.Tab(label="1", value='tab1', className='custom-tab', selected_className='custom-tab--selected')],
+            json.dumps("update"),
+            'tab1',
+            Sidebar().show()
+        ]
+
     #colorbar_range
     if 'intermediate-colorbar-range' == dash.callback_context.triggered_id:
         if colorbar_range == None:
@@ -420,7 +429,6 @@ def main_update(
             Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
         ]
 
-
     try:
         dash.callback_context.triggered_id['type']
     except:
@@ -435,8 +443,8 @@ def main_update(
             if relayout_data[i] == None:
                 continue
             try:
-                new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = relayout_data[i]['xaxis.range[0]'], relayout_data[i]['xaxis.range[1]']
-                new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = relayout_data[i]['yaxis.range[0]'], relayout_data[i]['yaxis.range[1]']
+                new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = np.round(relayout_data[i]['xaxis.range[0]'], 3), np.round(relayout_data[i]['xaxis.range[1]'], 3)
+                new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = np.round(relayout_data[i]['yaxis.range[0]'], 3), np.round(relayout_data[i]['yaxis.range[1]'], 3)
             except:
                 if relayout_data[i] == {'dragmode': 'pan'} or relayout_data[i] == {'dragmode': 'zoom'}:
                     raise PreventUpdate
@@ -507,16 +515,6 @@ def main_update(
             json.dumps("noupdate"),
             tab_n,
             Sidebar(cur_views[n-1], series_n, len(cur_tabs)).show(),
-        ]
-    
-    #reset_page
-    if "reset-button" == dash.callback_context.triggered_id['type']:
-        return [
-            json.dumps([default]), 
-            [dcc.Tab(label="1", value='tab1', className='custom-tab', selected_className='custom-tab--selected')],
-            json.dumps("update"),
-            'tab1',
-            Sidebar().show()
         ]
 
     #dropdown_input

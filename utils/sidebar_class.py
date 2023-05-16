@@ -10,7 +10,8 @@ import numpy as np
 class Sidebar:
     
     def __init__(self, views_dict={"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
-           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None]}, series_tab=1, maintabs_length=1):
+           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None], 
+           "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None]}, series_tab=1, maintabs_length=1):
         for key in views_dict:
             setattr(self, key, views_dict[key])
         if series_tab == "new":

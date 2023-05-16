@@ -21,7 +21,9 @@ import pandas as pd
 import random as rand
 
 class View:
-    def __init__(self, my_dict, graphindex=0, zview=None, nview=None):
+    def __init__(self, my_dict={"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
+           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None], 
+           "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None]}, graphindex=0, zview=None, nview=None):
         for key in my_dict:
             setattr(self, key, my_dict[key])
         self.index = graphindex
