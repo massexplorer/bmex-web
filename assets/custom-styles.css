@@ -153,7 +153,7 @@
         height: auto;
         display: grid ;
         grid-template-columns: [left] 50% [center] 50% [right];
-        grid-template-rows: [top] 60vh [center] auto [bottom];
+        grid-template-rows: [top] auto [center] auto [bottom];
         align-items: flex-start;
     }
 
@@ -191,132 +191,6 @@
         flex-direction: row;
         align-items: flex-start;
     }
-}
-
-/* Tabs
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-#main-tabs {
-    display: flex !important;
-    width: 20vw !important;
-    /* height: 8vh !important; */
-    aspect-ratio: 4 / 1;
-    background-color: #282b38 !important;
-    flex-direction: row !important 
-}
-
-.custom-tab {
-    width: 25% !important;
-    height: auto !important;
-    border-radius: 40% !important;
-    border: 3px solid #ffff !important;
-    background: #a5b1cd !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    font-size: 175% !important;
-    color: #282b38 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-
-.custom-tab--selected {
-    width: 25% !important;
-    height: auto !important;
-    border: 3px solid #ffffff76 !important;
-    background: #e76f51 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    font-size: 32 !important;
-    color: #282b38  !important;
-}
-
-
-.series-tabs {
-    width: 17vw !important;
-    display: flex !important;
-    background-color: #282b38 !important;
-    flex-direction: column !important;
-}
-
-.series-tab {
-    width: 100% !important;
-    height: 35px !important;
-    border-radius: 0% !important;
-    border: 2px solid #ffff !important;
-    background: #a5b1cd !important;
-    padding: 0 !important;
-    font-size: 100% !important;
-    color: #282b38 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-
-.series-tab--selected {
-    border: 2px solid #ffffff76 !important;
-    background: #e76f51 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    font-size: 32 !important;
-    color: #282b38  !important; 
-}
-
-/* Buttons
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-
-#button-zero-threshold {
-    background-color: #2f3445;
-    color: #a5b1cd;
-    border-color: gray;
-}
-
-#button-zero-threshold:hover {
-    border-color: white;
-}
-
-
-/* Dropdowns and Inputs
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-.Select-control {
-    color: #a5b1cd;
-}
-
-.Select {
-    color: #a5b1cd;
-}
-
-.Select-menu-outer {
-    background-color: #2f3445;
-    border: 1px solid gray;
-}
-
-.Select div {
-    background-color: #2f3445;
-}
-
-.Select-menu-outer div:hover {
-    background-color: rgba(255, 255, 255, 0.01);
-}
-
-.Select-value-label {
-    color: #a5b1cd !important;
-}
-
-.Select--single > .Select-control .Select-value, .Select-placeholder {
-    border: 1px solid gray;
-    border-radius: 4px;
-}
-
-.input {
-    margin-left: 0px;
-    color:#e76f51;
-}
-
-.card {
-    border-bottom: 0px solid rgba(255, 255, 255, 0.1);
-    width: 100%;
-    padding: 0 0;
 }
 
 /* Left Column Contents
@@ -477,19 +351,19 @@
     width: 90%;
     margin-bottom: 3rem;
     flex-direction: row;
-    height: 3rem;
+    height: 3.8rem;
 }
 
 #link-colorbar-button {
-    width: 82%;
+    width: 76%;
     padding: 0;
     color: #a5b1cd;
 }
 
 #link-colorbar-help {
     margin-left: 6%;
-    max-width: 12%;
-    max-height: 100%;
+    max-width: 17%;
+    max-height: 70%;
     vertical-align: middle;
 }
 
@@ -506,7 +380,131 @@
     width: 100%; 
 }
 
+/* Tabs
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
 
+#main-tabs {
+    display: flex !important;
+    width: 20vw !important;
+    /* height: 8vh !important; */
+    aspect-ratio: 4 / 1;
+    background-color: #282b38 !important;
+    flex-direction: row !important 
+}
+
+.custom-tab {
+    width: 25% !important;
+    height: auto !important;
+    border-radius: 40% !important;
+    border: 3px solid #ffff !important;
+    background: #a5b1cd !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 175% !important;
+    color: #282b38 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.custom-tab--selected {
+    width: 25% !important;
+    height: auto !important;
+    border: 3px solid #ffffff76 !important;
+    background: #e76f51 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 32 !important;
+    color: #282b38  !important;
+}
+
+
+.series-tabs {
+    width: 17vw !important;
+    display: flex !important;
+    background-color: #282b38 !important;
+    flex-direction: column !important;
+}
+
+.series-tab {
+    width: 100% !important;
+    height: 35px !important;
+    border-radius: 0% !important;
+    border: 2px solid #ffff !important;
+    background: #a5b1cd !important;
+    padding: 0 !important;
+    font-size: 100% !important;
+    color: #282b38 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.series-tab--selected {
+    border: 2px solid #ffffff76 !important;
+    background: #e76f51 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    font-size: 32 !important;
+    color: #282b38  !important; 
+}
+
+/* Buttons
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+#button-zero-threshold {
+    background-color: #2f3445;
+    color: #a5b1cd;
+    border-color: gray;
+}
+
+#button-zero-threshold:hover {
+    border-color: white;
+}
+
+
+/* Dropdowns and Inputs
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.Select-control {
+    color: #a5b1cd;
+}
+
+.Select {
+    color: #a5b1cd;
+}
+
+.Select-menu-outer {
+    background-color: #2f3445;
+    border: 1px solid gray;
+}
+
+.Select div {
+    background-color: #2f3445;
+}
+
+.Select-menu-outer div:hover {
+    background-color: rgba(255, 255, 255, 0.01);
+}
+
+.Select-value-label {
+    color: #a5b1cd !important;
+}
+
+.Select--single > .Select-control .Select-value, .Select-placeholder {
+    border: 1px solid gray;
+    border-radius: 4px;
+}
+
+.input {
+    margin-left: 0px;
+    color:#e76f51;
+}
+
+.card {
+    border-bottom: 0px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    padding: 0 0;
+}
 
 /* 
 @media (min-width: 951px) {
