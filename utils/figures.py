@@ -43,14 +43,16 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
         title="Isotopic Chain",
-        xaxis=dict(title="Neutrons", gridcolor="#2f3445",title_font_size=14),
-        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        xaxis=dict(title="Neutrons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
         #legend=dict(x=0, y=1.05, orientation="h"),
         #margin=dict(l=100, r=10, t=25, b=40),
         plot_bgcolor="#282b38",
         paper_bgcolor="#282b38",
         font={"color": "#a5b1cd", "size": 14},
-        width=600,
+        # width=600,
     )
     
     traces = []
@@ -98,14 +100,16 @@ def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
         title="Isotonic Chain",
-        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
-        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
         #legend=dict(x=0, y=1.05, orientation="h"),
         #margin=dict(l=100, r=10, t=25, b=40),
         plot_bgcolor="#282b38",
         paper_bgcolor="#282b38",
         font={"color": "#a5b1cd", "size": 14},
-        width=600,
+        # width=600,
     )
     
     traces = []
@@ -152,14 +156,16 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
     layout = go.Layout(
         #title=f"ROC Curve (AUC = {auc_score:.3f})",
         title="Isobaric Chain",
-        xaxis=dict(title="Protons", gridcolor="#2f3445",title_font_size=14),
-        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#2f3445",title_font_size=14),
+        xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
+        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
         #legend=dict(x=0, y=1.05, orientation="h"),
         #margin=dict(l=100, r=10, t=25, b=40),
         plot_bgcolor="#282b38",
         paper_bgcolor="#282b38",
         font={"color": "#a5b1cd", "size": 14},
-        width=600,
+        # width=600,
     )
     
     traces = []
@@ -206,17 +212,17 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
     layout = go.Layout(
             font={"color": "#a5b1cd"},
             title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=22)),
-            xaxis=dict(title=dict(text="Neutrons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True, #gridcolor="#2f3445",
+            xaxis=dict(title=dict(text="Neutrons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True,  #gridcolor="#2f3445",
             showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,156]),
-            yaxis=dict(title=dict(text="Protons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True,
+            yaxis=dict(title=dict(text="Protons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True, 
             showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,104]),
             #legend=dict(x=0, y=1.05, orientation="h"),
             #margin=dict(l=100, r=10, t=25, b=40),
             plot_bgcolor="#282b38",
             paper_bgcolor="#282b38",
             #uirevision=model,
-            width=600,
-            height=440,
+            # width=600,
+            # height=440
     )
 
     step = 2

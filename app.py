@@ -183,28 +183,27 @@ def display_reset_confirm(reset):
 @app.callback(
     Output("download-figs", "data"),
     Input("download-button", "n_clicks"),
-    State("viewsmemory", "data"),
+    State({'type': 'graph','index': ALL}, "figure"),
     prevent_initial_call=True,
 )
-def download(n_clicks, json_cur_views):
+def download(n_clicks, figures):
     try:
         n_clicks>0
     except:
         raise PreventUpdate
-    cur_views = json.loads(json_cur_views)
     zip_file_name = "BMEX-"+str(date.today().strftime("%b-%d-%Y"))+"_"+str(datetime.now().strftime("%H-%M-%S"))+".zip"
     def write_zip(bytes_io):
         with zipfile.ZipFile(bytes_io, mode="w") as zf:
-            for i in range(len(cur_views)):
+            for i in range(len(figures)):
                 filename = "Fig_"+str(i+1)+".pdf"
                 buf = io.BytesIO()
-                fig = View(cur_views[i]).plot().figure
+                fig = go.Figure(figures[i])
                 pio.full_figure_for_development(fig, warn=False)
-
+                
                 fig.update_layout(
                     font={"color": "#000000"}, title=None,
-                    xaxis=dict(linecolor='black', showgrid=False,  minor=dict(showgrid=False), mirror="ticks", range=cur_views[i]['range']['x']),
-                    yaxis=dict(linecolor='black', showgrid=False, minor=dict(showgrid=False), mirror="ticks", range=cur_views[i]['range']['y']),
+                    xaxis=dict(linecolor='black', showgrid=False,  minor=dict(showgrid=False)),
+                    yaxis=dict(linecolor='black', showgrid=False, minor=dict(showgrid=False)),
                     plot_bgcolor="#ffffff", paper_bgcolor="#ffffff")
                 
                 fig.update_traces(dict(marker=dict(color='#000000')), dict(marker=dict(color='#ffffff')))
@@ -218,13 +217,14 @@ def download(n_clicks, json_cur_views):
     Output({'type': 'graph','index': ALL}, "figure"),
     Output('intermediate-colorbar-range', 'data'),
     State({'type': 'graph','index': ALL}, "figure"),
-    State("tabs", "value"),
+    State("main-tabs", "value"),
     State("viewsmemory", "data"),
     Input("link-colorbar-button", "n_clicks"),
     Input({'type': 'rescale-colorbar-button', 'index': ALL}, 'n_clicks'),
+    Input({'type': 'graph','index': ALL}, "relayoutData"),
     prevent_initial_call=True,
 )
-def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorbar):
+def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorbar, relayout_data):
     new_figures = figures
     cur_views = json.loads(json_cur_views)
 
@@ -274,26 +274,60 @@ def figure_update(figures, tab_n, json_cur_views, link_colorbar, rescale_colorba
             new_figures[n-1]['data'][0]['zmax'] = val_max
 
             return new_figures, {"index": n-1, "range": [val_min, val_max]}
+    
+    # Rescales tick marks
+    if "graph" == dash.callback_context.triggered_id['type']:
+        def round_one_sigfig(x):
+            print(figures[0])
+            return round(x, -int(math.floor(math.log10(abs(x)))))
+        new_figures = figures
+        for i in range(len(new_figures)):
+            try:
+                if list(relayout_data[i].keys())[0]=='dragmode':
+                    raise PreventUpdate
+            except:
+                raise PreventUpdate
+            try:
+                xdtick = math.ceil(round_one_sigfig((2/3)*(relayout_data[i]['xaxis.range[1]']-relayout_data[i]['xaxis.range[0]'])/4))
+                ydtick = math.ceil(round_one_sigfig((relayout_data[i]['yaxis.range[1]']-relayout_data[i]['yaxis.range[0]'])/4))
+                new_figures[i]['layout']['xaxis']['dtick'] = xdtick
+                new_figures[i]['layout']['yaxis']['dtick'] = ydtick
+                new_figures[i]['layout']['xaxis']['minor']['dtick'] = xdtick/5
+                new_figures[i]['layout']['yaxis']['minor']['dtick'] = ydtick/5
+            except:
+                if figures[i]['data'][0]['type'] == 'heatmap':
+                    new_figures[i]['layout']['xaxis']['dtick'] = 25
+                    new_figures[i]['layout']['yaxis']['dtick'] =  25
+                    new_figures[i]['layout']['xaxis']['minor']['dtick'] = 5
+                    new_figures[i]['layout']['yaxis']['minor']['dtick'] = 5
+                else:
+                    new_figures[i]['layout']['xaxis']['dtick'] = None
+                    new_figures[i]['layout']['yaxis']['dtick'] =  None
+                    new_figures[i]['layout']['xaxis']['minor']['dtick'] = None
+                    new_figures[i]['layout']['yaxis']['minor']['dtick'] = None
+        return new_figures, None
 
-        raise PreventUpdate
+    raise PreventUpdate
+    
+    
 
 
 @app.callback(
     [
         Output("viewsmemory", "data"),
-        Output("tabs", "children"),
+        Output("main-tabs", "children"),
         Output("triggerGraph", "data"),
-        Output("tabs", "value"),
+        Output("main-tabs", "value"),
         Output("tabs_output", "children"),
     ],
     [
         State("viewsmemory", "data"),
-        State("tabs", "children"),
+        State("main-tabs", "children"),
         State("tabs_output", "children"),
         #url
         Input("url-store", "data"),
         #tabs_output
-        Input("tabs", "value"),
+        Input("main-tabs", "value"),
         #colorbar_range
         Input('intermediate-colorbar-range', 'data'),
         #relayout_data
@@ -375,7 +409,7 @@ def main_update(
             ]
 
     #tabs_change
-    if "tabs" == dash.callback_context.triggered_id:
+    if "main-tabs" == dash.callback_context.triggered_id:
         return  [
             json_cur_views, 
             cur_tabs,
@@ -432,7 +466,6 @@ def main_update(
     try:
         dash.callback_context.triggered_id['type']
     except:
-        print('ERROR')
         raise PreventUpdate
 
 
@@ -443,8 +476,8 @@ def main_update(
             if relayout_data[i] == None:
                 continue
             try:
-                new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = np.round(relayout_data[i]['xaxis.range[0]'], 3), np.round(relayout_data[i]['xaxis.range[1]'], 3)
-                new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = np.round(relayout_data[i]['yaxis.range[0]'], 3), np.round(relayout_data[i]['yaxis.range[1]'], 3)
+                new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = float(np.round(relayout_data[i]['xaxis.range[0]'], 3)), float(np.round(relayout_data[i]['xaxis.range[1]'], 3))
+                new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = float(np.round(relayout_data[i]['yaxis.range[0]'], 3)), float(np.round(relayout_data[i]['yaxis.range[1]'], 3))
             except:
                 if relayout_data[i] == {'dragmode': 'pan'} or relayout_data[i] == {'dragmode': 'zoom'}:
                     raise PreventUpdate
@@ -558,7 +591,7 @@ def main_update(
         Input("nmax", "value"),
     ],
 )
-def main_output(
+def graph_output(
     trigger,
     json_views,
     zmin,

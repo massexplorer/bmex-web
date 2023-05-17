@@ -35,10 +35,10 @@ class View:
             return figs.single(self.quantity, self.dataset, self.proton, self.neutron, self.wigner)
         elif self.dimension == 'landscape':
             try:
-                return dcc.Graph(id={'type': 'graph','index': self.index}, figure=figs.landscape(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.colorbar_range, self.ZView, self.NView))
+                return dcc.Graph(className='graph', id={'type': 'graph','index': self.index}, figure=figs.landscape(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.colorbar_range, self.ZView, self.NView))
             except:
                 return html.P('This particular plot is not available', style={'font-size':'20px','padding-left': '0px', 'padding-right': '0px'})
         elif self.dimension == '1D':
             if {'isotopic': self.proton,'isotonic': self.neutron,'isobaric': self.nucleon}[self.chain] == None:
                 return html.P('Please Enter a Valid Chain', style={'padding-left': '180px', 'padding-right': '180px'})
-            return dcc.Graph(id={'type': 'graph','index': self.index}, figure=getattr(figs, self.chain)(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.ZView, self.NView))
+            return dcc.Graph(className='graph',id={'type': 'graph','index': self.index}, figure=getattr(figs, self.chain)(self.quantity, self.dataset, self.colorbar, self.wigner, self.proton, self.neutron, self.nucleon, self.ZView, self.NView))

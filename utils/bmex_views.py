@@ -48,7 +48,7 @@ def masses_view():
                         # className="three columns",
                         id="left-column",
                         children=[
-                            dcc.Tabs(id="tabs", value='tab1', parent_className='custom-tabs', className='custom-tabs-container', children=[
+                            dcc.Tabs(id="main-tabs", value='tab1', children=[
                                 dcc.Tab(label='1', value='tab1', className='custom-tab', selected_className='custom-tab--selected'),
                                 # style=TAB_STYLE, selected_style=SELECTED_STYLE
                             ]),
@@ -58,10 +58,10 @@ def masses_view():
                     html.Div(
                         id='center-column',
                         children=[
-                            dcc.Loading(id="loading-1",
-                            children=[
+                            # dcc.Loading(id="loading-1", style={'width':'100%'},
+                            # children=[
                                 html.Div(id="div-graphs")
-                            ])
+                            # ])
                         ]),
                     html.Div(
                         id="right-column",
@@ -89,7 +89,7 @@ def masses_view():
                                 html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures, retaining the furthest extrema of the original colorbars')
                             ]),
                             drc.Card(id="reset-card", children=[
-                                html.Button('Reset Page', id='reset-button')
+                                html.Button('Reset Page', id='reset-button', className='reset-button')
                             ]),
                         ]
                     )                   
