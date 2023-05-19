@@ -1,38 +1,9 @@
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-
 import utils.dash_reusable_components as drc
-
 import utils.views_class as views
 
-# SELECTED_STYLE = {
-#     'width': '72px',
-#     'border': 'none',
-#     'background': '#a5b1cd',
-#     'paddingTop': 0,
-#     'paddingBottom': 0,
-#     'height': '60px',
-#     'font-size': 32,
-#     'color': '#282b38',
-#     'borderTop': '4px  #a5b1cd solid',
-#     'borderLeft': '4px #a5b1cd solid',
-# }
-
-# TAB_STYLE = {
-#     'width': '72px',
-#     'boxShadow': 'none',
-#     'borderLeft': '4px #ffffff solid',
-#     'borderRight': '4px #282b38 solid',
-#     'borderTop': '4px #ffffff solid',
-#     'borderBottom': '4px #282b38 solid',
-#     'background': '#a5b1cd',
-#     'paddingTop': 0,
-#     'paddingBottom': 0,
-#     'height': '60px',
-#     'font-size': 32,
-#     'color': '#282b38'
-# }
 
 def masses_view():
     
@@ -42,15 +13,13 @@ def masses_view():
         children=[
             html.Div(
                 id="app-container",
-                # className="row",
                 children=[
                     html.Div(
-                        # className="three columns",
                         id="left-column",
                         children=[
                             dcc.Tabs(id="main-tabs", value='tab1', children=[
                                 dcc.Tab(label='1', value='tab1', className='custom-tab', selected_className='custom-tab--selected'),
-                                # style=TAB_STYLE, selected_style=SELECTED_STYLE
+                                dcc.Tab(label='+', value='tab0', className='custom-tab', selected_className='custom-tab--selected'),
                             ]),
                             html.Div(id='tabs_output', children=[])
                         ]
@@ -58,10 +27,10 @@ def masses_view():
                     html.Div(
                         id='center-column',
                         children=[
-                            # dcc.Loading(id="loading-1", style={'width':'100%'},
-                            # children=[
+                            dcc.Loading(id="loading-1", style={'width':'100%'},
+                            children=[
                                 html.Div(id="div-graphs")
-                            # ])
+                            ])
                         ]),
                     html.Div(
                         id="right-column",
@@ -88,6 +57,15 @@ def masses_view():
                                 html.Button("Link Colorbars", id="link-colorbar-button"),
                                 html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures, retaining the furthest extrema of the original colorbars')
                             ]),
+                            drc.Card(id="link-view-card", children=[
+                                html.Button("Link Views", id="link-view-button"),
+                                html.Img(src="assets/help.png", id='link-view-help', title='TEST'),
+                                dcc.Checklist(['1', '2', '3', '4'], id='link-view-checklist', inline=True, 
+                                              persistence=True, persistence_type='session')
+                            ]),
+                            # drc.Card(id="size-card", children=[
+                            #     dcc.Slider(id="size-slider", min=1, max=10, step=1),
+                            # ]),
                             drc.Card(id="reset-card", children=[
                                 html.Button('Reset Page', id='reset-button', className='reset-button')
                             ]),

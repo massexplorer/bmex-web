@@ -2,7 +2,8 @@
 
 #body {
     padding-bottom: 5rem;
-    height: 700px !important;
+    height: 700px;
+    /* font-size: 1vw !important; */
 }
 
 @media (max-width: 700px) {
@@ -26,6 +27,7 @@
 
 /* Banner
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
+
 .banner {
     background-color: #264653;/*#4986B6;/*#B64986;/*#8f4d86; /*#2f3445; /* Machine Learning Color is orange */
     padding: 0;
@@ -35,10 +37,6 @@
     height: auto;
     display: flex;
 }
-
-/* .container.scalable {
-    display:flex;
-} */
 
 #logo {
     width: 50%;
@@ -60,70 +58,7 @@
     height: auto;
 }
 
-
-
-/* .banner h2:hover {
-    color: #b4b5bf;
-    cursor: pointer;
-}
-
-.banner Img {
-    position: relative;
-    float: right;
-    height: 14rem;
-    margin-top: 1.00rem */
-/* } */
-
-@media (max-width: 1300px) {
-
-    /* .banner .container.scalable {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .banner h2 {
-        font-size: 4rem;
-    }
-
-    .banner Img {
-        height: 10rem;
-        margin-bottom: 3rem;
-    } */
-}
-
-@media (max-width: 700px) {
-    /* .banner .container.scalable {
-        padding: 0
-    }
-
-    .banner Img {
-        height:  9.5rem;
-        margin-bottom: 2rem;
-    }
-
-    .banner h2 {
-        font-size: 3rem;
-    } */
-}
-
-@media (max-width: 500px) {
-    /* .banner {
-        padding: 1rem 0;
-        margin-bottom: 1rem;
-    }
-
-    .banner Img {
-        height: 6rem;
-        margin-bottom: 1rem;
-    }
-
-    .banner h2 {
-        font-size: 2.5rem;
-    } */
-}
-
-/* Columns
+/* app-container and columns
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 #left-column{
@@ -142,9 +77,6 @@
     height: auto;
     width: 20vw;
 }
-
-/* app-container
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
 
 /* MOBILE */
 @media (max-width: 950px) {
@@ -286,11 +218,6 @@
 
 /* Center Column Contents
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-.new-button {
-    color: #a5b1cd;
-    width: 50%;
-    align-self: center;
-}
 
 .graph-title {
     font-size: 2rem;
@@ -305,8 +232,10 @@
 }
 
 .graph {
-    width: 52.5vw;
-    height: 38.5vw;
+    /* aspect-ratio: 15 / 11;
+    height: auto; */
+    width: 48.75vw;
+    height: 35.75vw;
 }
 
 /* Right Column Contents
@@ -349,7 +278,7 @@
 
 #colorbar-button-card {
     width: 90%;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
     flex-direction: row;
     height: 3.8rem;
 }
@@ -366,6 +295,38 @@
     max-height: 70%;
     vertical-align: middle;
 }
+
+/* Link Views */
+#link-view-card {
+    display: grid;
+    grid-template-columns: [c1] 17% [c2] 66% [c3] 17% [c4];
+    grid-template-rows: [r1] 30% [r2] 20% [r3] 20% [r4] 30% [r5];
+    width: 90%;
+    margin-bottom: 3rem;
+    height: 6rem;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    text-align: center;
+}
+#link-view-button {
+    grid-column: c2 / c3;
+    grid-row: r1 / r3;
+    padding: 0;
+    color: #a5b1cd;
+    cursor: default;
+    border: 0;
+}
+#link-view-help {
+    grid-column: c3 / c4;
+    grid-row: r2 / r4;
+    max-height: 100%;
+}
+#link-view-checklist {
+    grid-column: c2 / c3;
+    grid-row: r3 / r5;
+    font-size: 1vw;
+}
+
 
 #range-card {
     display: none;
@@ -505,6 +466,11 @@
     width: 100%;
     padding: 0 0;
 }
+
+
+
+
+
 
 /* 
 @media (min-width: 951px) {

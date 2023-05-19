@@ -264,11 +264,11 @@ class Sidebar:
             )
             # output.append(
             #     drc.Card(id="colorbar-slider-card", children=[
-            #         dcc.Slider("Colorbar Slider", id={'type': 'rescale-colorbar-button','index': 1}, className='rescale-colorbar-button'),
+            #         dcc.RangeSlider(min=self.colorbar_range[0], max=self.colorbar_range[1], step=(self.colorbar_range[1]-self.colorbar_range[0])/10, id={'type': 'colorbar-slider','index': 1}, className='colorbar-slider'),
             #     ]),
             # )
 
-        if self.maintabs_length > 1:
+        if self.maintabs_length > 2:
             output.append(
                 drc.Card(id="delete-card", children=[
                     html.Button('Delete Plot', id={'type': 'delete-button','index': 1}, value=None, className='delete-button')

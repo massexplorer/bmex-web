@@ -17,3 +17,4 @@ dependencies:
   - colorlover>=0.2.1
   - dash-bootstrap-components==1.0.2
   - kaleido
+  - dash_breakpoints

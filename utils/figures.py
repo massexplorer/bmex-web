@@ -71,10 +71,9 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
 
         try:
             traces.append(go.Scatter(
-                x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i]), marker=\
-                    {
-                        "color": series_colors[i],
-                    }
+                x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i]), 
+                marker={"color": series_colors[i]},
+                hovertemplate = '<b><i>N</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',
             ))
         except:
             traces.append(go.Scatter(x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i])))
@@ -127,10 +126,8 @@ def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
                 output.append(q)
         try:
             traces.append(go.Scatter(
-                x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i]), marker=\
-                    {
-                        "color": series_colors[i],
-                    }
+                x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i]),
+                marker={"color": series_colors[i]}, hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',
             ))
         except:
             traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i])))
@@ -172,6 +169,8 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
     for i in range(len(A)):
         protons = []
         output = []
+        if A[i] == None:
+            continue
         for z in range(A[i]):
             q = bmex.QuanValue(z,A[i]-z,model[i],quantity,wigner)
             try: 
@@ -184,10 +183,9 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
 
         try:
             traces.append(go.Scatter(
-                x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i]), marker=\
-                    {
-                        "color": series_colors[i],
-                    }
+                x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i]), 
+                marker={"color": series_colors[i]},
+                hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',   
             ))
         except:
             traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i])))
