@@ -133,29 +133,50 @@ class Sidebar:
                 ])
             )
 
+        if self.dimension=='single':
+            quantity_options = [
+                {"label": "All", "value": "All"},
+                {"label": "Binding Energy", "value": "BE"},
+                {"label": "One Neutron Separation Energy", "value": "OneNSE"},
+                {"label": "One Proton Separation Energy", "value": "OnePSE"},
+                {"label": "Two Neutron Separation Energy", "value": "TwoNSE"},
+                {"label": "Two Proton Separation Energy", "value": "TwoPSE"},
+                {"label": "Alpha Separation Energy", "value": "AlphaSE"},
+                {"label": "Two Neutron Shell Gap", "value": "TwoNSGap"},
+                {"label": "Two Proton Shell Gap", "value": "TwoPSGap"},
+                {"label": "Double Mass Difference", "value": "DoubleMDiff"},
+                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED"},
+                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED"},
+                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting"},
+                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting"},
+                # {"label": "Wigner Energy Coefficient", "value": "WignerEC"},
+                {"label": "Quad Def Beta2", "value": "QDB2t"},
+            ]
+        else:
+            quantity_options = [
+                {"label": "Binding Energy", "value": "BE"},
+                {"label": "One Neutron Separation Energy", "value": "OneNSE"},
+                {"label": "One Proton Separation Energy", "value": "OnePSE"},
+                {"label": "Two Neutron Separation Energy", "value": "TwoNSE"},
+                {"label": "Two Proton Separation Energy", "value": "TwoPSE"},
+                {"label": "Alpha Separation Energy", "value": "AlphaSE"},
+                {"label": "Two Neutron Shell Gap", "value": "TwoNSGap"},
+                {"label": "Two Proton Shell Gap", "value": "TwoPSGap"},
+                {"label": "Double Mass Difference", "value": "DoubleMDiff"},
+                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED"},
+                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED"},
+                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting"},
+                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting"},
+                # {"label": "Wigner Energy Coefficient", "value": "WignerEC"},
+                {"label": "Quad Def Beta2", "value": "QDB2t"},
+            ]
+
         output.append(
             drc.Card(id="quantity-card", children=[
                 drc.NamedDropdown(
                     name="Select Quantity",
                     id={'type': 'dropdown-quantity','index': 1},
-                    options=[
-                        {"label": "All", "value": "All"},
-                        {"label": "Binding Energy", "value": "BE"},
-                        {"label": "One Neutron Separation Energy", "value": "OneNSE"},
-                        {"label": "One Proton Separation Energy", "value": "OnePSE"},
-                        {"label": "Two Neutron Separation Energy", "value": "TwoNSE"},
-                        {"label": "Two Proton Separation Energy", "value": "TwoPSE"},
-                        {"label": "Alpha Separation Energy", "value": "AlphaSE"},
-                        {"label": "Two Neutron Shell Gap", "value": "TwoNSGap"},
-                        {"label": "Two Proton Shell Gap", "value": "TwoPSGap"},
-                        {"label": "Double Mass Difference", "value": "DoubleMDiff"},
-                        {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED"},
-                        {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED"},
-                        {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting"},
-                        {"label": "Single-Proton Energy Splitting", "value": "SPESplitting"},
-                        # {"label": "Wigner Energy Coefficient", "value": "WignerEC"},
-                        {"label": "Quad Def Beta2", "value": "QDB2t"},
-                    ],
+                    options=quantity_options,
                     clearable=False,
                     searchable=False,
                     value=self.quantity,
@@ -164,6 +185,51 @@ class Sidebar:
                 )
             ])
         )
+
+        dataset_options = [
+            {"label": "Experiment", "value": "EXP"},
+            {"label": "ME2", "value": "ME2"},
+            {"label": "MEdelta", "value": "MEdelta"},
+            {"label": "PC1", "value": "PC1"},
+            {"label": "NL3S", "value": "NL3S"},
+            {"label": "SkMs", "value": "SKMS"},
+            {"label": "SKP", "value": "SKP"},
+            {"label": "SLY4", "value": "SLY4"},
+            {"label": "SV", "value": "SV"},
+            {"label": "UNEDF0", "value": "UNEDF0"},
+            {"label": "UNEDF1", "value": "UNEDF1"},
+        ]
+
+
+        if self.quantity in ['OneNSE', 'OnePSE', 'N3PointOED', 'N3PointOED', 'SNESplitting', 'SPESplitting']:
+            dataset_options = [
+                {"label": "Experiment", "value": "EXP"},
+                {"label": "ME2", "value": "ME2", "disabled": True},
+                {"label": "MEdelta", "value": "MEdelta", "disabled": True},
+                {"label": "PC1", "value": "PC1", "disabled": True},
+                {"label": "NL3S", "value": "NL3S", "disabled": True},
+                {"label": "SkMs", "value": "SKMS"},
+                {"label": "SKP", "value": "SKP"},
+                {"label": "SLY4", "value": "SLY4"},
+                {"label": "SV", "value": "SV"},
+                {"label": "UNEDF0", "value": "UNEDF0"},
+                {"label": "UNEDF1", "value": "UNEDF1"},
+            ]
+
+        if self.quantity=="QDB2t":
+            dataset_options = [
+                {"label": "Experiment", "value": "EXP", "disabled": True},
+                {"label": "ME2", "value": "ME2", "disabled": True},
+                {"label": "MEdelta", "value": "MEdelta", "disabled": True},
+                {"label": "PC1", "value": "PC1", "disabled": True},
+                {"label": "NL3S", "value": "NL3S", "disabled": True},
+                {"label": "SkMs", "value": "SKMS"},
+                {"label": "SKP", "value": "SKP"},
+                {"label": "SLY4", "value": "SLY4"},
+                {"label": "SV", "value": "SV"},
+                {"label": "UNEDF0", "value": "UNEDF0"},
+                {"label": "UNEDF1", "value": "UNEDF1"},
+            ] 
 
         tabs_component, series_button_card = None, None
         if self.dimension == '1D':
@@ -186,19 +252,7 @@ class Sidebar:
                         drc.NamedDropdown(
                             name="Select Dataset",
                             id={'type': 'dropdown-dataset','index': self.series_n},
-                            options=[
-                                {"label": "Experiment", "value": "EXP"},
-                                {"label": "ME2", "value": "ME2"},
-                                {"label": "MEdelta", "value": "MEdelta"},
-                                {"label": "PC1", "value": "PC1"},
-                                {"label": "NL3S", "value": "NL3S"},
-                                {"label": "SkMs", "value": "SKMS"},
-                                {"label": "SKP", "value": "SKP"},
-                                {"label": "SLY4", "value": "SLY4"},
-                                {"label": "SV", "value": "SV"},
-                                {"label": "UNEDF0", "value": "UNEDF0"},
-                                {"label": "UNEDF1", "value": "UNEDF1"},
-                            ],
+                            options=dataset_options,
                             clearable=False,
                             searchable=False,
                             value=self.dataset[self.series_n-1],
@@ -216,19 +270,7 @@ class Sidebar:
                     drc.NamedDropdown(
                         name="Select Dataset",
                         id={'type': 'dropdown-dataset','index': self.series_n},
-                        options=[
-                            {"label": "Experiment", "value": "EXP"},
-                            {"label": "ME2", "value": "ME2"},
-                            {"label": "MEdelta", "value": "MEdelta"},
-                            {"label": "PC1", "value": "PC1"},
-                            {"label": "NL3S", "value": "NL3S"},
-                            {"label": "SkMs", "value": "SKMS"},
-                            {"label": "SKP", "value": "SKP"},
-                            {"label": "SLY4", "value": "SLY4"},
-                            {"label": "SV", "value": "SV"},
-                            {"label": "UNEDF0", "value": "UNEDF0"},
-                            {"label": "UNEDF1", "value": "UNEDF1"},
-                        ],
+                        options=dataset_options,
                         clearable=False,
                         searchable=False,
                         value=self.dataset[self.series_n-1],
@@ -259,7 +301,7 @@ class Sidebar:
             output.append(
                 drc.Card(id="colorbar-scale-card", children=[
                     html.Button("Rescale Colorbar", id={'type': 'rescale-colorbar-button','index': 1}, className='rescale-colorbar-button'),
-                    html.Img(src="assets/help.png", id='rescale-help', title='Rescales the colorbar of the selected figure based on the min and max of its currently visable values')
+                    html.Img(src="assets/help.png", id='rescale-help', title='Rescales the colorbar of the selected figure based on the min and max of its currently visable values.')
                 ]),
             )
             # output.append(

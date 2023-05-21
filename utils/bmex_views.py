@@ -27,10 +27,10 @@ def masses_view():
                     html.Div(
                         id='center-column',
                         children=[
-                            dcc.Loading(id="loading-1", style={'width':'100%'},
-                            children=[
+                            # dcc.Loading(id="loading-1", style={'width':'100%'},
+                            # children=[
                                 html.Div(id="div-graphs")
-                            ])
+                            # ])
                         ]),
                     html.Div(
                         id="right-column",
@@ -55,13 +55,13 @@ def masses_view():
                             ),
                             drc.Card(id="colorbar-button-card", children=[
                                 html.Button("Link Colorbars", id="link-colorbar-button"),
-                                html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures, retaining the furthest extrema of the original colorbars')
+                                html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures, retaining the furthest extrema of the original colorbars.')
                             ]),
                             drc.Card(id="link-view-card", children=[
                                 html.Button("Link Views", id="link-view-button"),
-                                html.Img(src="assets/help.png", id='link-view-help', title='TEST'),
-                                dcc.Checklist(['1', '2', '3', '4'], id='link-view-checklist', inline=True, 
-                                              persistence=True, persistence_type='session')
+                                html.Img(src="assets/help.png", id='link-view-help', title='Linked figures will mirror zooms upon interaction with one.'),
+                                dcc.Checklist([], id='link-view-checklist', inline=True, )
+                                            #   persistence=True, persistence_type='memory')
                             ]),
                             # drc.Card(id="size-card", children=[
                             #     dcc.Slider(id="size-slider", min=1, max=10, step=1),

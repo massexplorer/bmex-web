@@ -324,7 +324,7 @@
 #link-view-checklist {
     grid-column: c2 / c3;
     grid-row: r3 / r5;
-    font-size: 1vw;
+    /* font-size: 1vw; */
 }
 
 

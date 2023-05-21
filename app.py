@@ -185,13 +185,15 @@ def display_reset_confirm(reset):
     Output("download-figs", "data"),
     Input("download-button", "n_clicks"),
     State({'type': 'graph','index': ALL}, "figure"),
+    State("viewsmemory", "data"),
     prevent_initial_call=True,
 )
-def download(n_clicks, figures):
+def download(n_clicks, figures, json_cur_views):
     try:
         n_clicks>0
     except:
         raise PreventUpdate
+    cur_views = json.loads(json_cur_views)
     zip_file_name = "BMEX-"+str(date.today().strftime("%b-%d-%Y"))+"_"+str(datetime.now().strftime("%H-%M-%S"))+".zip"
     def write_zip(bytes_io):
         with zipfile.ZipFile(bytes_io, mode="w") as zf:
@@ -200,7 +202,8 @@ def download(n_clicks, figures):
                 buf = io.BytesIO()
                 fig = go.Figure(figures[i])
                 pio.full_figure_for_development(fig, warn=False)
-                
+                if cur_views[i]['colorbar'] == 'monochrome':
+                    fig.update_traces(colorscale=[[0, 'rgb(163, 77, 57)'], [1, 'rgb(255, 200, 170)']])
                 fig.update_layout(
                     font={"color": "#000000"}, title=None,
                     xaxis=dict(linecolor='black', showgrid=False,  minor=dict(showgrid=False)),
@@ -213,130 +216,125 @@ def download(n_clicks, figures):
                 zf.writestr(filename, buf.getvalue())
     return dcc.send_bytes(write_zip, zip_file_name)
 
-@app.callback(
-    Output({'type': 'graph','index': ALL}, "figure"),
-    Output('intermediate-colorbar-range', 'data'),
-    State({'type': 'graph','index': ALL}, "figure"),
-    State("main-tabs", "value"),
-    State("viewsmemory", "data"),
-    State('link-view-checklist', 'value'),
-    Input("link-colorbar-button", "n_clicks"),
-    Input({'type': 'rescale-colorbar-button', 'index': ALL}, 'n_clicks'),
-    Input({'type': 'graph','index': ALL}, "relayoutData"),
-    prevent_initial_call=True,
-)
-def figure_update(figures, tab_n, json_cur_views, links, link_colorbar, rescale_colorbar, relayout_data):
-    new_figures = figures
-    cur_views = json.loads(json_cur_views)
+# @app.callback(
+#     Output({'type': 'graph','index': ALL}, "figure"),
+#     Output('intermediate-colorbar-range', 'data'),
+#     State({'type': 'graph','index': ALL}, "figure"),
+#     State("main-tabs", "value"),
+#     State("viewsmemory", "data"),
+#     State('link-view-checklist', 'value'),
+#     Input("link-colorbar-button", "n_clicks"),
+#     Input({'type': 'rescale-colorbar-button', 'index': ALL}, 'n_clicks'),
+#     Input({'type': 'graph','index': ALL}, "relayoutData"),
+#     prevent_initial_call=True,
+# )
+# def figure_update(figures, tab_n, json_cur_views, links, link_colorbar, rescale_colorbar, relayout_data):
+#     new_figures = figures
+#     cur_views = json.loads(json_cur_views)
 
-    # A function that inputs an array of different data types and only keeps the floats
-    def float_array(array):
-        return np.array( [array[i] for i in range(len(array)) if type(array[i])==type(1.0)] )
+#     # A function that inputs an array of different data types and only keeps the floats
+#     def float_array(array):
+#         return np.array( [array[i] for i in range(len(array)) if type(array[i])==type(1.0)] )
     
-    # Match Colorbars
-    if "link-colorbar-button" == dash.callback_context.triggered_id:
-        mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
-        maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
-        try:
-            minz, maxz = min(mins), max(maxes)
-        except:
-            raise PreventUpdate
-        for i in range(len(figures)):
-            new_figures[i]['data'][0]['zmin'] = minz
-            new_figures[i]['data'][0]['zmax'] = maxz
+#     # Match Colorbars
+#     if "link-colorbar-button" == dash.callback_context.triggered_id:
+#         mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
+#         maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
+#         try:
+#             minz, maxz = min(mins), max(maxes)
+#         except:
+#             raise PreventUpdate
+#         for i in range(len(figures)):
+#             new_figures[i]['data'][0]['zmin'] = minz
+#             new_figures[i]['data'][0]['zmax'] = maxz
 
-        return new_figures, {"index": 'ALL', "range": [minz, maxz]}
+#         return new_figures, {"index": 'ALL', "range": [minz, maxz]}
     
-    # Resize
-    # if "size-slider" == dash.callback_context.triggered_id:
-    #     new_figures[0]['layout']['width'] = 30*size
-    #     return new_figures, None
+#     try:
+#         dash.callback_context.triggered_id['type']
+#     except:
+#         raise PreventUpdate
     
-    try:
-        dash.callback_context.triggered_id['type']
-    except:
-        raise PreventUpdate
-    
-    # Rescale Individual Plot Colorbar
-    if "rescale-colorbar-button" == dash.callback_context.triggered_id['type']:
-        if type(rescale_colorbar[0])==type(1):
-            n = int(tab_n[3])
-            new_figures = figures
-            x_range, y_range = cur_views[n-1]['range']['x'], cur_views[n-1]['range']['y']
-            if x_range[0] == None:
-                x_range[0] = -9999
-            if x_range[1] == None:
-                x_range[1] = 9999
-            if y_range[0] == None:
-                y_range[0] = -9999
-            if y_range[1] == None:
-                y_range[1] = 9999
-            xmin, xmax = math.floor(x_range[0])+math.floor(x_range[0])%2, math.ceil(x_range[1])-math.ceil(x_range[1])%2
-            ymin, ymax = math.floor(y_range[0])+math.floor(y_range[0])%2, math.ceil(y_range[1])-math.ceil(y_range[1])%2
-            x, y = np.array(figures[n-1]['data'][0]['x']), np.array(figures[n-1]['data'][0]['y'])
-            xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
-            ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
-            values = float_array(np.array(figures[n-1]['data'][0]['z'])[ymin_i:ymax_i, xmin_i:xmax_i].flatten())
-            val_min, val_max = np.round(np.min(values),3), np.round(np.max(values),3)
-            new_figures[n-1]['data'][0]['zmin'] = val_min
-            new_figures[n-1]['data'][0]['zmax'] = val_max
+#     # Rescale Individual Plot Colorbar
+#     if "rescale-colorbar-button" == dash.callback_context.triggered_id['type']:
+#         if type(rescale_colorbar[0])==type(1):
+#             n = int(tab_n[3])
+#             new_figures = figures
+#             x_range, y_range = cur_views[n-1]['range']['x'], cur_views[n-1]['range']['y']
+#             if x_range[0] == None:
+#                 x_range[0] = -9999
+#             if x_range[1] == None:
+#                 x_range[1] = 9999
+#             if y_range[0] == None:
+#                 y_range[0] = -9999
+#             if y_range[1] == None:
+#                 y_range[1] = 9999
+#             xmin, xmax = math.floor(x_range[0])+math.floor(x_range[0])%2, math.ceil(x_range[1])-math.ceil(x_range[1])%2
+#             ymin, ymax = math.floor(y_range[0])+math.floor(y_range[0])%2, math.ceil(y_range[1])-math.ceil(y_range[1])%2
+#             x, y = np.array(figures[n-1]['data'][0]['x']), np.array(figures[n-1]['data'][0]['y'])
+#             xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
+#             ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
+#             values = float_array(np.array(figures[n-1]['data'][0]['z'])[ymin_i:ymax_i, xmin_i:xmax_i].flatten())
+#             val_min, val_max = np.round(np.min(values),3), np.round(np.max(values),3)
+#             new_figures[n-1]['data'][0]['zmin'] = val_min
+#             new_figures[n-1]['data'][0]['zmax'] = val_max
 
-            return new_figures, {"index": n-1, "range": [val_min, val_max]}
+#             return new_figures, {"index": n-1, "range": [val_min, val_max]}
     
-    # Relayout Data Change
-    if "graph" == dash.callback_context.triggered_id['type']:
+#     # Relayout Data Change
+#     if "graph" == dash.callback_context.triggered_id['type']:
        
-        def round_one_sigfig(x):
-            return round(x, -int(math.floor(math.log10(abs(x)))))
+#         def round_one_sigfig(x):
+#             return round(x, -int(math.floor(math.log10(abs(x)))))
         
-        new_figures = figures.copy()
-        trigger_index = dash.callback_context.triggered_id['index']
+#         new_figures = figures.copy()
+#         trigger_index = dash.callback_context.triggered_id['index']
 
-        #Link Views
-        try:
-            if str(trigger_index) in links:
-                new_data = relayout_data[trigger_index-1]
-                for link in links:
-                    if int(link) != trigger_index:
-                        print("MARK-10", new_figures[int(link)-1]['layout']['xaxis']['range'])
-                        new_figures[int(link)-1]['layout']['xaxis']['range'] = [new_data['xaxis.range[0]'], new_data['xaxis.range[1]']]
-                        new_figures[int(link)-1]['layout']['yaxis']['range'] = [new_data['yaxis.range[0]'], new_data['yaxis.range[1]']]
-                        print("MARK-2", new_figures[int(link)-1]['layout']['xaxis']['range'])
-        except:
-            pass
+#         #Link Views
+#         try:
+#             if str(trigger_index) in links:
+#                 new_data = relayout_data[trigger_index-1]
+#                 for link in links:
+#                     if int(link) != trigger_index:
+#                         print("MARK-10", new_figures[int(link)-1]['layout']['xaxis']['range'])
+#                         new_figures[int(link)-1]['layout']['xaxis']['range'] = [new_data['xaxis.range[0]'], new_data['xaxis.range[1]']]
+#                         new_figures[int(link)-1]['layout']['yaxis']['range'] = [new_data['yaxis.range[0]'], new_data['yaxis.range[1]']]
+#                         print("MARK-2", new_figures[int(link)-1]['layout']['xaxis']['range'])
+#         except:
+#             pass
         
-        # Rescales tick marks
-        for i in range(len(figures)):
-            try:
-                if list(relayout_data[i].keys())[0]=='dragmode':
-                    raise PreventUpdate
-            except:
-                pass
-            try:
-                xdtick = math.ceil(round_one_sigfig((2/3)*(relayout_data[i]['xaxis.range[1]']-relayout_data[i]['xaxis.range[0]'])/4))
-                ydtick = math.ceil(round_one_sigfig((relayout_data[i]['yaxis.range[1]']-relayout_data[i]['yaxis.range[0]'])/4))
-                new_figures[i]['layout']['xaxis']['dtick'] = xdtick
-                new_figures[i]['layout']['yaxis']['dtick'] = ydtick
-                new_figures[i]['layout']['xaxis']['minor']['dtick'] = xdtick/5
-                new_figures[i]['layout']['yaxis']['minor']['dtick'] = ydtick/5
-            except:
-                try:
-                    if figures[i]['data'][0]['type'] == 'heatmap':
-                        new_figures[i]['layout']['xaxis']['dtick'] = 25
-                        new_figures[i]['layout']['yaxis']['dtick'] =  25
-                        new_figures[i]['layout']['xaxis']['minor']['dtick'] = 5
-                        new_figures[i]['layout']['yaxis']['minor']['dtick'] = 5
-                    else:
-                        raise Exception
-                except:
-                    new_figures[i]['layout']['xaxis']['dtick'] = None
-                    new_figures[i]['layout']['yaxis']['dtick'] =  None
-                    new_figures[i]['layout']['xaxis']['minor']['dtick'] = None
-                    new_figures[i]['layout']['yaxis']['minor']['dtick'] = None
-        print("TAG")
-        return new_figures, None
+#         # Rescales tick marks
+#         for i in range(len(figures)):
+#             try:
+#                 if list(relayout_data[i].keys())[0]=='dragmode':
+#                     raise PreventUpdate
+#             except:
+#                 pass
+#             try:
+#                 xdtick = math.ceil(round_one_sigfig((2/3)*(relayout_data[i]['xaxis.range[1]']-relayout_data[i]['xaxis.range[0]'])/4))
+#                 ydtick = math.ceil(round_one_sigfig((relayout_data[i]['yaxis.range[1]']-relayout_data[i]['yaxis.range[0]'])/4))
+#                 new_figures[i]['layout']['xaxis']['dtick'] = xdtick
+#                 new_figures[i]['layout']['yaxis']['dtick'] = ydtick
+#                 new_figures[i]['layout']['xaxis']['minor']['dtick'] = xdtick/5
+#                 new_figures[i]['layout']['yaxis']['minor']['dtick'] = ydtick/5
+#             except:
+#                 try:
+#                     if figures[i]['data'][0]['type'] == 'heatmap':
+#                         new_figures[i]['layout']['xaxis']['dtick'] = 25
+#                         new_figures[i]['layout']['yaxis']['dtick'] =  25
+#                         new_figures[i]['layout']['xaxis']['minor']['dtick'] = 5
+#                         new_figures[i]['layout']['yaxis']['minor']['dtick'] = 5
+#                     else:
+#                         raise Exception
+#                 except:
+#                     new_figures[i]['layout']['xaxis']['dtick'] = None
+#                     new_figures[i]['layout']['yaxis']['dtick'] =  None
+#                     new_figures[i]['layout']['xaxis']['minor']['dtick'] = None
+#                     new_figures[i]['layout']['yaxis']['minor']['dtick'] = None
+#         print("TAG")
+#         return new_figures, None
 
-    raise PreventUpdate
+#     raise PreventUpdate
     
 
 
@@ -347,18 +345,23 @@ def figure_update(figures, tab_n, json_cur_views, links, link_colorbar, rescale_
         Output("triggerGraph", "data"),
         Output("main-tabs", "value"),
         Output("tabs_output", "children"),
+        Output("link-view-checklist", "options"),
+        Output("link-view-checklist", "value"),
     ],
     [
         State("viewsmemory", "data"),
         State("main-tabs", "children"),
         State("tabs_output", "children"),
         State({'type': 'graph','index': ALL}, "figure"),
+        State('link-view-checklist', 'value'),
+        #link
+        Input("link-colorbar-button", "n_clicks"),
+        #rescale
+        Input({'type': 'rescale-colorbar-button', 'index': ALL}, 'n_clicks'),
         #url
         Input("url-store", "data"),
         #tabs_output
         Input("main-tabs", "value"),
-        #colorbar_range
-        Input('intermediate-colorbar-range', 'data'),
         #relayout_data
         Input({'type': 'graph','index': ALL}, "relayoutData"),
         #new_series
@@ -381,20 +384,20 @@ def figure_update(figures, tab_n, json_cur_views, links, link_colorbar, rescale_
         Input({'type': 'input-nucleons', 'index': ALL}, 'value'),
         Input({'type': 'dropdown-colorbar', 'index': ALL}, 'value'),
         Input({'type': 'radio-wigner', 'index': ALL}, 'value'),
-    ]
+    ],
 )
 def main_update(
-    json_cur_views, cur_tabs, cur_sidebar, figures, url, tab_n, colorbar_range, relayout_data, series_button, series_tab, delete_series, delete_button, 
+    json_cur_views, cur_tabs, cur_sidebar, figures, links, link_colorbar, rescale_colorbar, url, tab_n, relayout_data, series_button, series_tab, delete_series, delete_button, 
     reset_button, dimension, oneD, quantity, dataset, protons, neutrons, nucleons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
+    new_views = cur_views.copy()
+
     n = int(tab_n[3])
     if len(series_tab) == 0:
         series_n = 1
     else:
         series_n = int(series_tab[0][3])
-
-    #print(dash.callback_context.triggered_id)
 
     #url
     if "url-store" == dash.callback_context.triggered_id:
@@ -413,6 +416,8 @@ def main_update(
                 json.dumps('update'),
                 tab_n,
                 Sidebar(loaded_views[n-1], 1, len(new_tabs)).show(),
+                ['1'],
+                []
             ]
         # if(len(url)>10):
         #     con = sl.connect('view_hashes.db')
@@ -431,17 +436,19 @@ def main_update(
             new_tabs = [dcc.Tab(label=str(i+1),value='tab'+str(i+1),className='custom-tab', selected_className='custom-tab--selected') for i in range(len(cur_views))]
             if len(new_tabs)<4:
                 new_tabs.append(dcc.Tab(label='+', value='tab0', className='custom-tab', selected_className='custom-tab--selected'))
+            checklist = [str(i+1) for i in range(len(cur_views))]
             return  [
                 json_cur_views, 
                 new_tabs,
                 json.dumps("update"),
                 tab_n,
                 Sidebar(cur_views[n-1], 1, len(new_tabs)).show(),
+                checklist,
+                []
             ]
 
     #main-tabs_change
     if "main-tabs" == dash.callback_context.triggered_id:
-        new_views = cur_views.copy()
         new_tabs = cur_tabs.copy()
         update = "dontupdate"
         # add plot
@@ -452,6 +459,7 @@ def main_update(
             new_tabs.insert(len(cur_tabs)-1, dcc.Tab(label=str(len(cur_tabs)), value='tab'+str(len(cur_tabs)), className='custom-tab', selected_className='custom-tab--selected'))
             if len(new_tabs)>4:
                 new_tabs.pop()
+            checklist = [str(i+1) for i in range(len(cur_views)+1)]
             
         return [
             json.dumps(new_views),
@@ -459,13 +467,14 @@ def main_update(
             json.dumps(update), #graph
             tab_n,
             Sidebar(new_views[n-1], 1, len(new_tabs)).show(),
+            checklist,
+            links
         ]
 
     #delete_plot
     if 'confirm' == dash.callback_context.triggered_id:
         n_views = len(cur_views)
         if  n_views > 1:
-            new_views = cur_views
             new_views.pop(n-1)
             new_tabs = cur_tabs
             if n_views == 4:
@@ -473,12 +482,15 @@ def main_update(
                 new_tabs.append(dcc.Tab(label='+', value='tab0', className='custom-tab', selected_className='custom-tab--selected'))
             else:
                 new_tabs.pop(-2)
+            checklist = [str(i+1) for i in range(len(cur_views)-1)]
             return [
                 json.dumps(new_views), 
                 new_tabs,
                 json.dumps("update"), #graph
                 "tab"+str(len(new_views)),
                 Sidebar(new_views[-1], 1, len(new_tabs)).show(),
+                checklist,
+                links
             ]
         else:
             raise PreventUpdate
@@ -491,63 +503,211 @@ def main_update(
             dcc.Tab(label='+', value='tab0', className='custom-tab', selected_className='custom-tab--selected')],
             json.dumps("update"),
             'tab1',
-            Sidebar().show()
+            Sidebar().show(),
+            ['1'],
+            []
         ]
 
     #colorbar_range
-    if 'intermediate-colorbar-range' == dash.callback_context.triggered_id:
-        if colorbar_range == None:
+    # if 'intermediate-colorbar-range' == dash.callback_context.triggered_id:
+    #     if colorbar_range == None:
+    #         raise PreventUpdate
+    #     if colorbar_range['index'] == 'ALL':
+    #         for i in range(len(new_views)):
+    #             new_views[i]['colorbar_range'] = colorbar_range['range']
+    #     else:
+    #         new_views[colorbar_range['index']]['colorbar_range'] = colorbar_range['range']
+    #     return [
+    #         json.dumps(new_views),
+    #         cur_tabs,
+    #         json.dumps("update"), #graph
+    #         tab_n,
+    #         Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
+    #     ]
+
+
+
+    # A function that inputs an array of different data types and only keeps the floats
+    def float_array(array):
+        return np.array( [array[i] for i in range(len(array)) if type(array[i])==type(1.0)] )
+    
+    # Match Colorbars
+    if "link-colorbar-button" == dash.callback_context.triggered_id:
+        mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
+        maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
+        try:
+            minz, maxz = float(min(mins)), float(max(maxes))
+        except:
             raise PreventUpdate
-        new_views = cur_views
-        if colorbar_range['index'] == 'ALL':
-            for i in range(len(new_views)):
-                new_views[i]['colorbar_range'] = colorbar_range['range']
-        else:
-            new_views[colorbar_range['index']]['colorbar_range'] = colorbar_range['range']
+
+        for i in range(len(new_views)):
+            new_views[i]['colorbar_range'] = [minz, maxz]
+        checklist = [str(i+1) for i in range(len(cur_views))]
         return [
             json.dumps(new_views),
             cur_tabs,
             json.dumps("update"), #graph
             tab_n,
-            Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
+            Sidebar(new_views[n-1], series_n, len(cur_tabs)).show(),
+            checklist,
+            links
         ]
 
     try:
         dash.callback_context.triggered_id['type']
     except:
         raise PreventUpdate
+    
 
-
-    #relayout_data
-    if 'graph' == dash.callback_context.triggered_id['type']:
-        print('RELAYOUT TRIGGERED')
-        print(cur_views[1]['range']['x'])
-        print(figures[1]['layout']['xaxis']['range'])
-        print(relayout_data[1])
-        new_views = cur_views.copy()
-        for i in range(len(new_views)):
-            if relayout_data[i] == None:
-                print("CONTINUED", i)
-                continue
+    # Rescale Individual Plot Colorbar
+    if "rescale-colorbar-button" == dash.callback_context.triggered_id['type']:
+        if type(rescale_colorbar[0])==type(1):
+            x_range, y_range = cur_views[n-1]['range']['x'].copy(), cur_views[n-1]['range']['y'].copy()
+            if x_range[0] == None:
+                x_range[0] = -999
+            if x_range[1] == None:
+                x_range[1] = 999
+            if y_range[0] == None:
+                y_range[0] = -999
+            if y_range[1] == None:
+                y_range[1] = 999
+            xmin, xmax = math.floor(x_range[0])+math.floor(x_range[0])%2, math.ceil(x_range[1])-math.ceil(x_range[1])%2
+            ymin, ymax = math.floor(y_range[0])+math.floor(y_range[0])%2, math.ceil(y_range[1])-math.ceil(y_range[1])%2
+            x, y = np.array(figures[n-1]['data'][0]['x']), np.array(figures[n-1]['data'][0]['y'])
+            xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
+            ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
+            values = float_array(np.array(figures[n-1]['data'][0]['z'])[ymin_i:ymax_i, xmin_i:xmax_i].flatten())
+            val_min, val_max = np.round(np.min(values),3), np.round(np.max(values),3)
+            new_views[n-1]['colorbar_range'] = [val_min, val_max]
+            checklist = [str(i+1) for i in range(len(cur_views))]
+            return [
+                json.dumps(new_views),
+                cur_tabs,
+                json.dumps("update"), #graph
+                tab_n,
+                Sidebar(new_views[n-1], series_n, len(cur_tabs)).show(),
+                checklist,
+                links
+            ]
+        raise PreventUpdate
+    
+    # Relayout Data Change
+    if "graph" == dash.callback_context.triggered_id['type']:
+       
+        # Store Relayout Change
+        trigger_index = dash.callback_context.triggered_id['index']
+        new_data = relayout_data[trigger_index-1]
+        auto = False
+        if new_data == {'dragmode': 'pan'} or new_data == {'dragmode': 'zoom'} or 'autosize' in new_data:
+            raise PreventUpdate
+        if 'xaxis.autorange' in new_data:
+            auto = True
+            new_views[trigger_index-1]['range']['x'] = [None, None]
+            new_views[trigger_index-1]['range']['y'] = [None, None]
+        else:
             try:
-                new_views[i]['range']['x'] = [float(np.round(figures[i]['layout']['xaxis']['range'][0], 3)), float(np.round(figures[i]['layout']['xaxis']['range'][1], 3))]
-                new_views[i]['range']['y'] = [float(np.round(figures[i]['layout']['yaxis']['range'][0], 3)), float(np.round(figures[i]['layout']['yaxis']['range'][1], 3))]
+                new_xrange = [float(np.round(new_data['xaxis.range[0]'],3)), float(np.round(new_data['xaxis.range[1]'],3))]
+                new_views[trigger_index-1]['range']['x'] = new_xrange
             except:
-                if relayout_data[i] == {'dragmode': 'pan'} or relayout_data[i] == {'dragmode': 'zoom'}:
-                    raise PreventUpdate
-                print("AHHH!", i)
-                new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = None, None
-                new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = None, None
-        print("NEW", new_views[1]['range']['x'])
-        print(figures[1]['layout']['xaxis']['range'])
+                new_xrange = cur_views[trigger_index-1]['range']['x']
+            try:
+                new_yrange = [float(np.round(new_data['yaxis.range[0]'],3)), float(np.round(new_data['yaxis.range[1]'],3))]
+                new_views[trigger_index-1]['range']['y'] = new_yrange
+            except:
+                new_yrange = cur_views[trigger_index-1]['range']['y']
+            
+            
+        
+        #Link Views
+        if links != None and str(trigger_index) in links:
+            trig_dim = cur_views[trigger_index-1]['dimension']
+            if trig_dim == '1D':
+                trig_dim = cur_views[trigger_index-1]['chain']
+            for link in links:
+                if int(link) != trigger_index:
+                    if auto:
+                        new_views[int(link)-1]['range']['x'] = [None, None]
+                        new_views[int(link)-1]['range']['y'] = [None, None]
+                    else:
+                        link_dim = cur_views[int(link)-1]['dimension']
+                        if link_dim == '1D':
+                            link_dim = cur_views[int(link)-1]['chain']
+                        if (trig_dim[:3]=='iso' and link_dim=='landscape') or (trig_dim=='landscape' and link_dim[:3]=='iso'):
+                            chain = trig_dim
+                            if chain=='landscape':
+                                chain = link_dim
+                            if chain == 'isotopic':
+                                new_views[int(link)-1]['range']['x'] = new_xrange
+                            else:
+                                if trig_dim[:3]=='iso':
+                                    new_views[int(link)-1]['range']['y'] = new_xrange
+                                else:
+                                    new_views[int(link)-1]['range']['x'] = new_yrange
+                        elif (trig_dim!='isotopic' or link_dim!='isotopic') and ((trig_dim=='isotopic' and link_dim[:3]=='iso') or (trig_dim[:3]=='iso' and link_dim=='isotopic')):
+                            pass
+                        else:
+                            new_views[int(link)-1]['range']['x'] = new_xrange
+                            new_views[int(link)-1]['range']['y'] = new_yrange
+
+        # def round_one_sigfig(x):
+        #     return round(x, -int(math.floor(math.log10(abs(x)))))
+
+        # Rescales tick marks
+        # for i in range(len(figures)):
+        #     try:
+        #         if list(relayout_data[i].keys())[0]=='dragmode':
+        #             raise PreventUpdate
+        #     except:
+        #         pass
+        #     try:
+        #         xdtick = math.ceil(round_one_sigfig((2/3)*(relayout_data[i]['xaxis.range[1]']-relayout_data[i]['xaxis.range[0]'])/4))
+        #         ydtick = math.ceil(round_one_sigfig((relayout_data[i]['yaxis.range[1]']-relayout_data[i]['yaxis.range[0]'])/4))
+        #         new_figures[i]['layout']['xaxis']['dtick'] = xdtick
+        #         new_figures[i]['layout']['yaxis']['dtick'] = ydtick
+        #         new_figures[i]['layout']['xaxis']['minor']['dtick'] = xdtick/5
+        #         new_figures[i]['layout']['yaxis']['minor']['dtick'] = ydtick/5
+        #     except:
+        #         try:
+        #             if figures[i]['data'][0]['type'] == 'heatmap':
+        #                 new_figures[i]['layout']['xaxis']['dtick'] = 25
+        #                 new_figures[i]['layout']['yaxis']['dtick'] =  25
+        #                 new_figures[i]['layout']['xaxis']['minor']['dtick'] = 5
+        #                 new_figures[i]['layout']['yaxis']['minor']['dtick'] = 5
+        #             else:
+        #                 raise Exception
+        #         except:
+        #             new_figures[i]['layout']['xaxis']['dtick'] = None
+        #             new_figures[i]['layout']['yaxis']['dtick'] =  None
+        #             new_figures[i]['layout']['xaxis']['minor']['dtick'] = None
+        #             new_figures[i]['layout']['yaxis']['minor']['dtick'] = None
+                
+
+        # for i in range(len(new_views)):
+        #     if relayout_data[i] == None:
+        #         print("CONTINUED", i)
+        #         continue
+        #     try:
+        #         new_views[i]['range']['x'] = [float(np.round(figures[i]['layout']['xaxis']['range'][0], 3)), float(np.round(figures[i]['layout']['xaxis']['range'][1], 3))]
+        #         new_views[i]['range']['y'] = [float(np.round(figures[i]['layout']['yaxis']['range'][0], 3)), float(np.round(figures[i]['layout']['yaxis']['range'][1], 3))]
+        #     except:
+        #         if relayout_data[i] == {'dragmode': 'pan'} or relayout_data[i] == {'dragmode': 'zoom'}:
+        #             raise PreventUpdate
+        #         new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = None, None
+        #         new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = None, None
+        checklist = [str(i+1) for i in range(len(cur_views))]
         return [
             json.dumps(new_views),
             cur_tabs,
-            json.dumps("noupdate"), #graph
+            json.dumps("update"), #graph
             tab_n,
-            Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
+            Sidebar(new_views[n-1], series_n, len(cur_tabs)).show(),
+            checklist,
+            links
         ]
-    
+
+
+
+
     #delete_series
     if 'delete-series-button' == dash.callback_context.triggered_id['type']:
         l = len(cur_views[n-1]['proton'])
@@ -557,18 +717,22 @@ def main_update(
             new_views[n-1]['neutron'].pop(series_n-1)
             new_views[n-1]['nucleon'].pop(series_n-1)
             new_views[n-1]['dataset'].pop(series_n-1)
+            checklist = [str(i+1) for i in range(len(cur_views))]
             return [
                 json.dumps(new_views), 
                 cur_tabs,
                 json.dumps("update"), #graph
                 tab_n,
                 Sidebar(new_views[n-1], series_n-1+math.ceil(abs(series_n-l)/10), len(cur_tabs)).show(),
+                checklist,
+                links
             ]
         else:
             raise PreventUpdate
     
     #series_tabs
     if "series_tabs" == dash.callback_context.triggered_id['type']:
+        checklist = [str(i+1) for i in range(len(cur_views))]
         if series_n==0:
             new_views = cur_views
             new_views[n-1]['proton'].append(default['proton'][0])
@@ -581,6 +745,8 @@ def main_update(
                 json.dumps("update"),
                 tab_n,
                 Sidebar(new_views[n-1], "new", len(cur_tabs)).show(),
+                checklist,
+                links
             ]
         return [
             json.dumps(cur_views), 
@@ -588,6 +754,8 @@ def main_update(
             json.dumps("noupdate"),
             tab_n,
             Sidebar(cur_views[n-1], series_n, len(cur_tabs)).show(),
+            checklist,
+            links
         ]
 
     #dropdown_input
@@ -610,12 +778,15 @@ def main_update(
         new_views[n-1]['quantity'] = quantity[0]
     if "dropdown-dataset" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['dataset'][series_n-1] = dataset[0]
+    checklist = [str(i+1) for i in range(len(cur_views))]
     return [
         json.dumps(new_views),
         cur_tabs, 
         json.dumps("update"),
         tab_n,
-        Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
+        Sidebar(new_views[n-1], series_n, len(cur_tabs)).show(),
+        checklist,
+        links
     ]
 
 

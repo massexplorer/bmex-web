@@ -10,6 +10,7 @@ from tensorflow.keras import backend as K
 import pandas as pd
 from dash import html
 
+series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
 
 def single(quantity, model, Z, N, wigner=0):
     Z = Z[0]
@@ -18,7 +19,6 @@ def single(quantity, model, Z, N, wigner=0):
     if Z==None and N==None:
         return html.P("Please enter a proton and neutron value")
     if quantity == 'All':
-        # return html.P("All")
         output = []
         for qs in bmex.qinput:
             result = bmex.QuanValue(Z,N,model,qs,wigner)
@@ -39,20 +39,12 @@ def single(quantity, model, Z, N, wigner=0):
 
 def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
 
-    series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
     layout = go.Layout(
-        #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title="Isotopic Chain",
         xaxis=dict(title="Neutrons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
         yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        #legend=dict(x=0, y=1.05, orientation="h"),
-        #margin=dict(l=100, r=10, t=25, b=40),
-        plot_bgcolor="#282b38",
-        paper_bgcolor="#282b38",
-        font={"color": "#a5b1cd", "size": 14},
-        # width=600,
+        plot_bgcolor="#282b38", paper_bgcolor="#282b38", font={"color": "#a5b1cd", "size": 14}, title="Isotopic Chain",
     )
     
     traces = []
@@ -95,20 +87,12 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
 
 def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
 
-    series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
     layout = go.Layout(
-        #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title="Isotonic Chain",
         xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
         yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        #legend=dict(x=0, y=1.05, orientation="h"),
-        #margin=dict(l=100, r=10, t=25, b=40),
-        plot_bgcolor="#282b38",
-        paper_bgcolor="#282b38",
-        font={"color": "#a5b1cd", "size": 14},
-        # width=600,
+        plot_bgcolor="#282b38", paper_bgcolor="#282b38", font={"color": "#a5b1cd", "size": 14}, title="Isotonic Chain",
     )
     
     traces = []
@@ -149,20 +133,12 @@ def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
 
 def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
 
-    series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
     layout = go.Layout(
-        #title=f"ROC Curve (AUC = {auc_score:.3f})",
-        title="Isobaric Chain",
         xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
         yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        #legend=dict(x=0, y=1.05, orientation="h"),
-        #margin=dict(l=100, r=10, t=25, b=40),
-        plot_bgcolor="#282b38",
-        paper_bgcolor="#282b38",
-        font={"color": "#a5b1cd", "size": 14},
-        # width=600,
+        plot_bgcolor="#282b38", paper_bgcolor="#282b38", font={"color": "#a5b1cd", "size": 14}, title="Isobaric Chain",
     )
     
     traces = []
@@ -208,19 +184,13 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
 def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorbar_range=[None, None], ZView=None, NView=None):
     model = model[0]
     layout = go.Layout(
-            font={"color": "#a5b1cd"},
-            title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=22)),
-            xaxis=dict(title=dict(text="Neutrons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True,  #gridcolor="#2f3445",
-            showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,156]),
-            yaxis=dict(title=dict(text="Protons", font=dict(size=18)), gridcolor="#646464", tick0=0, dtick=25, showline=True, 
-            showgrid=True, gridwidth=1, minor=dict(tick0=0, dtick=5, showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,104]),
-            #legend=dict(x=0, y=1.05, orientation="h"),
-            #margin=dict(l=100, r=10, t=25, b=40),
-            plot_bgcolor="#282b38",
-            paper_bgcolor="#282b38",
-            #uirevision=model,
-            # width=600,
-            # height=440
+            title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=22)), font={"color": "#a5b1cd"},
+            xaxis=dict(title=dict(text="Neutrons", font=dict(size=18)), gridcolor="#646464", showline=True,  #gridcolor="#2f3445",
+            showgrid=True, gridwidth=1, minor=dict(showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,156]),
+            yaxis=dict(title=dict(text="Protons", font=dict(size=18)), gridcolor="#646464", showline=True, 
+            showgrid=True, gridwidth=1, minor=dict(showgrid=True, gridcolor="#3C3C3C",), mirror='ticks', zeroline=False, range=[0,104]),
+            plot_bgcolor="#282b38", paper_bgcolor="#282b38",
+            #uirevision=model, width=600, height=440
     )
 
     step = 2
@@ -250,6 +220,8 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
         else:
             filtered.append(e)
     filtered = np.array(filtered)
+    if len(filtered)<5:
+        raise Exception
     minz, maxz = colorbar_range[0], colorbar_range[1]
     if minz == None:
         minz = 0
@@ -293,7 +265,7 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
                 colorbar=dict(title="MeV"),
                 hovertemplate = '<b><i>N</i></b>: %{x}<br>'+
                         '<b><i>Z</i></b>: %{y}<br>'+
-                        '<b><i>Value</i></b>: %{z}',          
+                        '<b><i>Value</i></b>: %{z}',
     )
     if NView == None and ZView == None:
         return go.Figure(data=[trace], layout=layout)
