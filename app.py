@@ -460,6 +460,8 @@ def main_update(
             if len(new_tabs)>4:
                 new_tabs.pop()
             checklist = [str(i+1) for i in range(len(cur_views)+1)]
+        else:
+            checklist = [str(i+1) for i in range(len(cur_views))]
             
         return [
             json.dumps(new_views),
