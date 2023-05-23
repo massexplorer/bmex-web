@@ -10,7 +10,7 @@ import numpy as np
 class Sidebar:
     
     def __init__(self, views_dict={"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
-           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None], 
+           "colorbar": 'linear', "wigner": [0], "proton": [None], "neutron": [None], "nucleon": [None], 
            "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None]}, series_tab=1, maintabs_length=1):
         for key in views_dict:
             setattr(self, key, views_dict[key])
@@ -150,7 +150,8 @@ class Sidebar:
                 {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting"},
                 {"label": "Single-Proton Energy Splitting", "value": "SPESplitting"},
                 # {"label": "Wigner Energy Coefficient", "value": "WignerEC"},
-                {"label": "Quad Def Beta2", "value": "QDB2t"},
+                # {"label": "Quad Def Beta2", "value": "QDB2t"},
+                {"label": "Binding Energy per Nucleon", "value": "BE/A"},
             ]
         else:
             quantity_options = [
@@ -168,7 +169,8 @@ class Sidebar:
                 {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting"},
                 {"label": "Single-Proton Energy Splitting", "value": "SPESplitting"},
                 # {"label": "Wigner Energy Coefficient", "value": "WignerEC"},
-                {"label": "Quad Def Beta2", "value": "QDB2t"},
+                # {"label": "Quad Def Beta2", "value": "QDB2t"},
+                {"label": "Binding Energy per Nucleon", "value": "BE/A"},
             ]
 
         output.append(
@@ -258,6 +260,19 @@ class Sidebar:
                             value=self.dataset[self.series_n-1],
                         )
                     ]),
+                    drc.Card(
+                        id="Wigner-card",
+                        children=[
+                            drc.NamedDropdown(
+                                name="Wigner Adjustment",
+                                id={'type': 'radio-wigner','index': 1},
+                                options=[{"label": "None", "value": 0},{"label": "Wigner (1)", "value": 1},{"label": "Wigner (2)", "value": 2}],
+                                clearable=False,
+                                searchable=False,
+                                value=self.wigner[self.series_n-1],
+                            ),
+                        ]
+                    ),
                     series_button_card
                 ])
             )
@@ -276,6 +291,25 @@ class Sidebar:
                         value=self.dataset[self.series_n-1],
                     )
                 ]) 
+            )
+            output.append(
+                drc.Card(
+                    id="Wigner-card",
+                    children=[
+                        drc.NamedDropdown(
+                            name="Wigner Adjustment",
+                            id={'type': 'radio-wigner','index': 1},
+                            options=[
+                                {"label": "None", "value": 0},
+                                {"label": "Wigner (1)", "value": 1},
+                                {"label": "Wigner (2)", "value": 2},
+                            ],
+                            clearable=False,
+                            searchable=False,
+                            value=self.wigner[self.series_n-1],
+                        ),
+                    ]
+                ),
             )
 
         if self.dimension == 'landscape':
@@ -317,24 +351,7 @@ class Sidebar:
                 ])
             )
 
+
         return output
-        # drc.Card(
-        #     id="Wigner-card",
-        #     children=[
-        #         drc.NamedDropdown(
-        #             name="Wigner Adjustment",
-        #             id="radio-wigner",
-        #             options=[
-        #                 {"label": "None", "value": 0},
-        #                 {"label": "Wigner (1)", "value": 1},
-        #                 {"label": "Wigner (2)", "value": 2},
-        #                 #{"label": "Wigner Coefficient", "value": 3},
-        #             ],
-        #             clearable=False,
-        #             searchable=False,
-        #             value=0,
-        #         ),
-        #     ]
-        # ),
 
 

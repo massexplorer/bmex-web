@@ -12,7 +12,7 @@ from dash import html
 
 series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
 
-def single(quantity, model, Z, N, wigner=0):
+def single(quantity, model, Z, N, wigner=[0]):
     Z = Z[0]
     N = N[0]
     model = model[0]
@@ -21,7 +21,7 @@ def single(quantity, model, Z, N, wigner=0):
     if quantity == 'All':
         output = []
         for qs in bmex.qinput:
-            result = bmex.QuanValue(Z,N,model,qs,wigner)
+            result = bmex.QuanValue(Z,N,model,qs,wigner[0])
             try:
                 result+"a"
             except:
@@ -37,7 +37,7 @@ def single(quantity, model, Z, N, wigner=0):
             return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result))
         return html.P(result)
 
-def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
+def isotopic(quantity, model, colorbar, wigner, Z, N, A, view_range):
 
     layout = go.Layout(
         xaxis=dict(title="Neutrons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
@@ -52,7 +52,7 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
         neutrons = []
         output = []
         for n in range(0,157):
-            q = bmex.QuanValue(Z[i],n,model[i],quantity,wigner)
+            q = bmex.QuanValue(Z[i],n,model[i],quantity,wigner[i])
             try: 
                 q+1
             except:
@@ -68,24 +68,17 @@ def isotopic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
                 hovertemplate = '<b><i>N</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',
             ))
         except:
-            traces.append(go.Scatter(x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i])))
+            traces.append(go.Scatter(x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i]),
+                                     hovertemplate = '<b><i>N</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}'))
 
-    if NView == None:
-        figure =  go.Figure(data=traces, layout=layout)
-    else:
-        figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=NView)
-        try:
-            NView[1]-NView[0]
-        except:
-            pass
-        else:
-            figure.update_xaxes(dtick=(int((NView[1]-NView[0])/8))*2)
-    figure.update_xaxes(title_font_size=20)
-    figure.update_yaxes(title_font_size=20)
+    figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
+
+    figure.update_xaxes(title_font_size=16)
+    figure.update_yaxes(title_font_size=16)
     figure.update_layout(title_font_size=24)
     return figure
 
-def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
+def isotonic(quantity, model, colorbar, wigner, Z, N, A, view_range):
 
     layout = go.Layout(
         xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
@@ -100,7 +93,7 @@ def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
         protons = []
         output = []
         for z in range(120):
-            q = bmex.QuanValue(z,N[i],model[i],quantity,wigner)
+            q = bmex.QuanValue(z,N[i],model[i],quantity,wigner[i])
             try: 
                 q+1
             except:
@@ -114,24 +107,16 @@ def isotonic(quantity, model, colorbar, wigner, Z, N, A, ZView, NView):
                 marker={"color": series_colors[i]}, hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',
             ))
         except:
-            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i])))
+            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i]),
+                                     hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}'))
 
-    if NView == None:
-        figure =  go.Figure(data=traces, layout=layout)
-    else:
-        figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=NView)
-        try:
-            NView[1]-NView[0]
-        except:
-            pass
-        else:
-            figure.update_xaxes(dtick=(int((NView[1]-NView[0])/8))*2)
+    figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
     figure.update_xaxes(title_font_size=20)
     figure.update_yaxes(title_font_size=20)
     figure.update_layout(title_font_size=24)
     return figure
 
-def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
+def isobaric(quantity, model, colorbar, wigner, N, Z, A, view_range):
 
     layout = go.Layout(
         xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
@@ -148,7 +133,7 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
         if A[i] == None:
             continue
         for z in range(A[i]):
-            q = bmex.QuanValue(z,A[i]-z,model[i],quantity,wigner)
+            q = bmex.QuanValue(z,A[i]-z,model[i],quantity,wigner[i])
             try: 
                 q+1
             except:
@@ -164,24 +149,17 @@ def isobaric(quantity, model, colorbar, wigner, N, Z, A, ZView, NView):
                 hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',   
             ))
         except:
-            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i])))
+            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i]),
+                                     hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}'))
 
-    if NView == None:
-        figure =  go.Figure(data=traces, layout=layout)
-    else:
-        figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=NView)
-        try:
-            NView[1]-NView[0]
-        except:
-            pass
-        else:
-            figure.update_xaxes(dtick=(int((NView[1]-NView[0])/8))*2)
+    figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
     figure.update_xaxes(title_font_size=20)
     figure.update_yaxes(title_font_size=20)
     figure.update_layout(title_font_size=24)
     return figure
     
-def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorbar_range=[None, None], ZView=None, NView=None):
+def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorbar_range=[None, None], view_range=[None, None]):
+    W = wigner[0]
     model = model[0]
     layout = go.Layout(
             title=dict(text=bmex.OutputString(quantity)+"   |   "+str(model), font=dict(size=22)), font={"color": "#a5b1cd"},
@@ -194,12 +172,14 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
     )
 
     step = 2
-
+    
     values0 = np.full((200//step,350//step), None)
     for Z in range(2, 105, step):
-        chain = bmex.IsotopicChain(Z, model, quantity, step, wigner)
+        chain = bmex.IsotopicChain(Z, model, quantity, W)
+        chain = chain[chain["N"]%step==0]
         for N in chain["N"]:
-            values0[Z//2,N//2] = chain[chain["N"]==N].iloc[0,0]
+            values0[int(Z/2)-1,int(N/2)-1] = chain[chain["N"]==N].iloc[0,0]
+
 
     for ri in range(40,len(values0)):
         if np.all(values0[ri]==None):
@@ -226,7 +206,8 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
     if minz == None:
         minz = 0
     if maxz == None:
-        maxz=float(np.percentile(filtered, [97]))
+        maxz=float(max(filtered))
+        # maxz=float(np.percentile(filtered, [97]))
     equalized_color = filtered[filtered>=0]
     equalized_color = equalized_color[equalized_color<=maxz]
     
@@ -267,13 +248,9 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
                         '<b><i>Z</i></b>: %{y}<br>'+
                         '<b><i>Value</i></b>: %{z}',
     )
-    if NView == None and ZView == None:
-        return go.Figure(data=[trace], layout=layout)
-    if ZView == None:
-        return go.Figure(data=[trace], layout=layout, layout_xaxis_range=NView)
-    if NView == None:
-        return go.Figure(data=[trace], layout=layout, layout_yaxis_range=ZView)
-    return go.Figure(data=[trace], layout=layout, layout_xaxis_range=NView, layout_yaxis_range=ZView)
+
+    return go.Figure(data=trace, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
+
 
 def serve_prediction_plot(
     model, X_train, X_test, y_train, y_test, Z, xx, yy, mesh_step, threshold

@@ -35,7 +35,7 @@ import string
 
 
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
-           "colorbar": 'linear', "wigner": 0, "proton": [None], "neutron": [None], "nucleon": [None], 
+           "colorbar": 'linear', "wigner": [0], "proton": [None], "neutron": [None], "nucleon": [None], 
            "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None]}
 
 
@@ -216,127 +216,6 @@ def download(n_clicks, figures, json_cur_views):
                 zf.writestr(filename, buf.getvalue())
     return dcc.send_bytes(write_zip, zip_file_name)
 
-# @app.callback(
-#     Output({'type': 'graph','index': ALL}, "figure"),
-#     Output('intermediate-colorbar-range', 'data'),
-#     State({'type': 'graph','index': ALL}, "figure"),
-#     State("main-tabs", "value"),
-#     State("viewsmemory", "data"),
-#     State('link-view-checklist', 'value'),
-#     Input("link-colorbar-button", "n_clicks"),
-#     Input({'type': 'rescale-colorbar-button', 'index': ALL}, 'n_clicks'),
-#     Input({'type': 'graph','index': ALL}, "relayoutData"),
-#     prevent_initial_call=True,
-# )
-# def figure_update(figures, tab_n, json_cur_views, links, link_colorbar, rescale_colorbar, relayout_data):
-#     new_figures = figures
-#     cur_views = json.loads(json_cur_views)
-
-#     # A function that inputs an array of different data types and only keeps the floats
-#     def float_array(array):
-#         return np.array( [array[i] for i in range(len(array)) if type(array[i])==type(1.0)] )
-    
-#     # Match Colorbars
-#     if "link-colorbar-button" == dash.callback_context.triggered_id:
-#         mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
-#         maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
-#         try:
-#             minz, maxz = min(mins), max(maxes)
-#         except:
-#             raise PreventUpdate
-#         for i in range(len(figures)):
-#             new_figures[i]['data'][0]['zmin'] = minz
-#             new_figures[i]['data'][0]['zmax'] = maxz
-
-#         return new_figures, {"index": 'ALL', "range": [minz, maxz]}
-    
-#     try:
-#         dash.callback_context.triggered_id['type']
-#     except:
-#         raise PreventUpdate
-    
-#     # Rescale Individual Plot Colorbar
-#     if "rescale-colorbar-button" == dash.callback_context.triggered_id['type']:
-#         if type(rescale_colorbar[0])==type(1):
-#             n = int(tab_n[3])
-#             new_figures = figures
-#             x_range, y_range = cur_views[n-1]['range']['x'], cur_views[n-1]['range']['y']
-#             if x_range[0] == None:
-#                 x_range[0] = -9999
-#             if x_range[1] == None:
-#                 x_range[1] = 9999
-#             if y_range[0] == None:
-#                 y_range[0] = -9999
-#             if y_range[1] == None:
-#                 y_range[1] = 9999
-#             xmin, xmax = math.floor(x_range[0])+math.floor(x_range[0])%2, math.ceil(x_range[1])-math.ceil(x_range[1])%2
-#             ymin, ymax = math.floor(y_range[0])+math.floor(y_range[0])%2, math.ceil(y_range[1])-math.ceil(y_range[1])%2
-#             x, y = np.array(figures[n-1]['data'][0]['x']), np.array(figures[n-1]['data'][0]['y'])
-#             xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
-#             ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
-#             values = float_array(np.array(figures[n-1]['data'][0]['z'])[ymin_i:ymax_i, xmin_i:xmax_i].flatten())
-#             val_min, val_max = np.round(np.min(values),3), np.round(np.max(values),3)
-#             new_figures[n-1]['data'][0]['zmin'] = val_min
-#             new_figures[n-1]['data'][0]['zmax'] = val_max
-
-#             return new_figures, {"index": n-1, "range": [val_min, val_max]}
-    
-#     # Relayout Data Change
-#     if "graph" == dash.callback_context.triggered_id['type']:
-       
-#         def round_one_sigfig(x):
-#             return round(x, -int(math.floor(math.log10(abs(x)))))
-        
-#         new_figures = figures.copy()
-#         trigger_index = dash.callback_context.triggered_id['index']
-
-#         #Link Views
-#         try:
-#             if str(trigger_index) in links:
-#                 new_data = relayout_data[trigger_index-1]
-#                 for link in links:
-#                     if int(link) != trigger_index:
-#                         print("MARK-10", new_figures[int(link)-1]['layout']['xaxis']['range'])
-#                         new_figures[int(link)-1]['layout']['xaxis']['range'] = [new_data['xaxis.range[0]'], new_data['xaxis.range[1]']]
-#                         new_figures[int(link)-1]['layout']['yaxis']['range'] = [new_data['yaxis.range[0]'], new_data['yaxis.range[1]']]
-#                         print("MARK-2", new_figures[int(link)-1]['layout']['xaxis']['range'])
-#         except:
-#             pass
-        
-#         # Rescales tick marks
-#         for i in range(len(figures)):
-#             try:
-#                 if list(relayout_data[i].keys())[0]=='dragmode':
-#                     raise PreventUpdate
-#             except:
-#                 pass
-#             try:
-#                 xdtick = math.ceil(round_one_sigfig((2/3)*(relayout_data[i]['xaxis.range[1]']-relayout_data[i]['xaxis.range[0]'])/4))
-#                 ydtick = math.ceil(round_one_sigfig((relayout_data[i]['yaxis.range[1]']-relayout_data[i]['yaxis.range[0]'])/4))
-#                 new_figures[i]['layout']['xaxis']['dtick'] = xdtick
-#                 new_figures[i]['layout']['yaxis']['dtick'] = ydtick
-#                 new_figures[i]['layout']['xaxis']['minor']['dtick'] = xdtick/5
-#                 new_figures[i]['layout']['yaxis']['minor']['dtick'] = ydtick/5
-#             except:
-#                 try:
-#                     if figures[i]['data'][0]['type'] == 'heatmap':
-#                         new_figures[i]['layout']['xaxis']['dtick'] = 25
-#                         new_figures[i]['layout']['yaxis']['dtick'] =  25
-#                         new_figures[i]['layout']['xaxis']['minor']['dtick'] = 5
-#                         new_figures[i]['layout']['yaxis']['minor']['dtick'] = 5
-#                     else:
-#                         raise Exception
-#                 except:
-#                     new_figures[i]['layout']['xaxis']['dtick'] = None
-#                     new_figures[i]['layout']['yaxis']['dtick'] =  None
-#                     new_figures[i]['layout']['xaxis']['minor']['dtick'] = None
-#                     new_figures[i]['layout']['yaxis']['minor']['dtick'] = None
-#         print("TAG")
-#         return new_figures, None
-
-#     raise PreventUpdate
-    
-
 
 @app.callback(
     [
@@ -398,6 +277,8 @@ def main_update(
         series_n = 1
     else:
         series_n = int(series_tab[0][3])
+
+    print(dash.callback_context.triggered_id)
 
     #url
     if "url-store" == dash.callback_context.triggered_id:
@@ -510,24 +391,6 @@ def main_update(
             []
         ]
 
-    #colorbar_range
-    # if 'intermediate-colorbar-range' == dash.callback_context.triggered_id:
-    #     if colorbar_range == None:
-    #         raise PreventUpdate
-    #     if colorbar_range['index'] == 'ALL':
-    #         for i in range(len(new_views)):
-    #             new_views[i]['colorbar_range'] = colorbar_range['range']
-    #     else:
-    #         new_views[colorbar_range['index']]['colorbar_range'] = colorbar_range['range']
-    #     return [
-    #         json.dumps(new_views),
-    #         cur_tabs,
-    #         json.dumps("update"), #graph
-    #         tab_n,
-    #         Sidebar(new_views[n-1], series_n, len(cur_tabs)).show()
-    #     ]
-
-
 
     # A function that inputs an array of different data types and only keeps the floats
     def float_array(array):
@@ -535,11 +398,15 @@ def main_update(
     
     # Match Colorbars
     if "link-colorbar-button" == dash.callback_context.triggered_id:
+        print('A')
         mins = np.array( [figures[i]['data'][0]['zmin'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
         maxes = np.array( [figures[i]['data'][0]['zmax'] for i in range(len(figures)) if cur_views[i]['dimension']=='landscape'] )
+        print(cur_views[0]['colorbar_range'])
+        print(mins, maxes)
         try:
             minz, maxz = float(min(mins)), float(max(maxes))
         except:
+            print('ERROR')
             raise PreventUpdate
 
         for i in range(len(new_views)):
@@ -615,9 +482,10 @@ def main_update(
             try:
                 new_yrange = [float(np.round(new_data['yaxis.range[0]'],3)), float(np.round(new_data['yaxis.range[1]'],3))]
                 new_views[trigger_index-1]['range']['y'] = new_yrange
+                print('GOOD 2')
             except:
                 new_yrange = cur_views[trigger_index-1]['range']['y']
-            
+                print("ERROR 2")
             
         
         #Link Views
@@ -634,7 +502,7 @@ def main_update(
                         link_dim = cur_views[int(link)-1]['dimension']
                         if link_dim == '1D':
                             link_dim = cur_views[int(link)-1]['chain']
-                        if (trig_dim[:3]=='iso' and link_dim=='landscape') or (trig_dim=='landscape' and link_dim[:3]=='iso'):
+                        if (trig_dim[:3]=='iso' and link_dim=='landscape') or (trig_dim=='landscape' and link_dim[:3]=='iso'): # One of each type
                             chain = trig_dim
                             if chain=='landscape':
                                 chain = link_dim
@@ -645,8 +513,10 @@ def main_update(
                                     new_views[int(link)-1]['range']['y'] = new_xrange
                                 else:
                                     new_views[int(link)-1]['range']['x'] = new_yrange
-                        elif (trig_dim!='isotopic' or link_dim!='isotopic') and ((trig_dim=='isotopic' and link_dim[:3]=='iso') or (trig_dim[:3]=='iso' and link_dim=='isotopic')):
+                        elif (trig_dim!='isotopic' or link_dim!='isotopic') and ((trig_dim=='isotopic' and link_dim[:3]=='iso') or (trig_dim[:3]=='iso' and link_dim=='isotopic')): # 1Ds w/ only one isotopic
                             pass
+                        elif trig_dim[:3]=='iso' and link_dim[:3]=='iso':
+                            new_views[int(link)-1]['range']['x'] = new_xrange
                         else:
                             new_views[int(link)-1]['range']['x'] = new_xrange
                             new_views[int(link)-1]['range']['y'] = new_yrange
@@ -696,6 +566,7 @@ def main_update(
         #             raise PreventUpdate
         #         new_views[i]['range']['x'][0], new_views[i]['range']['x'][1] = None, None
         #         new_views[i]['range']['y'][0], new_views[i]['range']['y'][1] = None, None
+        
         checklist = [str(i+1) for i in range(len(cur_views))]
         return [
             json.dumps(new_views),
@@ -719,6 +590,7 @@ def main_update(
             new_views[n-1]['neutron'].pop(series_n-1)
             new_views[n-1]['nucleon'].pop(series_n-1)
             new_views[n-1]['dataset'].pop(series_n-1)
+            new_views[n-1]['wigner'].pop(series_n-1)
             checklist = [str(i+1) for i in range(len(cur_views))]
             return [
                 json.dumps(new_views), 
@@ -741,6 +613,7 @@ def main_update(
             new_views[n-1]['neutron'].append(default['neutron'][0])
             new_views[n-1]['nucleon'].append(default['nucleon'][0])
             new_views[n-1]['dataset'].append(default['dataset'][0])
+            new_views[n-1]['wigner'].append(default['wigner'][0])
             return [
                 json.dumps(new_views), 
                 cur_tabs,
@@ -769,7 +642,7 @@ def main_update(
     if "dropdown-colorbar" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['colorbar'] = colorbar[0]
     if "radio-wigner" == dash.callback_context.triggered_id['type']:
-        new_views[n-1]['wigner'] = wigner[0]
+        new_views[n-1]['wigner'][series_n-1] = wigner[0]
     if "input-protons" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['proton'][series_n-1] = protons[0]
     if "input-neutrons" == dash.callback_context.triggered_id['type']:
@@ -778,6 +651,7 @@ def main_update(
         new_views[n-1]['nucleon'][series_n-1] = nucleons[0]
     if "dropdown-quantity" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['quantity'] = quantity[0]
+        new_views[n-1]['colorbar_range'] = [None, None]
     if "dropdown-dataset" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['dataset'][series_n-1] = dataset[0]
     checklist = [str(i+1) for i in range(len(cur_views))]
@@ -798,37 +672,20 @@ def main_update(
     [
         Input("triggerGraph", "data"),
         State("viewsmemory", "data"),
-        Input("zmin", "value"),
-        Input("zmax", "value"),
-        Input("nmin", "value"),
-        Input("nmax", "value"),
     ],
 )
 def graph_output(
     trigger,
     json_views,
-    zmin,
-    zmax,
-    nmin,
-    nmax,
 ):  
-    if "triggerGraph" == dash.callback_context.triggered_id:
-        zview, nview = None, None
-    else:
-        zview, nview = [zmin,zmax], [nmin,nmax]
     if(json.loads(trigger)=="update"):
         output = []
         views_list = json.loads(json_views) # list of dicts
-        graphindex = 1
-        for view_dict in views_list: # iterate through dicts in list
-            zview, nview = view_dict["range"]["y"], view_dict["range"]["x"]
-            view = View(view_dict, graphindex, zview, nview) # create a view
+        for i in range(len(views_list)): # iterate through dicts in list
+            view = View(views_list[i], i+1)
             output.append(view.plot())
-            graphindex += 1
         return output
     raise PreventUpdate
-
-
 
 
 
