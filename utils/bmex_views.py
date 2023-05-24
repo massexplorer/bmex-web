@@ -35,12 +35,12 @@ def masses_view():
                     html.Div(
                         id="right-column",
                         children=[
-                            drc.Card(id="copy-card", children=[
+                            drc.Card(id="copy-card", title='Copy link to this exact view', children=[
                                 html.P("Share View", id="clipboard-title"),
                                 dcc.Clipboard(id="clipboard", content=""),
                             ]),
                             drc.Card(id="download-card", children=[
-                                html.Button("Export Pub. PDFs", id="download-button"),
+                                html.Button("Export Pub. PDFs", id="download-button", title='Download all displayed figures as PDFs'),
                             ]),
                             drc.Card(
                                 id="range-card", 
@@ -54,12 +54,10 @@ def masses_view():
                                 ]
                             ),
                             drc.Card(id="colorbar-button-card", children=[
-                                html.Button("Link Colorbars", id="link-colorbar-button"),
-                                html.Img(src="assets/help.png", id='link-colorbar-help', title='Matches colorbars of multiple figures, retaining the furthest extrema of the original colorbars.')
+                                html.Button("Link Colorbars", id="link-colorbar-button", title='Matches colorbars of multiple figures, retaining the furthest extrema of the original colorbars'),
                             ]),
-                            drc.Card(id="link-view-card", children=[
+                            drc.Card(id="link-view-card", title='Linked figures will mirror zooms upon interaction with one', children=[
                                 html.Button("Link Views", id="link-view-button"),
-                                html.Img(src="assets/help.png", id='link-view-help', title='Linked figures will mirror zooms upon interaction with one.'),
                                 dcc.Checklist([], id='link-view-checklist', inline=True, )
                                             #   persistence=True, persistence_type='memory')
                             ]),
@@ -67,7 +65,7 @@ def masses_view():
                             #     dcc.Slider(id="size-slider", min=1, max=10, step=1),
                             # ]),
                             drc.Card(id="reset-card", children=[
-                                html.Button('Reset Page', id='reset-button', className='reset-button')
+                                html.Button('Reset Page', id='reset-button', className='reset-button', title='Erases all user selections'),
                             ]),
                         ]
                     )                   

@@ -171,26 +171,6 @@
     width: 100%
 }
 
-#colorbar-scale-card {
-    width: 100%;
-    margin-top: 3rem;
-    flex-direction: row;
-    height: 3rem;
-}
-
-.rescale-colorbar-button {
-    width: 82%;
-    padding: 0;
-    color: #a5b1cd;
-}
-
-#rescale-help {
-    margin-left: 6%;
-    max-width: 12%;
-    max-height: 100%;
-    vertical-align: middle;
-}
-
 #series-card {
     display: flex;
 }
@@ -202,6 +182,18 @@
     height: 2rem !important;
     vertical-align: middle !important;
     line-height: 0;
+}
+
+#colorbar-scale-card {
+    width: 100%;
+    margin-top: 3rem;
+    flex-direction: row;
+    height: 3rem;
+}
+.rescale-colorbar-button {
+    width: 100%;
+    padding: 0;
+    color: #a5b1cd;
 }
 
 #delete-card {
@@ -284,23 +276,16 @@
 }
 
 #link-colorbar-button {
-    width: 76%;
+    width: 100%;
     padding: 0;
     color: #a5b1cd;
-}
-
-#link-colorbar-help {
-    margin-left: 6%;
-    max-width: 17%;
-    max-height: 70%;
-    vertical-align: middle;
 }
 
 /* Link Views */
 #link-view-card {
     display: grid;
-    grid-template-columns: [c1] 17% [c2] 66% [c3] 17% [c4];
-    grid-template-rows: [r1] 30% [r2] 20% [r3] 20% [r4] 30% [r5];
+    grid-template-columns: [c1] 100% [c2];
+    grid-template-rows: [r1] 50% [r2] 50% [r3];
     width: 90%;
     margin-bottom: 3rem;
     height: 6rem;
@@ -309,21 +294,16 @@
     text-align: center;
 }
 #link-view-button {
-    grid-column: c2 / c3;
-    grid-row: r1 / r3;
+    grid-column: c1 / c2;
+    grid-row: r1 / r2;
     padding: 0;
     color: #a5b1cd;
     cursor: default;
     border: 0;
 }
-#link-view-help {
-    grid-column: c3 / c4;
-    grid-row: r2 / r4;
-    max-height: 100%;
-}
 #link-view-checklist {
-    grid-column: c2 / c3;
-    grid-row: r3 / r5;
+    grid-column: c1 / c2;
+    grid-row: r2 / r3;
     /* font-size: 1vw; */
 }
 

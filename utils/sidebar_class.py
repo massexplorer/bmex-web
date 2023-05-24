@@ -99,7 +99,7 @@ class Sidebar:
     def show(self):
         
         output = [
-            drc.Card(id="dimension-card", children=[
+            drc.Card(id="dimension-card", title='Select a dimensionality of data to analyze', children=[
                 drc.NamedDropdown(
                     name="Dimension",
                     id={'type': 'dropdown-dimension','index': 1},
@@ -117,7 +117,7 @@ class Sidebar:
 
         if self.dimension == '1D':
             output.append(
-                drc.Card(id="oneD-card", children=[
+                drc.Card(id="oneD-card", title='Select the type of chain to plot', children=[
                     drc.NamedDropdown(
                         name='1D Chain',
                         id={'type': 'dropdown-1D','index': 1},
@@ -174,18 +174,20 @@ class Sidebar:
             ]
 
         output.append(
-            drc.Card(id="quantity-card", children=[
-                drc.NamedDropdown(
-                    name="Select Quantity",
-                    id={'type': 'dropdown-quantity','index': 1},
-                    options=quantity_options,
-                    clearable=False,
-                    searchable=False,
-                    value=self.quantity,
-                    maxHeight=160,
-                    optionHeight=80,                                   
-                )
-            ])
+            drc.Card(id="quantity-card", title='Select the quantity to be graphed on the selected figure', 
+                children=[
+                    drc.NamedDropdown(
+                        name="Select Quantity",
+                        id={'type': 'dropdown-quantity','index': 1},
+                        options=quantity_options,
+                        clearable=False,
+                        searchable=False,
+                        value=self.quantity,
+                        maxHeight=160,
+                        optionHeight=80,                           
+                    )
+                ]
+            )
         )
 
         dataset_options = [
@@ -261,7 +263,7 @@ class Sidebar:
                         )
                     ]),
                     drc.Card(
-                        id="Wigner-card",
+                        id="Wigner-card", title='Allows for the adjustment from a Wigner term in the selected figure',
                         children=[
                             drc.NamedDropdown(
                                 name="Wigner Adjustment",
@@ -281,20 +283,22 @@ class Sidebar:
                 output.append(self.proton_card(self.series_n-1))
                 output.append(self.neutron_card(self.series_n-1))
             output.append(
-                drc.Card(id="dataset-card", children=[
-                    drc.NamedDropdown(
-                        name="Select Dataset",
-                        id={'type': 'dropdown-dataset','index': self.series_n},
-                        options=dataset_options,
-                        clearable=False,
-                        searchable=False,
-                        value=self.dataset[self.series_n-1],
-                    )
-                ]) 
+                drc.Card(id="dataset-card", title='Select the experiment or model dataset to be used for the selected figure',
+                    children=[
+                        drc.NamedDropdown(
+                            name="Select Dataset",
+                            id={'type': 'dropdown-dataset','index': self.series_n},
+                            options=dataset_options,
+                            clearable=False,
+                            searchable=False,
+                            value=self.dataset[self.series_n-1],
+                        )
+                    ]
+                ) 
             )
             output.append(
                 drc.Card(
-                    id="Wigner-card",
+                    id="Wigner-card", title='Allows for the adjustment from a Wigner term in the selected figure',
                     children=[
                         drc.NamedDropdown(
                             name="Wigner Adjustment",
@@ -315,7 +319,7 @@ class Sidebar:
         if self.dimension == 'landscape':
             output.append(
                 drc.Card(
-                    id="colorbar-card",
+                    id="colorbar-card", title='Changes the color scheme of the selected figure',
                     children=[
                         drc.NamedDropdown(
                             name="Colorbar Style",
@@ -335,8 +339,8 @@ class Sidebar:
             )
             output.append(
                 drc.Card(id="colorbar-scale-card", children=[
-                    html.Button("Rescale Colorbar", id={'type': 'rescale-colorbar-button','index': 1}, className='rescale-colorbar-button'),
-                    html.Img(src="assets/help.png", id='rescale-help', title='Rescales the colorbar of the selected figure based on the min and max of its currently visable values.')
+                    html.Button("Rescale Colorbar", id={'type': 'rescale-colorbar-button','index': 1}, className='rescale-colorbar-button', 
+                                title='Rescales the colorbar of the selected figure based on the min and max of its currently visable values'),
                 ]),
             )
             # output.append(
