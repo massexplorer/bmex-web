@@ -324,6 +324,7 @@ class Sidebar:
                                 {"label": "Linear", "value": "linear"},
                                 {"label": "Equalized", "value": "equal"},
                                 {"label": "Monochrome", "value": "monochrome"},
+                                {"label": "Diverging", "value": "diverging"},
                             ],
                             clearable=False,
                             searchable=False,

@@ -238,6 +238,8 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
             ]
         elif(colorbar == 'monochrome'):
             return  [[0, 'rgb(230, 120, 85)'], [1, 'rgb(255, 255, 255)']]
+        elif(colorbar == 'diverging'):
+            return  [[0, 'rgb(0, 0, 255)'], [.5, 'rgb(255, 255, 255)'], [1, 'rgb(255, 0, 0)']]
 
     trace = go.Heatmap(
                 x=np.arange(2,155,step), y=np.arange(2,105,step), z=values, 
