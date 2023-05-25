@@ -6,7 +6,6 @@ import utils.views_class as views
 import numpy as np
 
 
-
 class Sidebar:
     
     def __init__(self, views_dict={"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
@@ -155,22 +154,22 @@ class Sidebar:
             ]
         else:
             quantity_options = [
-                {"label": "Binding Energy", "value": "BE"},
-                {"label": "One Neutron Separation Energy", "value": "OneNSE"},
-                {"label": "One Proton Separation Energy", "value": "OnePSE"},
-                {"label": "Two Neutron Separation Energy", "value": "TwoNSE"},
-                {"label": "Two Proton Separation Energy", "value": "TwoPSE"},
-                {"label": "Alpha Separation Energy", "value": "AlphaSE"},
-                {"label": "Two Neutron Shell Gap", "value": "TwoNSGap"},
-                {"label": "Two Proton Shell Gap", "value": "TwoPSGap"},
-                {"label": "Double Mass Difference", "value": "DoubleMDiff"},
-                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED"},
-                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED"},
-                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting"},
-                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting"},
+                {"label": "Binding Energy", "value": "BE", "title": "Energy required to completely seperate the nucleus: \n B(N,Z)"},
+                {"label": "One Neutron Separation Energy", "value": "OneNSE", "title": "Energy required to remove a neutron: \n S\u2099(N,Z) = B(N,Z) - B(N-1,Z)"},
+                {"label": "One Proton Separation Energy", "value": "OnePSE", "title": "Energy required to remove a proton: \n S\u209A(N,Z) = B(N,Z) - B(N,Z-1)"},
+                {"label": "Two Neutron Separation Energy", "value": "TwoNSE", "title": "Energy required to remove two neutrons: \n S\u2082\u2099(N,Z) = B(N,Z) - B(N-2,Z)"},
+                {"label": "Two Proton Separation Energy", "value": "TwoPSE", "title": "Energy required to remove two protons: \n S\u2082\u209A(N,Z) = B(N,Z) - B(N,Z-2)"},
+                {"label": "Alpha Separation Energy", "value": "AlphaSE", "title": "Energy required to remove an alpha particle: \n S\u2090 = B(N,Z) - B(N-2,Z-2) - 28.3 MeV"},
+                {"label": "Two Neutron Shell Gap", "value": "TwoNSGap", "title": "\u03B4\u2082\u2099(N,Z) = S\u2082\u2099(N,Z) - S\u2082\u2099(N+2,Z)"},
+                {"label": "Two Proton Shell Gap", "value": "TwoPSGap", "title": "\u03B4\u2082\u209A(N,Z) = S\u2082\u209A(N,Z) - S\u2082\u209A(N,Z+2)"},
+                {"label": "Double Mass Difference", "value": "DoubleMDiff", "title": "\u03B4V\u209A\u2099(N,Z) = 1/4 S\u2082\u209A(N,Z) - S\u2082\u209A(N-2,Z)"},
+                {"label": "Neutron 3-Point Odd-Even Binding Energy Difference", "value": "N3PointOED", "title": "\u0394\u2099(N,Z) = 1/2 S\u2099(N,Z) -S\u2099(N+1,Z)"},
+                {"label": "Proton 3-Point Odd-Even Binding Energy Difference", "value": "P3PointOED", "title": "\u0394\u209A(N,Z) = 1/2 S\u209A(N,Z) -S\u209A(N,Z+1)"},
+                {"label": "Single-Neutron Energy Splitting", "value": "SNESplitting", "title": "\u0394e\u2099(N,Z) = S\u2099(N,Z) - S\u2099(N+2,Z)"},
+                {"label": "Single-Proton Energy Splitting", "value": "SPESplitting", "title": " \u0394e\u209A(N,Z) = S\u209A(N,Z) - S\u209A(N,Z+2)"},
                 # {"label": "Wigner Energy Coefficient", "value": "WignerEC"},
                 # {"label": "Quad Def Beta2", "value": "QDB2t"},
-                {"label": "Binding Energy per Nucleon", "value": "BE/A"},
+                {"label": "Binding Energy per Nucleon", "value": "BE/A", "title": "B/A(N,Z) = B(N,Z)/(N+Z)"},
             ]
 
         output.append(
