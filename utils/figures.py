@@ -10,7 +10,7 @@ from tensorflow.keras import backend as K
 import pandas as pd
 from dash import html
 
-series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00"]
+series_colors = ["#e76f51", "#a5b1cd", "#ffffff", "#13c6e9", "#ffc300", "#1eae00", "#ff6692", "#b6e880"]
 
 def single(quantity, model, Z, N, wigner=[0]):
     Z = Z[0]
@@ -37,127 +37,78 @@ def single(quantity, model, Z, N, wigner=[0]):
             return html.P(model+" "+bmex.OutputString(quantity)+": "+str(result))
         return html.P(result)
 
-def isotopic(quantity, model, colorbar, wigner, Z, N, A, view_range):
-
-    layout = go.Layout(
-        xaxis=dict(title="Neutrons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+def isotopic(quantity, model, colorbar, wigner, Z, N, A, view_range, uncertainties):
+    layout = go.Layout(font={"color": "#a5b1cd", "size": 14}, title={"text": "Isotopic Chain", "font": {"size": 20}}, 
+        plot_bgcolor="#282b38", paper_bgcolor="#282b38", 
+        xaxis=dict(title="Neutrons", gridcolor="#646464",title_font_size=16, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
-                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        plot_bgcolor="#282b38", paper_bgcolor="#282b38", font={"color": "#a5b1cd", "size": 14}, title="Isotopic Chain",
-    )
-    
+        yaxis=dict(title=quantity+' (MeV)', gridcolor="#646464",title_font_size=16, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)), 
+        )
     traces = []
     for i in range(len(Z)):
-        neutrons = []
-        output = []
-        for n in range(0,157):
-            q = bmex.QuanValue(Z[i],n,model[i],quantity,wigner[i])
-            try: 
-                q+1
-            except:
-                continue
-            else:
-                neutrons.append(n)
-                output.append(q)
+        df = bmex.IsotopicChain(Z[i],model[i],quantity,wigner[i]).sort_values(by=['N'])
+        neutrons = df['N']
+        output = df[quantity]
+        error_dict = None
+        if uncertainties[i] and model[i]=='EXP':
+            error_dict = dict(type='data',array=df['u'+quantity],visible=True)
+        traces.append(go.Scatter(
+            x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i]), 
+            marker={"color": series_colors[i]}, error_y=error_dict,
+            hovertemplate = '<b><i>N</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y} MeV',
+        ))
+    return go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
 
-        try:
-            traces.append(go.Scatter(
-                x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i]), 
-                marker={"color": series_colors[i]},
-                hovertemplate = '<b><i>N</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',
-            ))
-        except:
-            traces.append(go.Scatter(x=neutrons, y=output, mode="lines+markers", name='Z='+str(Z[i])+' | '+str(model[i]),
-                                     hovertemplate = '<b><i>N</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}'))
 
-    figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
-
-    figure.update_xaxes(title_font_size=16)
-    figure.update_yaxes(title_font_size=16)
-    figure.update_layout(title_font_size=24)
-    return figure
-
-def isotonic(quantity, model, colorbar, wigner, Z, N, A, view_range):
-
-    layout = go.Layout(
-        xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+def isotonic(quantity, model, colorbar, wigner, Z, N, A, view_range, uncertainties):
+    layout = go.Layout(font={"color": "#a5b1cd", "size": 14}, title={"text": "Isotonic Chain", "font": {"size": 20}}, 
+        plot_bgcolor="#282b38", paper_bgcolor="#282b38", 
+        xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=16, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
-                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        plot_bgcolor="#282b38", paper_bgcolor="#282b38", font={"color": "#a5b1cd", "size": 14}, title="Isotonic Chain",
-    )
-    
+        yaxis=dict(title=quantity+' (MeV)', gridcolor="#646464",title_font_size=16, showline=True,mirror='ticks',
+                   minor=dict(showgrid=True, gridcolor="#3C3C3C",)), 
+        )
     traces = []
     for i in range(len(N)):
-        protons = []
-        output = []
-        for z in range(120):
-            q = bmex.QuanValue(z,N[i],model[i],quantity,wigner[i])
-            try: 
-                q+1
-            except:
-                continue
-            else:
-                protons.append(z)
-                output.append(q)
-        try:
-            traces.append(go.Scatter(
-                x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i]),
-                marker={"color": series_colors[i]}, hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',
-            ))
-        except:
-            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i]),
-                                     hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}'))
+        df = bmex.IsotonicChain(N[i],model[i],quantity,wigner[i]).sort_values(by=['Z'])
+        protons = df['Z']
+        output = df[quantity]
+        error_dict = None
+        if uncertainties[i] and model[i]=='EXP':
+            error_dict = dict(type='data',array=df['u'+quantity],visible=True)
+        traces.append(go.Scatter(
+            x=protons, y=output, mode="lines+markers", name='N='+str(N[i])+' | '+str(model[i]), 
+            marker={"color": series_colors[i]}, error_y=error_dict,
+            hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y} MeV',
+        ))
+    return go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
 
-    figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
-    figure.update_xaxes(title_font_size=20)
-    figure.update_yaxes(title_font_size=20)
-    figure.update_layout(title_font_size=24)
-    return figure
 
-def isobaric(quantity, model, colorbar, wigner, N, Z, A, view_range):
-
-    layout = go.Layout(
-        xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+def isobaric(quantity, model, colorbar, wigner, N, Z, A, view_range, uncertainties):
+    layout = go.Layout(font={"color": "#a5b1cd", "size": 14}, title={"text": "Isotonic Chain", "font": {"size": 20}}, 
+        plot_bgcolor="#282b38", paper_bgcolor="#282b38", 
+        xaxis=dict(title="Protons", gridcolor="#646464",title_font_size=16, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        yaxis=dict(title=bmex.OutputString(quantity), gridcolor="#646464",title_font_size=14, showline=True,mirror='ticks',
+        yaxis=dict(title=quantity+' (MeV)', gridcolor="#646464",title_font_size=16, showline=True,mirror='ticks',
                    minor=dict(showgrid=True, gridcolor="#3C3C3C",)),
-        plot_bgcolor="#282b38", paper_bgcolor="#282b38", font={"color": "#a5b1cd", "size": 14}, title="Isobaric Chain",
-    )
-    
+        )
     traces = []
     for i in range(len(A)):
-        protons = []
-        output = []
-        if A[i] == None:
-            continue
-        for z in range(A[i]):
-            q = bmex.QuanValue(z,A[i]-z,model[i],quantity,wigner[i])
-            try: 
-                q+1
-            except:
-                continue
-            else:
-                protons.append(z)
-                output.append(q)
-
-        try:
-            traces.append(go.Scatter(
-                x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i]), 
-                marker={"color": series_colors[i]},
-                hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}',   
-            ))
-        except:
-            traces.append(go.Scatter(x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i]),
-                                     hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y}'))
-
-    figure = go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
-    figure.update_xaxes(title_font_size=20)
-    figure.update_yaxes(title_font_size=20)
-    figure.update_layout(title_font_size=24)
-    return figure
+        df = bmex.IsobaricChain(A[i],model[i],quantity,wigner[i]).sort_values(by=['Z'])
+        protons = df['Z']
+        output = df[quantity]
+        error_dict = None
+        if uncertainties[i] and model[i]=='EXP':
+            error_dict = dict(type='data',array=df['u'+quantity],visible=True)
+        traces.append(go.Scatter(
+            x=protons, y=output, mode="lines+markers", name='A='+str(A[i])+' | '+str(model[i]), 
+            marker={"color": series_colors[i]}, error_y=error_dict,
+            hovertemplate = '<b><i>Z</i></b>: %{x}<br>'+'<b><i>'+quantity+'</i></b>: %{y} MeV',
+        ))
+    return go.Figure(data=traces, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])
     
+
 def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorbar_range=[None, None], view_range=[None, None]):
     W = wigner[0]
     model = model[0]
@@ -172,27 +123,15 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
     )
 
     step = 2
-    
-    values0 = np.full((200//step,350//step), None)
-    for Z in range(2, 105, step):
-        chain = bmex.IsotopicChain(Z, model, quantity, W)
-        chain = chain[chain["N"]%step==0]
-        for N in chain["N"]:
-            values0[int(Z/2)-1,int(N/2)-1] = chain[chain["N"]==N].iloc[0,0]
-
-
-    for ri in range(40,len(values0)):
-        if np.all(values0[ri]==None):
-            r=ri
-            break
-    for ci in range(70,len(values0[0])):
-        if np.all(values0[:, ci]==None):
-            c=ci
-            break
-    values = values0[:r,:c]
+    vals_arr2d, estimated = bmex.Landscape(model, quantity, W, step)
+    estimated[estimated==True] = 'E'
+    estimated[estimated==False] = ''
+    estimated[estimated==None] = ''
+    est_str = estimated.copy()
+    est_str[est_str=='E'] = 'Estimated'
 
     filtered = []
-    for e in values.flatten():
+    for e in vals_arr2d.flatten():
         try:
             e + 0.0
         except:
@@ -242,13 +181,10 @@ def landscape(quantity, model, colorbar, wigner, Z=None, N=None, A=None, colorba
             return  [[0, 'rgb(0, 0, 255)'], [.5, 'rgb(255, 255, 255)'], [1, 'rgb(255, 0, 0)']]
 
     trace = go.Heatmap(
-                x=np.arange(2,155,step), y=np.arange(2,105,step), z=values, 
-                zmin=minz, zmax=maxz, name = "",
-                colorscale=cb(colorbar),
-                colorbar=dict(title="MeV"),
-                hovertemplate = '<b><i>N</i></b>: %{x}<br>'+
-                        '<b><i>Z</i></b>: %{y}<br>'+
-                        '<b><i>Value</i></b>: %{z}',
+        x=np.arange(0, vals_arr2d.shape[0]*step, step), y=np.arange(-1, vals_arr2d.shape[1]*step, step), 
+        z=vals_arr2d, zmin=minz, zmax=maxz, name = "", colorscale=cb(colorbar), colorbar=dict(title="MeV"), customdata=est_str,
+        hovertemplate = '<b><i>N</i></b>: %{x}<br>'+'<b><i>Z</i></b>: %{y}<br>'+'<b><i>Value</i></b>: %{z}<br>'+'<b>%{customdata}</b>', 
+        text=estimated, texttemplate="%{text}",
     )
 
     return go.Figure(data=trace, layout=layout, layout_xaxis_range=view_range['x'], layout_yaxis_range=view_range['y'])

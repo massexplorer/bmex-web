@@ -10,7 +10,8 @@ class Sidebar:
     
     def __init__(self, views_dict={"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
            "colorbar": 'linear', "wigner": [0], "proton": [None], "neutron": [None], "nucleon": [None], 
-           "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None]}, series_tab=1, maintabs_length=1):
+           "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None], "uncertainty": False},
+             series_tab=1, maintabs_length=1):
         for key in views_dict:
             setattr(self, key, views_dict[key])
         if series_tab == "new":
@@ -235,7 +236,7 @@ class Sidebar:
                 {"label": "UNEDF1", "value": "UNEDF1"},
             ] 
 
-        tabs_component, series_button_card = None, None
+        tabs_component, series_button_card, uncertainty_card = None, None, [None]
         if self.dimension == '1D':
             tabs = []
             for i in range(len(self.dataset)):
@@ -247,7 +248,13 @@ class Sidebar:
                 series_button_card = drc.Card(id="delete-series-card", children=[
                     html.Button('Delete Series', id={'type': 'delete-series-button','index': 1}, value=None, className='delete-button')
                 ])
-
+            uncer_checklist = []
+            if self.uncertainty[self.series_n-1]:
+                uncer_checklist = ['Include Uncertainties']
+            if self.dataset[self.series_n-1] == 'EXP':
+                uncertainty_card = drc.Card(id="uncertainty-card", children=[
+                    dcc.Checklist(options=['Include Uncertainties'], value=uncer_checklist, id={'type': 'uncertainty-checklist','index': 1}),
+                ]),
             output.append(
                 drc.Card(id='series-card', children=[
                     tabs_component,
@@ -275,6 +282,7 @@ class Sidebar:
                             ),
                         ]
                     ),
+                    uncertainty_card[0],
                     series_button_card
                 ])
             )

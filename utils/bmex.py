@@ -14,32 +14,63 @@ import pandas as pd
 # 'Single-Neutron Energy Splitting', 'Single-Proton Energy Splitting', 'Wigner Energy Coeffienct', 'Quad_Def_Beta2_total']
 # q_dict = {qinput[j]: qnames[j] for j in range(len(qinput))}
 
+db = 'data/June2.h5'
+
 # Retrieves single value
-def QuanValue(Z,N,model,quan,W=0):
-    df = pd.read_hdf('utils/May23.h5', model)
+def QuanValue(Z,N,model,quan,W=0,uncertainty=False):
+    df = pd.read_hdf(db, model)
     try:
-        return np.round(float(df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)][quan]),6)
+        if uncertainty and model=='EXP':
+            v = np.round(float(df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)][quan]),6)
+            e = df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)]['Estimated'].values[0]
+            try:
+                u = np.round(float(df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)]['u'+quan]),6)
+            except:
+                u = None
+            return v, u, e
+        else:
+            return np.round(float(df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)][quan]),6), None, None
     except:
-        return "Error: "+str(model)+" data does not have "+OutputString(quan)+" available for Nuclei with N="+str(N)+" and Z="+str(Z)
+        return "Error: "+str(model)+" data does not have "+OutputString(quan)+" available for Nuclei with N="+str(N)+" and Z="+str(Z), None, None
+
+def Landscape(model,quan,W=0,step=2):
+    df = pd.read_hdf(db, model)
+    df = df[df["Wigner"]==W]
+    df = df[df["N"]%step==0]
+    df = df[df["Z"]%step==0]
+    arr2d = np.full((int(max(df['Z'])//step+1),int(max(df['N'])//step+1)), None)
+    for rowi in df.index:
+        arr2d[int(df.loc[rowi,'Z']//step), int(df.loc[rowi,'N']//step)] = df.loc[rowi,quan]
+    if model=='EXP':
+        estimated = np.full((max(df['Z'])//step+1,max(df['N'])//step+1), None)
+        for rowi in df.index:
+            estimated[df.loc[rowi,'Z']//step, df.loc[rowi,'N']//step] = df.loc[rowi,'Estimated']
+        return arr2d, estimated
+    return arr2d, None
 
 def IsotopicChain(Z,model,quan,W=0):
-    df = pd.read_hdf('utils/May23.h5', model)
+    df = pd.read_hdf(db, model)
     df = df[df["Wigner"]==W]
     df = df[df["Z"]==Z]
-    return df.loc[:, [quan, "N"]]
-
+    if model=='EXP':
+        return df.loc[:, ["N", quan, "u"+quan, "Estimated"]]
+    return df.loc[:, ["N", quan]]
 
 def IsotonicChain(N,model,quan,W=0):
-    df = pd.read_hdf('utils/May23.h5', model)
+    df = pd.read_hdf(db, model)
     df = df[df["Wigner"]==W]
     df = df[df["N"]==N]
-    return df.loc[:, [quan, "Z"]]
+    if model=='EXP':
+        return df.loc[:, ["Z", quan, "u"+quan, "Estimated"]]
+    return df.loc[:, ["Z", quan]]
 
 def IsobaricChain(A,model,quan,W=0):
-    df = pd.read_hdf('utils/May23.h5', model)
+    df = pd.read_hdf(db, model)
     df = df[df["Wigner"]==W]
-    df = df[df["N"]+df["Z"]==A]
-    return df.loc[:, [quan, "Z"]]
+    df = df[df["Z"]+df["N"]==A]
+    if model=='EXP':
+        return df.loc[:, ["Z", quan, "u"+quan, "Estimated"]]
+    return df.loc[:, ["Z", quan]]
 
 def OutputString(quantity):
     out_str = "Quantity not found!"

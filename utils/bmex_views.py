@@ -61,9 +61,6 @@ def masses_view():
                                 dcc.Checklist([], id='link-view-checklist', inline=True, )
                                             #   persistence=True, persistence_type='memory')
                             ]),
-                            # drc.Card(id="size-card", children=[
-                            #     dcc.Slider(id="size-slider", min=1, max=10, step=1),
-                            # ]),
                             drc.Card(id="reset-card", children=[
                                 html.Button('Reset Page', id='reset-button', className='reset-button', title='Erases all user selections'),
                             ]),

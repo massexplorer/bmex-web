@@ -36,8 +36,8 @@ import string
 
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
            "colorbar": 'linear', "wigner": [0], "proton": [None], "neutron": [None], "nucleon": [None], 
-           "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None]}
-
+           "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None],
+           "uncertainty": [False],}
 
 app = dash.Dash(
     __name__,
@@ -260,6 +260,8 @@ def download(n_clicks, figures, json_cur_views):
         Input('confirm', 'submit_n_clicks'),
         #reset_page
         Input('confirm-reset', "submit_n_clicks"),
+        #uncertainty-checklist
+        Input({'type': 'uncertainty-checklist', 'index': ALL}, 'value'),
         #dropdowns
         Input({'type': 'dropdown-dimension', 'index': ALL}, 'value'),
         Input({'type': 'dropdown-1D', 'index': ALL}, 'value'),
@@ -274,7 +276,7 @@ def download(n_clicks, figures, json_cur_views):
 )
 def main_update(
     json_cur_views, cur_tabs, cur_sidebar, figures, links, link_colorbar, rescale_colorbar, url, tab_n, relayout_data, series_button, series_tab, delete_series, delete_button, 
-    reset_button, dimension, oneD, quantity, dataset, protons, neutrons, nucleons, colorbar, wigner):
+    reset_button, uncer, dimension, oneD, quantity, dataset, protons, neutrons, nucleons, colorbar, wigner):
 
     cur_views = json.loads(json_cur_views)
     new_views = cur_views.copy()
@@ -396,7 +398,6 @@ def main_update(
             []
         ]
 
-
     # A function that inputs an array of different data types and only keeps the floats
     def float_array(array):
         return np.array( [array[i] for i in range(len(array)) if type(array[i])==type(1.0)] )
@@ -442,6 +443,7 @@ def main_update(
                 y_range[1] = 999
             xmin, xmax = math.floor(x_range[0])+math.floor(x_range[0])%2, math.ceil(x_range[1])-math.ceil(x_range[1])%2
             ymin, ymax = math.floor(y_range[0])+math.floor(y_range[0])%2, math.ceil(y_range[1])-math.ceil(y_range[1])%2
+            print(figures[n-1]['data'][0].keys())
             x, y = np.array(figures[n-1]['data'][0]['x']), np.array(figures[n-1]['data'][0]['y'])
             xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
             ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
@@ -572,9 +574,6 @@ def main_update(
             links
         ]
 
-
-
-
     #delete_series
     if 'delete-series-button' == dash.callback_context.triggered_id['type']:
         l = len(cur_views[n-1]['proton'])
@@ -585,6 +584,7 @@ def main_update(
             new_views[n-1]['nucleon'].pop(series_n-1)
             new_views[n-1]['dataset'].pop(series_n-1)
             new_views[n-1]['wigner'].pop(series_n-1)
+            new_views[n-1]['uncertainty'].pop(series_n-1)
             checklist = [str(i+1) for i in range(len(cur_views))]
             return [
                 json.dumps(new_views), 
@@ -608,6 +608,7 @@ def main_update(
             new_views[n-1]['nucleon'].append(default['nucleon'][0])
             new_views[n-1]['dataset'].append(default['dataset'][0])
             new_views[n-1]['wigner'].append(default['wigner'][0])
+            new_views[n-1]['uncertainty'].append(default['uncertainty'][0])
             return [
                 json.dumps(new_views), 
                 cur_tabs,
@@ -626,32 +627,34 @@ def main_update(
             checklist,
             links
         ]
-
+    
     #dropdown_input
-    new_views = cur_views
     if "dropdown-dimension" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['dimension'] = dimension[0]
-    if "dropdown-1D" == dash.callback_context.triggered_id['type']:   
+    elif "dropdown-1D" == dash.callback_context.triggered_id['type']:   
         new_views[n-1]['chain'] = oneD[0]
-    if "dropdown-colorbar" == dash.callback_context.triggered_id['type']:
+    elif "dropdown-colorbar" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['colorbar'] = colorbar[0]
-    if "radio-wigner" == dash.callback_context.triggered_id['type']:
+    elif "radio-wigner" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['wigner'][series_n-1] = wigner[0]
-    if "input-protons" == dash.callback_context.triggered_id['type']:
+    elif "input-protons" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['proton'][series_n-1] = protons[0]
-    if "input-neutrons" == dash.callback_context.triggered_id['type']:
+    elif "input-neutrons" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['neutron'][series_n-1] = neutrons[0]
-    if "input-nucleons" == dash.callback_context.triggered_id['type']:
+    elif "input-nucleons" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['nucleon'][series_n-1] = nucleons[0]
-    if "dropdown-quantity" == dash.callback_context.triggered_id['type']:
+    elif "dropdown-quantity" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['quantity'] = quantity[0]
         new_views[n-1]['colorbar_range'] = [None, None]
-    if "dropdown-dataset" == dash.callback_context.triggered_id['type']:
+    elif "dropdown-dataset" == dash.callback_context.triggered_id['type']:
         new_views[n-1]['dataset'][series_n-1] = dataset[0]
+    elif "uncertainty-checklist" == dash.callback_context.triggered_id['type']:
+        u = bool(len(uncer[0]))
+        new_views[n-1]['uncertainty'][series_n-1] = u
     checklist = [str(i+1) for i in range(len(cur_views))]
     return [
         json.dumps(new_views),
-        cur_tabs, 
+        cur_tabs,
         json.dumps("update"),
         tab_n,
         Sidebar(new_views[n-1], series_n, len(cur_tabs)).show(),

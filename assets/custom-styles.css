@@ -171,8 +171,8 @@
     width: 100%
 }
 
-#series-card {
-    display: flex;
+#uncertainty-card {
+    margin-bottom: 1rem;
 }
 
 .series-button {
