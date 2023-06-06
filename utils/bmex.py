@@ -14,7 +14,7 @@ import pandas as pd
 # 'Single-Neutron Energy Splitting', 'Single-Proton Energy Splitting', 'Wigner Energy Coeffienct', 'Quad_Def_Beta2_total']
 # q_dict = {qinput[j]: qnames[j] for j in range(len(qinput))}
 
-db = 'data/June2.h5'
+db = 'data/6-6-23.h5'
 
 # Retrieves single value
 def QuanValue(Z,N,model,quan,W=0,uncertainty=False):
@@ -22,7 +22,7 @@ def QuanValue(Z,N,model,quan,W=0,uncertainty=False):
     try:
         if uncertainty and model=='EXP':
             v = np.round(float(df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)][quan]),6)
-            e = df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)]['Estimated'].values[0]
+            e = df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)]['e'+quan].values[0]
             try:
                 u = np.round(float(df[(df["N"]==N) & (df["Z"]==Z) & (df["Wigner"]==W)]['u'+quan]),6)
             except:
@@ -44,7 +44,7 @@ def Landscape(model,quan,W=0,step=2):
     if model=='EXP':
         estimated = np.full((max(df['Z'])//step+1,max(df['N'])//step+1), None)
         for rowi in df.index:
-            estimated[df.loc[rowi,'Z']//step, df.loc[rowi,'N']//step] = df.loc[rowi,'Estimated']
+            estimated[df.loc[rowi,'Z']//step, df.loc[rowi,'N']//step] = df.loc[rowi,'e'+quan]
         return arr2d, estimated
     return arr2d, None
 
@@ -53,7 +53,7 @@ def IsotopicChain(Z,model,quan,W=0):
     df = df[df["Wigner"]==W]
     df = df[df["Z"]==Z]
     if model=='EXP':
-        return df.loc[:, ["N", quan, "u"+quan, "Estimated"]]
+        return df.loc[:, ["N", quan, "u"+quan, 'e'+quan]]
     return df.loc[:, ["N", quan]]
 
 def IsotonicChain(N,model,quan,W=0):
@@ -61,7 +61,7 @@ def IsotonicChain(N,model,quan,W=0):
     df = df[df["Wigner"]==W]
     df = df[df["N"]==N]
     if model=='EXP':
-        return df.loc[:, ["Z", quan, "u"+quan, "Estimated"]]
+        return df.loc[:, ["Z", quan, "u"+quan, 'e'+quan]]
     return df.loc[:, ["Z", quan]]
 
 def IsobaricChain(A,model,quan,W=0):
@@ -69,7 +69,7 @@ def IsobaricChain(A,model,quan,W=0):
     df = df[df["Wigner"]==W]
     df = df[df["Z"]+df["N"]==A]
     if model=='EXP':
-        return df.loc[:, ["Z", quan, "u"+quan, "Estimated"]]
+        return df.loc[:, ["Z", quan, "u"+quan, 'e'+quan]]
     return df.loc[:, ["Z", quan]]
 
 def OutputString(quantity):
