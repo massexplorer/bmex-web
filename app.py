@@ -9,7 +9,7 @@ from dash.dependencies import Input, Output, State
 import json
 import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate
-# import dash_breakpoints
+from dash_breakpoints import WindowBreakpoints
 
 import utils.dash_reusable_components as drc
 import utils.figures as figs
@@ -37,7 +37,7 @@ import string
 default = {"dimension": 'landscape', "chain": 'isotopic', "quantity": 'BE', "dataset": ['EXP'], 
            "colorbar": 'linear', "wigner": [0], "proton": [None], "neutron": [None], "nucleon": [None], 
            "range": {"x": [None, None], "y": [None, None]}, "colorbar_range": [None, None],
-           "uncertainty": [False],}
+           "uncertainty": [False], "estimated": [False]}
 
 app = dash.Dash(
     __name__,
@@ -55,6 +55,11 @@ server = app.server
 app.layout = html.Div(
     children=[
         dcc.Location(id='url', refresh=False),
+        WindowBreakpoints(
+            id="breakpoints",
+            widthBreakpointThresholdsPx=[800, 1700],
+            widthBreakpointNames=["sm", "md", "lg"],
+        ),
         html.Div(
             className="banner",
             children=[
@@ -79,9 +84,7 @@ app.layout = html.Div(
         dcc.Store(id='intermediate-colorbar-range'),
         html.P(id='placeholder', hidden=True),
         dcc.Store(id='url-store'),
-        #dcc.Store(id="linkmemory", storage_type='memory', data=json.dumps("")),
-        dcc.Store(id='viewsmemory', storage_type='session', data=json.dumps([default]),
-        ),
+        dcc.Store(id='viewsmemory', storage_type='session', data=json.dumps([default]),),
         dcc.Store(id='triggerGraph', data=json.dumps("update")),
         dcc.ConfirmDialog(id='confirm', message='Warning! Are you sure you want to delete this view?'),
         dcc.ConfirmDialog(id='confirm-reset', message='Warning! Are you sure you want to reset this page?'),
@@ -443,7 +446,6 @@ def main_update(
                 y_range[1] = 999
             xmin, xmax = math.floor(x_range[0])+math.floor(x_range[0])%2, math.ceil(x_range[1])-math.ceil(x_range[1])%2
             ymin, ymax = math.floor(y_range[0])+math.floor(y_range[0])%2, math.ceil(y_range[1])-math.ceil(y_range[1])%2
-            print(figures[n-1]['data'][0].keys())
             x, y = np.array(figures[n-1]['data'][0]['x']), np.array(figures[n-1]['data'][0]['y'])
             xmin_i, xmax_i = int(np.where(x>=xmin)[0][0]), int(np.where(x<=xmax)[0][-1])+1
             ymin_i, ymax_i = int(np.where(y>=ymin)[0][0]), int(np.where(y<=ymax)[0][-1])+1
@@ -468,6 +470,8 @@ def main_update(
         # Store Relayout Change
         trigger_index = dash.callback_context.triggered_id['index']
         new_data = relayout_data[trigger_index-1]
+        if new_data == None:
+            raise PreventUpdate
         auto = False
         if new_data == {'dragmode': 'pan'} or new_data == {'dragmode': 'zoom'} or 'autosize' in new_data:
             raise PreventUpdate
@@ -666,25 +670,33 @@ def main_update(
 
 @app.callback(
     Output("div-graphs", "children"),
+    Output("div-graphs", "style"),
     [
         Input("triggerGraph", "data"),
+        Input("breakpoints", "widthBreakpoint"),
         State("viewsmemory", "data"),
     ],
 )
-def graph_output(
-    trigger,
-    json_views,
-):  
+def graph_output(trigger: str, breakpoint_name: str, json_views: list):  
     if(json.loads(trigger)=="update"):
+        views_list = json.loads(json_views)
+        graph_styles = []
+        if breakpoint_name == "lg":
+            style = {"display": 'grid', "grid-template-columns": '[c1] 50% [c2] 50% [c3]',
+            "grid-template-rows": '[r1] 50% [r2] 50% [r3]', "width": '100%', "height": '39.6vw'}
+            for i in range(len(views_list)):
+                graph_styles.append({"grid-area": f"r{math.ceil((i+1)/2)} / c{1+i%2} / r{math.ceil((i+1)/2)+1} / c{2+i%2}", \
+                                     "width": '27vw', "height": '19.8vw'})
+        else:
+            style = {"display": 'flex', "width": '100%'}
+            graph_styles = [{"width": '48.75vw', "height": '35.75vw'} for i in range(len(views_list))]
         output = []
-        views_list = json.loads(json_views) # list of dicts
         for i in range(len(views_list)): # iterate through dicts in list
             view = View(views_list[i], i+1)
-            output.append(view.plot())
-        return output
+            output.append(view.plot(graph_style=graph_styles[i]))
+
+        return output, style
     raise PreventUpdate
-
-
 
 # Running the server
 if __name__ == "__main__":

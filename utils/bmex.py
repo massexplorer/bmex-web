@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import math
 
 # # Make dictionary of models and corresponding pandas dataframes
 # modelNames = ['EXP', 'ME2', 'MEdelta', 'PC1', 'NL3S', 'SKMS', 'SKP', 'SLY4', 'SV', 'UNEDF0', 'UNEDF1']
@@ -14,7 +15,7 @@ import pandas as pd
 # 'Single-Neutron Energy Splitting', 'Single-Proton Energy Splitting', 'Wigner Energy Coeffienct', 'Quad_Def_Beta2_total']
 # q_dict = {qinput[j]: qnames[j] for j in range(len(qinput))}
 
-db = 'data/6-6-23.h5'
+db = 'data/6-14-23.h5'
 
 # Retrieves single value
 def QuanValue(Z,N,model,quan,W=0,uncertainty=False):
@@ -38,20 +39,34 @@ def Landscape(model,quan,W=0,step=2):
     df = df[df["Wigner"]==W]
     df = df[df["N"]%step==0]
     df = df[df["Z"]%step==0]
+    print(df.loc[:,['OneNSE', 'eOneNSE']])
+    # df = df.dropna(subset=[quan])
     arr2d = np.full((int(max(df['Z'])//step+1),int(max(df['N'])//step+1)), None)
     for rowi in df.index:
-        arr2d[int(df.loc[rowi,'Z']//step), int(df.loc[rowi,'N']//step)] = df.loc[rowi,quan]
+        try:
+            arr2d[int(df.loc[rowi,'Z']//step), int(df.loc[rowi,'N']//step)] = np.round(df.loc[rowi,quan], 6)
+        except:
+            continue
     if model=='EXP':
+        uncertainties = np.full((max(df['Z'])//step+1,max(df['N'])//step+1), None)
         estimated = np.full((max(df['Z'])//step+1,max(df['N'])//step+1), None)
         for rowi in df.index:
-            estimated[df.loc[rowi,'Z']//step, df.loc[rowi,'N']//step] = df.loc[rowi,'e'+quan]
-        return arr2d, estimated
-    return arr2d, None
+            try:
+                uncertainties[df.loc[rowi,'Z']//step, df.loc[rowi,'N']//step] = np.round(df.loc[rowi,'u'+quan], 6)
+            except:
+                pass
+            try:
+                estimated[df.loc[rowi,'Z']//step, df.loc[rowi,'N']//step] = df.loc[rowi,'e'+quan]
+            except:
+                    pass
+        return df, arr2d, uncertainties, estimated
+    return df, arr2d, None, None
 
 def IsotopicChain(Z,model,quan,W=0):
     df = pd.read_hdf(db, model)
     df = df[df["Wigner"]==W]
     df = df[df["Z"]==Z]
+    df = df.dropna(subset=[quan])
     if model=='EXP':
         return df.loc[:, ["N", quan, "u"+quan, 'e'+quan]]
     return df.loc[:, ["N", quan]]

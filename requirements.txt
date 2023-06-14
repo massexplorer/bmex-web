@@ -13,3 +13,4 @@ tensorflow
 tensorflow_io
 tables
 kaleido
+dash_breakpoints
